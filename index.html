@@ -1765,6 +1765,9 @@ function activate(i, fromUser = true) {
     mEl.classList.toggle('fil', on); if (on) lit++;
     if (on && !was && prev >= 0 && prev < i && stops.indexOf(last) === i) flyTo(scenes[id], mEl, m >= 5);
   });
+  const nb = $('.controls [data-go="next"]');
+  if (nb) { const last = i >= stops.length - 1; nb.classList.toggle('is-end', last);
+    nb.innerHTML = last ? 'Fin' : '<span class="lbl-next">Suivant </span>▸'; nb.setAttribute('aria-label', last ? "Fin de l'atlas" : "Étape suivante"); }
   if (settings.listen) speakStop(s);
   if (auto.on) auto.schedule();
 }
