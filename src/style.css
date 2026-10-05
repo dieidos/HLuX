@@ -667,7 +667,7 @@ body.deep .lbl.kind{display:inline-flex}
 .note{grid-template-columns:40px minmax(0,1fr);gap:10px;min-height:52vh}
 .note .who .pv{width:40px;height:40px}
 .note .recit{font-size:clamp(17px,1.45vw,21px);line-height:1.35}
-.wl{font-size:13.5px}
+.wl{font-size:15.5px}
 .scene-head h3{font-size:clamp(24px,2.6vw,34px)}
 /* Menu interne de la tablette : sur toute la largeur */
 .app-top .stepper{flex:1 1 auto;margin-left:10px;justify-content:space-between;gap:4px}
