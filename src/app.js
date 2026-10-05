@@ -300,7 +300,7 @@ const WHY = {
     { k: "Deux ou trois mots par étape ; la phrase entière, sa date et ce qu'elle ouvre vivent dans le toucher." },
     { k: "La légende arrive avec les autres chemins et repart avec eux ; une alternative n'est jamais grise." },
     { k: "La condition s'écrit sur sa branche ; la dépendance se trace, avec sa phrase." },
-    { k: "On essaie un futur sur une copie : le sombre dit qu'on joue.", g: "Le vrai chemin reste intact ; rien n'est décidé par l'application." },
+    { k: "On essaie un futur sur une copie : le cadre en pointillé dit qu'on joue.", g: "Le vrai chemin reste intact ; rien n'est décidé par l'application." },
     { k: "Deux sorties, jamais implicites : garder l'idée pour la séance, ou refermer." },
     { k: "Ce qu'Amina emporte, en quatre temps et dans ses mots.", g: "Son dossier lui appartient : son récit reste amendable (« ce n'est pas comme ça que je le dirais ») et s'exporte, même si le compte de la structure est désactivé." }
   ],
@@ -380,7 +380,7 @@ const NOTE_WHY = {
   ],
   p06: [
     ["Au repos : le chemin, ses étapes, le temps ; ◆ une décision d'Amina, ● un événement du monde.", "Le détail vit dans le toucher : l'écran ne surcharge jamais la personne.", "Projet personnalisé : objectifs, modalités d'accompagnement et plan d'action."],
-    ["On essaie un futur sur une copie : le sombre dit qu'on joue.", "Le vrai chemin reste intact ; rien n'est décidé par l'application.", "Contrat de séjour et avenant : des objectifs et des prestations révisables."],
+    ["On essaie un futur sur une copie : le cadre en pointillé dit qu'on joue.", "Le vrai chemin reste intact ; rien n'est décidé par l'application.", "Contrat de séjour et avenant : des objectifs et des prestations révisables."],
     ["Deux sorties, jamais implicites ; puis le plan, en quatre tuiles et dans ses mots.", "Son dossier lui appartient : récit amendable (« ce n'est pas comme ça que je le dirais ») et export, même si le compte de la structure est désactivé.", "RGPD : droit d'accès et droit à la portabilité des données (article 20)."]
   ],
   p07: [
@@ -487,7 +487,7 @@ defineScene('p06', 'amina', [
   { r: "L'étape du fil : l'atelier avec Sarah.", c: "◆ une décision d'Amina, ● un événement du monde.", do: h => { h.cls('nfil', 'pulse'); h.say('Le jeudi, avec Sarah.', 'كلّ خميس، مع سارة.', null, 'amina'); } },
   { r: "Les autres chemins, et leur légende.", c: "Une alternative n'est jamais grise.", do: h => { h.say(null); h.cls('nfil', 'pulse', false); h.show('alt1', 'nalt', 'cond1', 'ncond', 'legend'); h.cls('b-alt', 'hl'); } },
   { r: "Une condition, une attente.", c: "La condition s'écrit sur sa branche ; la dépendance se trace.", do: h => h.show('c-cond', 'c-dep', 'dep1') },
-  { r: "Et si le récépissé arrivait après mars ?", c: "La seule simulation : le sombre dit qu'on joue, sur une copie.", do: h => { h.show('whatif'); h.css('moved', 'left', '600px'); h.cls('b-whatif', 'hl'); } },
+  { r: "Et si le récépissé arrivait après mars ?", c: "La seule simulation : le cadre en pointillé dit qu'on joue, sur une copie.", do: h => { h.show('whatif'); h.css('moved', 'left', '600px'); h.cls('b-whatif', 'hl'); } },
   { r: "Elle referme. Rien n'a bougé.", c: "Deux sorties, jamais implicites : garder l'idée ou refermer.", do: h => { h.hide('whatif', 'c-cond', 'c-dep'); h.cls('b-whatif', 'hl', false); h.say("Ton chemin n'a pas changé.", 'طريقكِ لم يتغيّر.'); } },
   { r: "Elle emporte son plan d'action.", c: "Quatre temps, dans ses mots, sans échéance qui menace.", do: h => { h.say(null); h.show('plan'); } }
 ]);

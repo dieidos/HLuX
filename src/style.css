@@ -644,3 +644,12 @@ body.deep .lbl.kind{display:inline-flex}
 .circle.c4{background:rgba(255,217,102,.75)}
 .ik-lab.l1{background:#e7d6f3}.ik-lab.l4{background:#ffe9a6}
 .crit[data-k="cr-aime"]{border-left-color:#cfafe7}.crit[data-k="cr-vivre"]{border-left-color:#ffd966}
+/* « Et si… ? » : clair, cadre en pointillé (plus de fond noir) */
+.whatif{background:#f6f1fb;color:#2d1d3d;border:3px dashed #8c6aa8}
+.whatif .q{color:#2d1d3d}
+.whatif .copy{background:#8c6aa8;color:#fff}
+.whatif .path{background:#fff;border-color:#e3d6ef}
+.whatif .node span{background:rgba(255,255,255,.9);color:#343e51}
+.whatif .node.pic .np{background:#fff}
+.whatif .node.pic::after{background:#fff}
+.whatif .aid{background:#fff;color:#0d1117;border-color:#fff}
