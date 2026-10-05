@@ -684,6 +684,44 @@ body.deep .lbl.kind{display:inline-flex}
 .whatif .node.pic::after{background:#fff}
 .whatif .aid{background:#fff;color:#0d1117;border-color:#fff}
 
+/* --- Équilibre tablette : visuels plus grands, textes plus sobres, menus pleine largeur --- */
+.wrap{max-width:1560px}
+.topnav .wrap.nav-row{max-width:none;padding-inline:clamp(10px,1.5vw,24px);justify-content:space-between;gap:10px}
+.topnav .grp{flex:1 1 0;justify-content:space-between}
+.topnav .grp a{flex:1 1 0;min-width:54px;height:52px}
+.topnav .grp a i{font-size:23px}
+.topnav .grp a small{font-size:12.5px}
+.topnav .grp-tag{font-size:12.5px;flex:none}
+.nav-home .logo-badge{width:32px}.nav-home .wm{font-size:13px}
+.scene-body{grid-template-columns:minmax(0,72fr) minmax(0,28fr);gap:clamp(14px,2vw,28px)}
+.note{grid-template-columns:40px minmax(0,1fr);gap:10px;min-height:52vh}
+.note .who .pv{width:40px;height:40px}
+.note .recit{font-size:clamp(17px,1.45vw,21px);line-height:1.35}
+.wl{font-size:13.5px}
+.scene-head h3{font-size:clamp(24px,2.6vw,34px)}
+/* Menu interne de la tablette : sur toute la largeur */
+.app-top .stepper{flex:1 1 auto;margin-left:10px;justify-content:space-between;gap:4px}
+.app-top .stepper span{flex:1 1 0;text-align:center;font-size:12px;padding:5px 4px}
+@media (max-width:980px),(orientation:portrait){
+  .note{min-height:40vh}
+  .note .recit{font-size:clamp(17px,2.6vw,21px)}
+}
+@media (max-width:980px),(orientation:portrait){.stage{max-height:64vh;max-height:64dvh}}
+.app-top .stepper span{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:clip;font-size:11.5px;padding:5px 2px}
+@media (max-width:980px),(orientation:portrait){
+  .scene-body{grid-template-columns:minmax(0,1fr)}
+  .note{grid-template-columns:44px minmax(0,1fr);min-height:36vh}
+  .note .recit{font-size:clamp(19px,2.8vw,23px)}
+}
+@media (max-width:1120px){
+  .topnav .grp-tag,.topnav .nav-bridge{display:none}
+  .topnav .wrap.nav-row{gap:6px;padding-inline:8px}
+  .topnav .grp{gap:1px;padding:2px}
+  .topnav .grp a{min-width:0;padding:2px 1px;height:50px}
+  .topnav .grp a i{font-size:21px}
+  .topnav .grp a small{font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -1340,8 +1378,8 @@ function fit() {
     const sb = $('.storyboard', stage);
     const sbH = sb && getComputedStyle(sb).display !== 'none' ? sb.offsetHeight + 10 : 0;
     const availW = stage.clientWidth - 24;
-    const availH = (portrait() ? innerHeight * 0.58 : innerHeight - nav) - sbH - 48;
-    const s = Math.max(.3, Math.min(availW / BASE_W, availH / BASE_H, 1.3));
+    const availH = (portrait() ? innerHeight * 0.62 : innerHeight - nav) - sbH - 36;
+    const s = Math.max(.3, Math.min(availW / BASE_W, availH / BASE_H, 1.6));
     app.style.transform = `scale(${s})`; app._scale = s;
     sf.style.width = BASE_W * s + 'px'; sf.style.height = BASE_H * s + 'px';
     dev.style.width = BASE_W * s + 24 + 'px';

@@ -139,8 +139,8 @@ function fit() {
     const sb = $('.storyboard', stage);
     const sbH = sb && getComputedStyle(sb).display !== 'none' ? sb.offsetHeight + 10 : 0;
     const availW = stage.clientWidth - 24;
-    const availH = (portrait() ? innerHeight * 0.58 : innerHeight - nav) - sbH - 48;
-    const s = Math.max(.3, Math.min(availW / BASE_W, availH / BASE_H, 1.3));
+    const availH = (portrait() ? innerHeight * 0.62 : innerHeight - nav) - sbH - 36;
+    const s = Math.max(.3, Math.min(availW / BASE_W, availH / BASE_H, 1.6));
     app.style.transform = `scale(${s})`; app._scale = s;
     sf.style.width = BASE_W * s + 'px'; sf.style.height = BASE_H * s + 'px';
     dev.style.width = BASE_W * s + 24 + 'px';
