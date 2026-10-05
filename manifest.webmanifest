@@ -1,0 +1,25 @@
+{
+  "name": "Harmonia Lux",
+  "short_name": "HLuX",
+  "description": "Du Projet Personnalisé au Projet d'Établissement — atlas interactif. By dieidos.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#8c6aa8",
+  "theme_color": "#8c6aa8",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
