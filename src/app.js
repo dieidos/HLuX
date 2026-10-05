@@ -410,8 +410,8 @@ const NOTE_WHY = {
   ],
   p12: [
     ["La grammaire de Mon chemin, au pluriel : couloirs, décisions, événements, porteurs.", "On remarque les prénoms ; jamais de total, ni dette, ni solde.", "Projet d'Établissement : pilotage, suivi et évaluation."],
-    ["Le réel reboucle : quand le résultat ne suffit pas, il revient au constat.", "Aucun écart durable entre l'écrit et le vécu ne reste invisible.", "Évaluation de la qualité des ESSMS tous les cinq ans, selon le référentiel HAS."],
-    ["Un seul sens : le collectif ne lit jamais le chemin d'Amina.", "C'est elle qui y fait entrer ce qu'il propose, d'un geste, depuis son propre espace.", "Loi 2002-2 : le projet de la personne et le projet d'établissement se répondent."]
+    ["Un seul sens : le collectif ne lit jamais le chemin d'Amina.", "C'est elle qui y fait entrer ce qu'il propose, d'un geste, depuis son propre espace.", "Loi 2002-2 : le projet de la personne et le projet d'établissement se répondent."],
+    ["Le réel reboucle : quand le résultat ne suffit pas, il revient au constat.", "Aucun écart durable entre l'écrit et le vécu ne reste invisible.", "Évaluation de la qualité des ESSMS tous les cinq ans, selon le référentiel HAS."]
   ]
 };
 function whyNote(id, k) {
@@ -431,9 +431,9 @@ const NOTES = {
   p07: [[0, "Au CHRS, sa difficulté reste la sienne.", 'amina'], [2, "Amina dit oui : elle apporte le sujet.", 'amina'], [3, "Le sujet entre à l'ordre du jour."]],
   p08: [[1, "Aïcha a la parole ; la tablette circule."], [2, "Bruno pose une carte de l'équipe.", 'bruno'], [4, "Deux sources : difficulté répétée."]],
   p09: [[0, "Le même Ikigai, au pluriel."], [2, "Aïcha et Bruno placent la carte différemment.", 'bruno'], [3, "Deux marques restent, et un changement attendu."]],
-  p10: [[1, "Six critères rangés, cinq regards autour."], [4, "Chacun place seul, puis tout se révèle.", 'karim'], [6, "La bande montre l'écart ; le groupe décide."]],
+  p10: [[1, "Six critères rangés, cinq regards autour."], [4, "Chacun place seul, puis tout se révèle.", 'karim'], [6, "Les écarts restent visibles ; le groupe décide."]],
   p11: [[0, "Trois solutions sur la table."], [1, "Placées sur deux lignes : effet, faisabilité."], [2, "Engagement : un atelier chaque mardi."]],
-  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Au printemps, trois personnes lisent seules leurs courriers."], [4, "Amina relie l'atelier à son chemin.", 'amina']]
+  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes lisent seules leurs courriers."]]
 };
 const PHASES = ['a', 'g', 'p'];
 function whyFor(id, from, to) {
@@ -528,8 +528,8 @@ defineScene('p12', 'lea', [
   { r: "Le pilotage : la grammaire de Mon chemin.", c: "Une seule grammaire, pour la personne comme pour l'établissement.", do: h => h.hide('dep', 'cond', 'perm', 'jeudi', 'c-dep', 'c-cond') },
   { r: "Une attente, une condition.", c: "La dépendance se trace sans reproche.", do: h => h.show('dep', 'cond', 'perm', 'jeudi', 'c-dep', 'c-cond') },
   { r: "Ce que nous portons : des prénoms, un rythme.", c: "On remarque les prénoms, jamais un total.", do: h => { h.hide('c-dep', 'c-cond'); h.show('carry'); } },
-  { r: "Trois personnes lisent seules leurs courriers.", c: "Le réel reboucle : retour au diagnostic pour les relances.", do: h => { h.hide('carry'); h.show('res'); } },
-  { r: "Amina relie l'atelier à son chemin.", c: "Un seul sens : c'est elle qui choisit ce qui entre.", who: 'amina', do: h => { h.show('inset'); h.cls('link', 'hl'); h.cls('tue', 'hl'); h.say('Je le relie à mon chemin.', 'أربطها بطريقي.', null, 'amina'); } }
+  { r: "Amina relie l'atelier à son chemin.", c: "Un seul sens : c'est elle qui choisit ce qui entre.", who: 'amina', do: h => { h.hide('carry'); h.show('inset'); h.cls('link', 'hl'); h.cls('tue', 'hl'); h.say('Je le relie à mon chemin.', 'أربطها بطريقي.', null, 'amina'); } },
+  { r: "Trois personnes lisent seules leurs courriers.", c: "Le réel reboucle : retour au constat pour les relances.", do: h => { h.say(null); h.hide('inset'); h.show('res'); } }
 ]);
 const FIL = { p02: 1, p03: 2, p04: 3, p06: 4, p07: 5, p11: 6 };
 
@@ -568,7 +568,7 @@ function activate(i, fromUser = true) {
   });
   const nb = $('.controls [data-go="next"]');
   if (nb) { const last = i >= stops.length - 1; nb.classList.toggle('is-end', last);
-    nb.innerHTML = last ? 'Fin' : '<span class="lbl-next">Suivant </span>▸'; nb.setAttribute('aria-label', last ? "Fin de l'atlas" : "Étape suivante"); }
+    nb.innerHTML = last ? 'Fin 🎉' : '<span class="lbl-next">Suivant </span>▸'; nb.setAttribute('aria-label', last ? "Fin de l'atlas" : "Étape suivante"); }
   if (settings.listen) speakStop(s);
   if (auto.on) auto.schedule();
 }
