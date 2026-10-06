@@ -714,3 +714,6 @@ body.deep .lbl.kind{display:inline-flex}
 /* Menu : HLuX net — police ronde Quicksand, sans liseré flou, sur une pastille violet nuit pour garder les couleurs exactes du logo */
 .nav-home .wm{font-family:Quicksand,var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.05em;line-height:1;text-shadow:none;background:#2d1d3d;border-radius:6px;padding:3px 6px 4px;margin-top:5px}
 .nav-home .wm b{font-weight:700}
+/* Menu : HLuX sans fond, liseré net (contour sous le remplissage), collé au logo */
+.nav-home{gap:0}
+.nav-home .wm{background:none;padding:0;margin-top:1px;font-size:13px;-webkit-text-stroke:3px #2d1d3d;paint-order:stroke fill;text-shadow:none}
