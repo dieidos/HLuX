@@ -756,3 +756,7 @@ footer .by{color:#565f6f}
 /* Schéma « Deux projets » : même survol lavande que le menu */
 .half li a{transition:background-color .15s,box-shadow .15s}
 @media (hover:hover){.half li a:hover{background:color-mix(in srgb,var(--lav) 30%,var(--surface2));box-shadow:0 2px 8px rgba(0,0,0,.08)}}
+
+/* « Plein écran » : un vrai bouton blanc, pas un lien */
+.fs-link{display:inline-flex;align-items:center;gap:6px;margin:0 12px 6px 0;padding:8px 16px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-weight:700;text-decoration:none;box-shadow:0 2px 0 var(--line),0 4px 12px rgba(0,0,0,.06);vertical-align:middle;transition:background-color .15s}
+@media (hover:hover){.fs-link:hover{color:var(--ink);background:color-mix(in srgb,var(--lav) 22%,var(--surface))}}
