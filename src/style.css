@@ -762,3 +762,5 @@ footer .by{color:#565f6f}
 @media (hover:hover){.fs-link:hover{color:var(--ink);background:color-mix(in srgb,var(--lav) 22%,var(--surface))}}
 
 .next-link{margin:0 0 6px 8px}
+/* Mobile : « Faites défiler ou Suivant ▸ » passe sous le bouton Plein écran */
+@media (max-width:680px){.fs-inline:not([hidden]){display:block}.fs-inline .fs-link{margin-right:0}}
