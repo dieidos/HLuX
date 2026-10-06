@@ -717,3 +717,5 @@ body.deep .lbl.kind{display:inline-flex}
 /* Menu : HLuX sans fond, liseré net (contour sous le remplissage), collé au logo */
 .nav-home{gap:0}
 .nav-home .wm{background:none;padding:0;margin-top:1px;font-size:13px;-webkit-text-stroke:3px #2d1d3d;paint-order:stroke fill;text-shadow:none}
+/* Menu : HLuX tout simple — lettres en couleurs, sans fond ni contour */
+.nav-home .wm{-webkit-text-stroke:0;paint-order:normal;text-shadow:none;background:none}
