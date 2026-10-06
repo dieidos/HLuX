@@ -35,14 +35,14 @@ html = f'''<!doctype html>
 <link rel="canonical" href="{SITE}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:site_name" content="Harmonia Lux">
+<meta property="og:site_name" content="Harmonia LuX">
 <meta property="og:title" content="{TITLE}">
 <meta property="og:description" content="{DESC}">
 <meta property="og:url" content="{SITE}">
 <meta property="og:image" content="{SITE}og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Harmonia Lux, du Projet Personnalisé au Projet d'Établissement">
+<meta property="og:image:alt" content="Harmonia LuX, du Projet Personnalisé au Projet d'Établissement">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">

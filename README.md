@@ -1,4 +1,4 @@
-# Harmonia Lux · Atlas
+# Harmonia LuX · Atlas
 
 **Du Projet Personnalisé au Projet d'Établissement.** Un atlas interactif en 12 écrans qui suit un même fil, d'Amina au CHRS Les Lilas. Il se présente sur tablette, étape par étape, et se lit seul, à son rythme : il suffit de faire défiler.
 
@@ -22,7 +22,7 @@ La page `index.html` est générée : ne la modifiez pas directement. Les source
 |---|---|
 | `src/body.html` | Le contenu : couverture, écrans, maquettes |
 | `src/style.css` | Les styles (couleurs dieidos, cartes, chemins) |
-| `src/app.js` | Le moteur : défilement guidé, étapes, textes (`NOTES`), explications (`WHY`), portraits, pictos |
+| `src/app.js` | Le moteur : défilement guidé, étapes, textes (`NOTES`), explications « En savoir plus » (`NOTE_WHY`), portraits, pictos |
 | `src/logo.svg`, `src/aqua.ttf` | Le symbole dieidos et la police des titres |
 
 Après une modification, régénérez la page :

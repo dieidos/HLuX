@@ -9,14 +9,14 @@
 <link rel="canonical" href="https://dieidos.github.io/HLuX/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:site_name" content="Harmonia Lux">
+<meta property="og:site_name" content="Harmonia LuX">
 <meta property="og:title" content="Atlas - HLuX, by dieidos">
 <meta property="og:description" content="Du Projet Personnalisé au Projet d'Établissement : un même fil, d'Amina au CHRS Les Lilas. By dieidos.">
 <meta property="og:url" content="https://dieidos.github.io/HLuX/">
 <meta property="og:image" content="https://dieidos.github.io/HLuX/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Harmonia Lux, du Projet Personnalisé au Projet d'Établissement">
+<meta property="og:image:alt" content="Harmonia LuX, du Projet Personnalisé au Projet d'Établissement">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
@@ -1068,7 +1068,7 @@ footer .by{color:#565f6f}
 
 <!-- 07 -->
 <section class="scene pe" id="sujets" data-scene="p07"><div class="wrap">
-  <div class="scene-head"><div class="num">07</div><div><h3>📥 Sujets</h3><p class="simple">Quels sujets travailler ? Seulement après un geste explicite.</p><div class="labels"><span class="lbl kind">Participation, expression collective et saisine</span></div><div class="dots"></div></div></div>
+  <div class="scene-head"><div class="num">07</div><div><h3>📥 Sujets</h3><p class="simple">Quels sujets travailler ? Seulement si la personne le veut.</p><div class="labels"><span class="lbl kind">Participation, expression collective et saisine</span></div><div class="dots"></div></div></div>
   <div class="scene-body"><div class="stage"><div class="storyboard"></div><div class="device"><div class="screen-fit">
     <div class="app pe" data-on="0">
       <div class="cols">
@@ -1538,104 +1538,11 @@ function defineScene(id, who, steps) {
 }
 
 /* ---------- « pourquoi ? » : conception, garde-fou, cadre (repris des V1 à V3) ---------- */
-const WHY = {
-  p01: [
-    { k: "On entre, on n'administre pas : pas de sas, pas de formulaire long, jamais de mot de passe.", g: "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", f: "PP · expression et participation de la personne." },
-    { k: "Une question, trois grands choix : l'accès vient avant toute explication.", g: "Écouter, version simple et langue sont là sur chaque écran, dès le départ." },
-    { k: "La Carte se crée en parlant, en écrivant ou en choisissant une image.", g: "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle." },
-    { k: "Une Carte garde son identité, sa provenance et son historique, du premier geste jusqu'à l'engagement du CHRS." }
-  ],
-  p02: [
-    { k: "Les états sont des lieux, pas un menu ; « ça va » reste toujours visible, sans geste.", g: "Parler au micro reste un choix : Amina peut aussi se contenter de toucher une carte. Ce qu'elle dit n'est jamais enregistré.", f: "PP · recueil des attentes, des besoins et des éléments de situation." },
-    { k: "Ce qu'on peut prendre se voit au repos ; les destinations s'éclairent dès la prise." },
-    { k: "Le geste se voit sans lire : carte soulevée, traînée, point de contact." },
-    { k: "Changer d'état, c'est déplacer la carte : aucun autre chemin. Annuler, c'est le même geste à l'envers.", g: "Aucun écran de validation, aucune note : la personne n'est jamais évaluée." },
-    { k: "La phrase d'origine est la seule trace du verbatim ; la version simple s'affiche à côté, jamais à sa place.", g: "Rien n'entre au dossier sans un geste d'Amina." }
-  ],
-  p03: [
-    { k: "L'Ikigai réutilise le geste du Bilan : rien de nouveau à apprendre.", f: "PP · aspirations, souhaits et possibilités envisagées." },
-    { k: "Les croisements se nomment sous le doigt, jamais comme une grille ou une coordonnée." },
-    { k: "Une hypothèse n'est qu'un intitulé ; elle naît d'une Carte et en garde le lien.", g: "L'application ne propose aucune hypothèse : tout vient d'Amina ou de la séance." },
-    { k: "À la prise, les quatre cercles s'éclairent : les destinations se montrent d'elles-mêmes." },
-    { k: "La position est un geste, pas une mesure : aucun score n'est calculé." },
-    { k: "Une hypothèse posée se reprend et se déplace à tout moment.", g: "L'écarter par le bord est le seul geste irréversible, et l'écran le dit clairement." }
-  ],
-  p04: [
-    { k: "Les critères ne sont pas les Cartes : on range les quatre axes, jamais les hypothèses.", f: "PP · priorités exprimées par la personne." },
-    { k: "Quatre rangs dits avec des mots : d'abord, ensuite, aussi, moins. Deux axes peuvent partager un rang.", g: "« Je ne sais pas encore » est une réponse légitime, jamais signalée comme un défaut." },
-    { k: "Les lignes s'empilent dans l'ordre des rangs : la plus importante est haute et contrastée, la dernière discrète.", g: "C'est la personne qui lit ses lignes ; l'application ne calcule aucun classement." },
-    { k: "Une ligne situe les idées les unes par rapport aux autres : quatre y tiennent, huit encore." },
-    { k: "Réglé une fois, révisable toujours : l'ordre vaut pour toutes les hypothèses, présentes et à venir.", g: "Ni total, ni pourcentage : la phrase dit ce qui a changé, en mots." }
-  ],
-  p05: [
-    { k: "Choisir qui éclaire quoi : chaque invité, dans sa langue et par son canal.", g: "Chaque invité voit uniquement l'hypothèse qui le concerne, jamais le dossier.", f: "PP · co-construction, coordination et regards croisés." },
-    { k: "L'invitée reçoit le même geste que la personne : prendre, poser sur la ligne.", g: "Lien éphémère, sans compte ni installation ; il se régénère d'un geste s'il expire." },
-    { k: "L'attente porte les commandes d'Amina : rythme des relances, retirer un invité, révéler sans attendre.", g: "On voit qui a répondu, jamais le contenu ; le silence est une réponse acceptable, dite sans reproche." },
-    { k: "Les marques d'Amina en plein, sur ses lignes rangées." },
-    { k: "Les marques de Salma en pointillé, sur les mêmes lignes : rien n'est encore comparé." },
-    { k: "La bande s'étend de la marque la plus à gauche à la plus à droite.", g: "Aucune moyenne : un désaccord franc et un accord tiède ne se confondent jamais.", g2: "Sarah n'a qu'un carnet de rendez-vous, sans indicateur ni statut ; elle ne propose qu'en séance, à deux." },
-    { k: "« Avec l'ordre de Sarah » ne déplace aucune marque : il réempile les lignes. Mêmes places, autre lecture.", g: "Le regard professionnel éclaire, il ne tranche pas." }
-  ],
-  p06: [
-    { k: "Au repos, trois choses seulement : le chemin choisi, ses étapes, le temps.", f: "PP · objectifs personnalisés, modalités d'accompagnement, plan d'action et révision." },
-    { k: "Deux ou trois mots par étape ; la phrase entière, sa date et ce qu'elle ouvre vivent dans le toucher." },
-    { k: "La légende arrive avec les autres chemins et repart avec eux ; une alternative n'est jamais grise." },
-    { k: "La condition s'écrit sur sa branche ; la dépendance se trace, avec sa phrase." },
-    { k: "On essaie un futur sur une copie : le cadre en pointillé dit qu'on joue.", g: "Le vrai chemin reste intact ; rien n'est décidé par l'application." },
-    { k: "Deux sorties, jamais implicites : garder l'idée pour la séance, ou refermer." },
-    { k: "Ce qu'Amina emporte, en quatre temps et dans ses mots.", g: "Son dossier lui appartient : son récit reste amendable (« ce n'est pas comme ça que je le dirais ») et s'exporte, même si le compte de la structure est désactivé." }
-  ],
-  p07: [
-    { k: "Le collectif ne reçoit jamais un dossier individuel.", g: "Seul passe ce que la personne choisit d'apporter, sous la forme qu'elle choisit.", f: "PE · participation des personnes accompagnées, expression collective et saisine." },
-    { k: "Sa version et la version collective restent côte à côte : Amina voit exactement ce que verront les autres." },
-    { k: "Le consentement est situé : quoi, pour qui, pourquoi.", g: "« Pas maintenant » reste possible ; chaque passage est inscrit dans l'historique de la Carte." },
-    { k: "La même Carte, avec sa provenance, passe du jaune au vert.", g: "Les présents ne portent aucun statut ; l'absence est dite sans reproche." }
-  ],
-  p08: [
-    { k: "La même table que le Bilan d'Amina, au pluriel.", f: "PE · diagnostic partagé." },
-    { k: "Le tour de parole se voit : la main et la personne qui parle restent visibles." },
-    { k: "Chaque carte porte sa source : parole consentie, équipe, CVS." },
-    { k: "Qualification collective : situation individuelle, signal à vérifier, difficulté répétée, enjeu confirmé.", g: "Un cas isolé ne devient jamais une vérité générale." },
-    { k: "La relecture à voix haute, une phrase par carte, ferme la boucle avant d'orienter." }
-  ],
-  p09: [
-    { k: "Le même Ikigai, au pluriel ; « nous en vivons », ce sont les moyens et les financements.", f: "PE · orientations stratégiques." },
-    { k: "Placement à tour de rôle ou à main levée, guidé par l'animatrice." },
-    { k: "Deux placements revendiqués restent affichés, comme un sujet à discuter.", g: "Pas de moyenne des positions." },
-    { k: "Le changement attendu est observable, pour pouvoir l'évaluer plus tard." }
-  ],
-  p10: [
-    { k: "Le geste d'Amina en 04, avec les critères du métier : effet, droits, urgence, faisabilité, ressources, coopération.", f: "PE · priorisation et arbitrage des enjeux." },
-    { k: "Le 360° du collectif : animation, équipe, personnes accompagnées, direction, CVS.", g: "Chaque voix garde sa marque ; aucune majorité automatique." },
-    { k: "Chacun règle seul ses rangs et ses lignes, sur la tablette qui passe ou sur son mobile.", g: "On voit qui a placé, jamais où, jusqu'au geste de révélation." },
-    { k: "Les marques de Karim en plein ; celles des autres restent invisibles." },
-    { k: "Révélation : les marques de tous se superposent.", g: "Jamais de vote, jamais de comptage, pas même « la plupart »." },
-    { k: "Les phrases nomment qui converge avec qui ; le désaccord reste ouvert." },
-    { k: "La décision est une phrase dictée, reformulée, puis validée par le groupe.", g: "Elle garde sa provenance : diagnostic, orientation, critères, lignes." }
-  ],
-  p11: [
-    { k: "Plusieurs solutions avant un objectif : on ne fige pas la première idée.", f: "PE · objectifs opérationnels et plan d'action." },
-    { k: "Les mêmes lignes et la même bande que le 360° d'Amina : les regards se croisent sans se moyenner." },
-    { k: "La Carte-engagement porte le fil depuis Papiers, la parole d'Amina." }
-  ],
-  p12: [
-    { k: "La grammaire de Mon chemin, au pluriel : couloirs, décisions, événements.", f: "PE · pilotage, calendrier, suivi et évaluation." },
-    { k: "La dépendance se trace sans reproche ; la condition s'écrit sur sa branche." },
-    { k: "Une ligne par charge : son nom, ses porteurs, son rythme.", g: "On remarque les prénoms ; l'application ne compte jamais et ne dit pas qui porte le plus." },
-    { k: "Le réel reboucle : un engagement reste révisable par ses résultats." },
-    { k: "Un seul sens : le collectif ne lit jamais le chemin d'Amina.", g: "C'est elle qui y fait entrer ce qu'il propose, d'un geste, depuis son propre espace." }
-  ]
-};
-function whyHTML(id, j, fallback) {
-  const w = (WHY[id] || [])[j] || { k: fallback };
-  return [['k', '🎨', 'Conception'], ['g', '🛡️', 'Garde-fou'], ['f', '📚', 'Cadre']]
-    .filter(([key]) => w[key]).map(([key, ic, lab]) => `<span class="wl"><b>${ic} ${lab}</b> · ${w[key]}</span>`).join('');
-}
 
 /* ---------- « En savoir plus » : 🎨 Conception · 🛡️ Garde-fou · 📚 Cadre, pour chacun des 36 textes ---------- */
 const NOTE_WHY = {
   p01: [
-    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
+    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager à l'équipe.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
     ["Une Carte se crée en parlant, en écrivant ou en choisissant une image.", "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle.", "Recommandation HAS (ex-Anesm) « Les attentes de la personne et le projet personnalisé »."],
     ["Une Carte garde son identité, sa provenance et son historique, jusqu'au Projet d'Établissement.", "Ce qui est écrit sur Amina lui est montré, dans ses mots et dans sa langue.", "CASF L311-3 : droit à l'information et accès aux informations qui la concernent."]
   ],
@@ -1717,14 +1624,6 @@ const NOTES = {
   p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes lisent seules leurs courriers."]]
 };
 const PHASES = ['a', 'g', 'p'];
-function whyFor(id, from, to) {
-  const ws = (WHY[id] || []).slice(from, to + 1); const pick = key => (ws.find(w => w && w[key]) || {})[key];
-  const last = ws[ws.length - 1] || {};
-  const gs = [...new Set(ws.flatMap(w => w ? [w.g, w.g2] : []).filter(Boolean))].slice(0, 2);
-  const line = (ic, lab, t) => `<span class="wl"><b>${ic} ${lab}</b> · ${t}</span>`;
-  return [last.k || pick('k')].filter(Boolean).map(t => line('🎨', 'Conception', t)).join('')
-    + gs.map(t => line('🛡️', 'Garde-fou', t)).join('');
-}
 /* ---------- Le récit, écran par écran : une phrase, un portrait, un « pourquoi ? » ---------- */
 defineScene('p01', 'amina', [
   { r: "Amina ouvre HLuX. On l'accueille par son prénom.", c: "On entre, on n'administre pas : ni sas, ni formulaire.", do: h => h.cls('choices', 'dim') },
