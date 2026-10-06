@@ -719,3 +719,7 @@ body.deep .lbl.kind{display:inline-flex}
 .nav-home .wm{background:none;padding:0;margin-top:1px;font-size:13px;-webkit-text-stroke:3px #2d1d3d;paint-order:stroke fill;text-shadow:none}
 /* Menu : HLuX tout simple — lettres en couleurs, sans fond ni contour */
 .nav-home .wm{-webkit-text-stroke:0;paint-order:normal;text-shadow:none;background:none}
+/* Interfaces : HLuX identique au menu — Quicksand gras, couleurs exactes du logo, sans fond ni contour */
+.app .wm{font-family:Quicksand,var(--f-display);font-weight:700;letter-spacing:.05em;text-shadow:none;-webkit-text-stroke:0;background:none}
+.app .wm b{font-weight:700}
+.app .wm b:nth-child(1){color:#ffd965}.app .wm b:nth-child(2){color:#8faadc}.app .wm b:nth-child(3){color:#a9d18e}
