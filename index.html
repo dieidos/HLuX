@@ -764,6 +764,9 @@ footer .by{color:#565f6f}
 .views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
 /* Menu (desktop) : un peu d'air entre l'icône et le mot */
 @media (min-width:681px){.topnav .grp a{gap:3px}.topnav .grp a i{line-height:1.1}}
+/* Lignes : l'idée d'Amina (« Comprendre », plus longue) passe au-dessus, les autres en dessous — plus de chevauchement */
+[data-scene="p04"] .lines .line .chip.me,[data-scene="p05"] .vlines .line .chip.me{top:34%;z-index:3}
+[data-scene="p04"] .lines .line .chip:not(.me),[data-scene="p05"] .vlines .line .chip:not(.me){top:66%}
 
 </style>
 </head>
@@ -906,7 +909,7 @@ footer .by{color:#565f6f}
       </div>
       <div class="tray drop" data-k="tray" style="min-height:64px;margin-top:4px" data-name="le plateau" data-name-ar="اللوحة">
         <div class="card pic" data-drag data-flip data-name="Permis" data-name-ar="رخصة القيادة"><span class="cpic" data-mini data-picto="permis"></span><span data-ar="رخصة القيادة">Permis</span></div>
-        <div class="card pic violet off" data-drag data-flip data-k="lire" data-name="Lire mes courriers seule" data-name-ar="أقرأ رسائلي وحدي"><span class="cpic" data-mini data-picto="papiers"></span><span data-ar="أقرأ رسائلي وحدي">Lire mes courriers seule</span><small data-ar="نابعة من بطاقة « الأوراق »">née de Papiers</small></div>
+        <div class="card pic violet off" data-drag data-flip data-k="lire" data-name="Comprendre mes courriers seule" data-name-ar="أفهم رسائلي وحدي"><span class="cpic" data-mini data-picto="papiers"></span><span data-ar="أفهم رسائلي وحدي">Comprendre mes courriers seule</span><small data-ar="نابعة من بطاقة « الأوراق »">née de Papiers</small></div>
       </div>
       <span class="trail off" data-k="trail"></span>
       <span class="touch off" data-k="touch"></span>
@@ -938,13 +941,13 @@ footer .by{color:#565f6f}
       <div class="fade off" data-k="paneB" style="position:absolute;inset:14px 16px 50px">
         <div class="lines">
           <div class="lrow r1"><div class="lname"><small data-ar="أوّلاً">D'ABORD</small><span data-ar="أعيش منه">J'en vis</span></div><div class="line drop" data-k="L1" data-line>
-            <span class="chip" style="left:30%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:55%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:74%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m1" data-name="Lire mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
+            <span class="chip" style="left:30%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:55%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:74%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m1" data-name="Comprendre mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
           <div class="lrow r2"><div class="lname"><small data-ar="ثمّ">ENSUITE</small><span data-ar="أنا قادرة">J'en suis capable</span></div><div class="line drop" data-k="L2" data-line>
-            <span class="chip" style="left:28%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:42%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:60%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m2" data-name="Lire mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
+            <span class="chip" style="left:28%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:42%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:60%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m2" data-name="Comprendre mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
           <div class="lrow r3"><div class="lname"><small data-ar="أيضاً">AUSSI</small><span data-ar="أحبّ">J'aime</span></div><div class="line drop" data-k="L3" data-line>
-            <span class="chip" style="left:25%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:52%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip" style="left:72%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip me" data-drag data-k="m3" data-name="Lire mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
+            <span class="chip" style="left:25%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:52%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip" style="left:72%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip me" data-drag data-k="m3" data-name="Comprendre mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
           <div class="lrow r3"><div class="lname"><small data-ar="أيضاً">AUSSI</small><span data-ar="أنا مفيدة">Je suis utile</span></div><div class="line drop" data-k="L4" data-line>
-            <span class="chip" style="left:28%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:45%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:80%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m4" data-name="Lire mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
+            <span class="chip" style="left:28%"><span class="chpic" data-mini data-picto="creer"></span>Créer</span><span class="chip" style="left:45%"><span class="chpic" data-mini data-picto="permis"></span>Permis</span><span class="chip" style="left:80%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip me" data-drag data-k="m4" data-name="Comprendre mes courriers" style="left:7%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
         </div>
         <p class="live" data-k="live"></p>
       </div>
@@ -963,14 +966,14 @@ footer .by{color:#565f6f}
         <i class="seg ray" data-k="ray-s" data-a="364,215" data-b="118,150"></i><i class="seg ray" data-k="ray-r" data-a="364,215" data-b="610,150"></i><i class="seg ray" data-k="ray-h" data-a="364,215" data-b="364,60"></i>
         <div class="sat center" style="left:279px;top:160px"><span class="pv lg" data-persona="amina"></span><b data-ar="أمينة">Amina</b><small data-ar="هي من تدعو">c'est elle qui invite</small></div>
         <div class="sat" style="left:279px;top:0"><span class="pv" data-persona="sarah"></span><b data-ar="سارة">Sarah</b><small data-ar="في الجلسة · كلّ الأفكار">en séance · toutes les idées</small><span class="pill" data-k="st-h" data-ar="مدعوّة">invitée</span></div>
-        <div class="sat" style="left:30px;top:96px"><span class="pv" data-persona="salma"></span><b data-ar="سلمى، أختي">Salma, ma sœur</b><small data-ar="« أقرأ رسائلي وحدي » · بالعربية">« Lire mes courriers seule » · en arabe</small><span class="pill" data-k="st-s" data-ar="مدعوّة">invitée</span></div>
+        <div class="sat" style="left:30px;top:96px"><span class="pv" data-persona="salma"></span><b data-ar="سلمى، أختي">Salma, ma sœur</b><small data-ar="« أفهم رسائلي وحدي » · بالعربية">« Comprendre mes courriers seule » · en arabe</small><span class="pill" data-k="st-s" data-ar="مدعوّة">invitée</span></div>
         <div class="sat" style="left:528px;top:96px"><span class="pv" data-persona="robert"></span><b data-ar="السيد روبير">M. Robert</b><small data-ar="« إنشاء نشاط »">« Créer une activité »</small><span class="pill" data-k="st-r" data-ar="مدعوّ">invité</span></div>
         <p class="ring-note" data-ar="كلّ واحد يرى فكرته فقط، وملفّكِ يبقى لكِ." data-falc="Chacun voit seulement sa carte.">👁️ Chacun voit son idée ; ton dossier reste à toi.</p>
       </div>
       <div class="phone off" data-k="phone" style="right:30px;top:40px"><div class="ph" lang="ar">
         <small style="color:#6b7487">رابط مؤقّت · دون حساب</small>
         <h5>أمينة تطلب رأيكِ</h5>
-        <b>أقرأ رسائلي وحدي</b>
+        <b>أفهم رسائلي وحدي</b>
         <small>ما يمكن أن تعيش منه</small>
         <div class="line"><span class="chip me" style="left:30%">✓</span></div>
         <small>قليلاً ←→ كثيراً</small>
@@ -985,9 +988,9 @@ footer .by{color:#565f6f}
           <button class="tab" data-tab="sarah"><span class="pv xs" data-persona="sarah"></span><span data-ar="بترتيب سارة">Avec l'ordre de Sarah</span></button>
         </div>
         <div class="lines vlines" data-k="vl">
-          <div class="lrow r1" data-k="row-vivre" data-flip><div class="lname"><small data-k="rk-vivre">D'ABORD</small>💶 <span data-ar="أعيش منه">J'en vis</span></div><div class="line"><span class="band" style="left:76%;width:8%"></span><span class="chip mf" style="left:64%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:76%">Salma</span><span class="chip me" style="left:86%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
-          <div class="lrow r2" data-k="row-sait" data-flip><div class="lname"><small data-k="rk-sait">ENSUITE</small>🛠️ <span data-ar="أنا قادرة">J'en suis capable</span></div><div class="line"><span class="band" style="left:72%;width:12%"></span><span class="chip mf" style="left:54%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:86%">Salma</span><span class="chip me" style="left:72%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
-          <div class="lrow r3" data-k="row-aime" data-flip><div class="lname"><small data-k="rk-aime">AUSSI</small>❤️ <span data-ar="أحبّ">J'aime</span></div><div class="line"><span class="band" style="left:36%;width:44%"></span><span class="chip mf" style="left:56%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:82%">Salma</span><span class="chip me" style="left:36%"><span class="chpic" data-mini data-picto="papiers"></span>Lire</span></div></div>
+          <div class="lrow r1" data-k="row-vivre" data-flip><div class="lname"><small data-k="rk-vivre">D'ABORD</small>💶 <span data-ar="أعيش منه">J'en vis</span></div><div class="line"><span class="band" style="left:76%;width:8%"></span><span class="chip mf" style="left:64%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:76%">Salma</span><span class="chip me" style="left:86%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
+          <div class="lrow r2" data-k="row-sait" data-flip><div class="lname"><small data-k="rk-sait">ENSUITE</small>🛠️ <span data-ar="أنا قادرة">J'en suis capable</span></div><div class="line"><span class="band" style="left:72%;width:12%"></span><span class="chip mf" style="left:54%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:86%">Salma</span><span class="chip me" style="left:72%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
+          <div class="lrow r3" data-k="row-aime" data-flip><div class="lname"><small data-k="rk-aime">AUSSI</small>❤️ <span data-ar="أحبّ">J'aime</span></div><div class="line"><span class="band" style="left:36%;width:44%"></span><span class="chip mf" style="left:56%"><span class="chpic" data-mini data-picto="formation"></span>Formation</span><span class="chip ms" style="left:82%">Salma</span><span class="chip me" style="left:36%"><span class="chpic" data-mini data-picto="papiers"></span>Comprendre</span></div></div>
         </div>
         <p class="legend-v" data-ar="شريط ضيّق: نلتقي · شريط عريض: لنتحدّث"><span>😊 bande étroite : on se rejoint</span><span>💬 bande large : à en parler</span></p>
       </div>
@@ -1206,7 +1209,7 @@ footer .by{color:#565f6f}
         <div class="lrow r1"><div class="lname"><small>REGARDS RÉUNIS</small>effet pour les personnes</div><div class="line"><span class="band" style="left:70%;width:14%"></span><span class="chip me" style="left:78%"><span class="chpic" data-mini data-picto="papiers"></span>Atelier</span><span class="chip" style="left:62%"><span class="chpic" data-mini data-picto="amis"></span>Binôme</span><span class="chip" style="left:48%"><span class="chpic" data-mini data-picto="allocations"></span>Permanence</span></div></div>
         <div class="lrow r1"><div class="lname"><small>REGARDS RÉUNIS</small>faisabilité pour l'équipe</div><div class="line"><span class="band" style="left:58%;width:20%"></span><span class="chip me" style="left:70%"><span class="chpic" data-mini data-picto="papiers"></span>Atelier</span><span class="chip" style="left:40%"><span class="chpic" data-mini data-picto="amis"></span>Binôme</span><span class="chip" style="left:24%"><span class="chpic" data-mini data-picto="allocations"></span>Permanence</span></div></div>
       </div>
-      <div class="decision off fade" data-k="eng" style="margin-top:12px;border-width:3px">Carte-engagement validée : « Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »<small>fil : Papiers → Lire mes courriers seule → Comprendre les courriers → engagement</small></div>
+      <div class="decision off fade" data-k="eng" style="margin-top:12px;border-width:3px">Carte-engagement validée : « Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »<small>fil : Papiers → Comprendre mes courriers seule → Comprendre les courriers → engagement</small></div>
       <div class="conseq" data-k="say"></div>
     </div>
   </div></div></div><div class="notes"></div></div>
@@ -1242,7 +1245,7 @@ footer .by{color:#565f6f}
           <span>📝 Les fiches en FALC</span><span><span class="pv xs" data-persona="karim"></span> Karim</span><span>chaque mois</span></div>
         <p style="font-size:11px;color:#6b7487;margin-top:6px">On remarque les prénoms : chacun apporte ce qu'il peut.</p>
       </div>
-      <div class="result fade off" data-k="res" style="margin-top:6px">📊 Au printemps : 5 personnes chaque mardi, 3 lisent seules leurs courriers. Les relances restent dures <b>→ retour au constat 🔁</b></div>
+      <div class="result fade off" data-k="res" style="margin-top:6px">📊 Au printemps : 5 personnes chaque mardi, 3 comprennent seules leurs courriers. Les relances restent dures <b>→ retour au constat 🔁</b></div>
       <div class="inset off" data-k="inset"><div class="in" dir="auto">
         <b data-ar="طريقي">Mon chemin</b><p style="font-size:12px;color:#4a5466" data-ar="المركز يقترح: ورشة الرسائل يوم الثلاثاء.">Le CHRS propose : l'atelier courriers du mardi.</p>
         <div style="display:flex;gap:6px;align-items:center;margin-top:6px"><span class="pill wait" data-ar="ورشة الرسائل مع سارة">atelier courriers avec Sarah</span><span>⇠</span><span class="card pic green" data-k="tue" style="min-width:0;padding:5px 8px;font-size:12px"><span class="cpic" data-mini data-picto="papiers"></span><span data-ar="ورشة الثلاثاء">atelier du mardi</span></span></div>
@@ -1283,6 +1286,7 @@ footer .by{color:#565f6f}
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const SLUG = { cartes: 'p01', ressenti: 'p02', envies: 'p03', priorites: 'p04', regards: 'p05', chemin: 'p06', sujets: 'p07', constat: 'p08', cap: 'p09', choix: 'p10', actions: 'p11', suivi: 'p12' };
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const settings = { listen: false, simple: false, lang: 'fr' };
 
@@ -1612,8 +1616,8 @@ function whyNote(id, k) {
 const NOTES = {
   p01: [[0, "Amina ouvre HLuX ; on l'accueille par son prénom."], [2, "Elle touche Papiers, sa Carte dite avec Sarah."], [3, "La Carte s'ouvre, avec toute son histoire."]],
   p02: [[0, "Trois lieux : ça va, je ne sais pas, difficile."], [2, "Amina prend Papiers et la glisse vers « difficile »."], [4, "Posée. Sa phrase est gardée, mot pour mot."]],
-  p03: [[1, "Quatre cercles : j'aime, j'en suis capable, je suis utile, j'en vis."], [4, "De Papiers naît une envie : lire ses courriers seule."], [5, "Elle la pose entre « j'en suis capable » et « j'en vis »."]],
-  p04: [[1, "D'abord « j'en vis », ensuite « j'en suis capable »."], [3, "Sur ses lignes, elle glisse « Lire » vers la droite."], [4, "« Lire » arrive en tête de ce qui compte pour elle."]],
+  p03: [[1, "Quatre cercles : j'aime, j'en suis capable, je suis utile, j'en vis."], [4, "De Papiers naît une envie : comprendre ses courriers seule."], [5, "Elle la pose entre « j'en suis capable » et « j'en vis »."]],
+  p04: [[1, "D'abord « j'en vis », ensuite « j'en suis capable »."], [3, "Sur ses lignes, elle glisse « Comprendre » vers la droite."], [4, "« Comprendre » arrive en tête de ce qui compte pour elle."]],
   p05: [[0, "Amina, au centre, choisit qui l'éclaire."], [4, "Salma répond en arabe ; les regards se superposent.", 'salma'], [5, "La bande montre où chacun se situe."]],
   p06: [[1, "Le chemin d'Amina, saison après saison."], [4, "Et si le rendez-vous à la CAF était repoussé ? Une copie se joue."], [6, "Rien n'a bougé ; elle emporte son plan."]],
   p07: [[0, "Sa difficulté reste privée, tant qu'elle ne choisit pas de la partager.", 'amina'], [2, "Amina dit oui : elle apporte le sujet.", 'amina'], [3, "Le sujet entre à l'ordre du jour."]],
@@ -1621,7 +1625,7 @@ const NOTES = {
   p09: [[0, "Le même Ikigai, au pluriel."], [2, "Aïcha et Bruno placent la carte différemment.", 'bruno'], [3, "Les deux avis restent visibles ; le groupe écrit ce qu'il veut voir changer."]],
   p10: [[1, "Le groupe range six critères ; cinq personnes donnent leur avis."], [4, "Chacun place seul, puis tout se révèle.", 'karim'], [6, "Les écarts restent visibles ; le groupe décide."]],
   p11: [[0, "Trois solutions sur la table."], [1, "Placées sur deux lignes : effet, faisabilité."], [2, "Engagement : un atelier chaque mardi."]],
-  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes lisent seules leurs courriers."]]
+  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes comprennent seules leurs courriers."]]
 };
 const PHASES = ['a', 'g', 'p'];
 /* ---------- Le récit, écran par écran : une phrase, un portrait, un « pourquoi ? » ---------- */
@@ -1641,17 +1645,17 @@ defineScene('p02', 'amina', [
 defineScene('p03', 'amina', [
   { ph: 'a', r: "Aimer, j'en suis capable, être utile, en vivre.", c: "L'Ikigai, avec le même geste qu'au Bilan : prendre, poser.", do: h => h.hide('i-pas', 'i-mis', 'i-pro', 'i-voc') },
   { ph: 'a', r: "Passion, Mission, Profession, Vocation.", c: "Les croisements sont nommés avec des mots, jamais des coordonnées.", do: h => h.show('i-pas', 'i-mis', 'i-pro', 'i-voc') },
-  { ph: 'g', r: "De Papiers naît une idée.", c: "Les idées viennent d'Amina, jamais de l'application.", do: h => { h.show('lire'); h.say('Je voudrais lire mes courriers seule.', 'أريد أن أقرأ رسائلي وحدي.', null, 'amina'); } },
+  { ph: 'g', r: "De Papiers naît une idée.", c: "Les idées viennent d'Amina, jamais de l'application.", do: h => { h.show('lire'); h.say('Je voudrais comprendre mes courriers seule.', 'أريد أن أفهم رسائلي وحدي.', null, 'amina'); } },
   { ph: 'g', r: "Elle la prend : les cercles s'éclairent.", c: "Les destinations se montrent d'elles-mêmes.", do: h => { h.say(null); h.cls('lire', 'lifted'); h.glow(true, 'c1', 'c2', 'c3', 'c4'); h.touch('lire'); } },
   { ph: 'g', r: "Sous son doigt : Profession.", c: "La position est un geste, pas une mesure.", do: h => { h.move('lire', 's-pro'); h.cls('i-pro', 'big'); } },
-  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say("« Lire mes courriers seule », entre « j'en suis capable » et « j'en vis ».", '« أقرأ رسائلي وحدي »، بين « أنا قادرة » و« أعيش منه ».'); } }
+  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say("« Comprendre mes courriers seule », entre « j'en suis capable » et « j'en vis ».", '« أفهم رسائلي وحدي »، بين « أنا قادرة » و« أعيش منه ».'); } }
 ]);
 defineScene('p04', 'amina', [
   { ph: 'a', r: "Qu'est-ce qui compte le plus ?", c: "On range les critères, jamais les Cartes." },
   { ph: 'a', r: "D'abord en vivre, ensuite j'en suis capable.", c: "Un ordre en mots, sans chiffre ; deux axes peuvent partager un rang.", do: h => { h.put('cr-vivre', 'r1'); h.put('cr-sait', 'r2'); h.put('cr-aime', 'r3'); h.put('cr-utile', 'r3'); h.say("D'abord, gagner ma vie.", 'أوّلاً، أن أكسب عيشي.', null, 'amina'); } },
   { ph: 'g', r: "Les lignes s'empilent dans cet ordre.", c: "La plus importante en haut, la plus marquée. L'application ne calcule rien.", do: h => { h.say(null); h.hide('paneA'); h.show('paneB'); } },
-  { ph: 'g', r: "Elle glisse « Lire » vers la droite.", c: "On dit « plus à droite que… », jamais une note.", do: h => { h.left('m1', 86); h.touch('m1'); h.text('live', '« Lire » passe devant Formation.', '« أقرأ » قبل « التكوين ».'); } },
-  { ph: 'p', r: "« Lire » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Lire » compte beaucoup pour toi.', '« أقرأ » مهمّة جداً بالنسبة لكِ.'); } }
+  { ph: 'g', r: "Elle glisse « Comprendre » vers la droite.", c: "On dit « plus à droite que… », jamais une note.", do: h => { h.left('m1', 86); h.touch('m1'); h.text('live', '« Comprendre » passe devant Formation.', '« أفهم » قبل « التكوين ».'); } },
+  { ph: 'p', r: "« Comprendre » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Comprendre » compte beaucoup pour toi.', '« أفهم » مهمّة جداً بالنسبة لكِ.'); } }
 ]);
 defineScene('p05', 'amina', [
   { ph: 'a', r: "Amina au centre. Elle choisit qui l'éclaire.", c: "C'est elle qui invite, et sur quoi. Personne ne voit son dossier." },
@@ -1709,7 +1713,7 @@ defineScene('p12', 'lea', [
   { r: "Une attente, une condition.", c: "La dépendance se trace sans reproche.", do: h => h.show('dep', 'cond', 'perm', 'jeudi', 'c-dep', 'c-cond') },
   { r: "Ce que nous portons : des prénoms, un rythme.", c: "On remarque les prénoms, jamais un total.", do: h => { h.hide('c-dep', 'c-cond'); h.show('carry'); } },
   { r: "Amina relie l'atelier à son chemin.", c: "Un seul sens : c'est elle qui choisit ce qui entre.", who: 'amina', do: h => { h.hide('carry'); h.show('inset'); h.cls('link', 'hl'); h.cls('tue', 'hl'); h.say('Je le relie à mon chemin.', 'أربطها بطريقي.', null, 'amina'); } },
-  { r: "Trois personnes lisent seules leurs courriers.", c: "Le réel reboucle : retour au constat pour les relances.", do: h => { h.say(null); h.hide('inset'); h.show('res'); } }
+  { r: "Trois personnes comprennent seules leurs courriers.", c: "Le réel reboucle : retour au constat pour les relances.", do: h => { h.say(null); h.hide('inset'); h.show('res'); } }
 ]);
 const FIL = { p02: 1, p03: 2, p04: 3, p06: 4, p07: 5, p11: 6 };
 
@@ -1738,6 +1742,9 @@ function activate(i, fromUser = true) {
   // navigation
   const sceneEl = s.closest('[data-scene]'); const sid = sceneEl ? sceneEl.dataset.scene : null;
   $$('[data-nav]').forEach(a => a.setAttribute('aria-current', String(a.dataset.nav === sid)));
+  // L'ancre de l'adresse suit la rubrique courante (sans ajouter d'entrée à l'historique)
+  const slugNow = sid ? Object.keys(SLUG).find(k => SLUG[k] === sid) : '';
+  if (('#' + slugNow) !== (location.hash || '#')) history.replaceState(null, '', slugNow ? '#' + slugNow : location.pathname + location.search);
   // Menu qui déborde (mobile) : on fait glisser l'item courant au centre.
   const navCur = $(`[data-nav="${sid}"]`), row = navCur && navCur.closest('.nav-row');
   if (row && row.scrollWidth > row.clientWidth + 1) {
@@ -1945,7 +1952,6 @@ fit();
 Object.values(scenes).forEach(sc => { sc.apply(0, false); $$('.dots i', sc.root)[0].classList.add('on'); });
 addEventListener('resize', () => { fit(); });
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
-const SLUG = { cartes: 'p01', ressenti: 'p02', envies: 'p03', priorites: 'p04', regards: 'p05', chemin: 'p06', sujets: 'p07', constat: 'p08', cap: 'p09', choix: 'p10', actions: 'p11', suivi: 'p12' };
 const hash = SLUG[location.hash.slice(1)] || location.hash.slice(1);
 setTimeout(() => {
   if (hash && scenes[hash]) { const first = $('.note', scenes[hash].root); goStop(stops.indexOf(first)); }

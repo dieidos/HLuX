@@ -734,3 +734,6 @@ footer .by{color:#565f6f}
 .views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
 /* Menu (desktop) : un peu d'air entre l'icône et le mot */
 @media (min-width:681px){.topnav .grp a{gap:3px}.topnav .grp a i{line-height:1.1}}
+/* Lignes : l'idée d'Amina (« Comprendre », plus longue) passe au-dessus, les autres en dessous — plus de chevauchement */
+[data-scene="p04"] .lines .line .chip.me,[data-scene="p05"] .vlines .line .chip.me{top:34%;z-index:3}
+[data-scene="p04"] .lines .line .chip:not(.me),[data-scene="p05"] .vlines .line .chip:not(.me){top:66%}

@@ -2,6 +2,7 @@
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const SLUG = { cartes: 'p01', ressenti: 'p02', envies: 'p03', priorites: 'p04', regards: 'p05', chemin: 'p06', sujets: 'p07', constat: 'p08', cap: 'p09', choix: 'p10', actions: 'p11', suivi: 'p12' };
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const settings = { listen: false, simple: false, lang: 'fr' };
 
@@ -331,8 +332,8 @@ function whyNote(id, k) {
 const NOTES = {
   p01: [[0, "Amina ouvre HLuX ; on l'accueille par son prénom."], [2, "Elle touche Papiers, sa Carte dite avec Sarah."], [3, "La Carte s'ouvre, avec toute son histoire."]],
   p02: [[0, "Trois lieux : ça va, je ne sais pas, difficile."], [2, "Amina prend Papiers et la glisse vers « difficile »."], [4, "Posée. Sa phrase est gardée, mot pour mot."]],
-  p03: [[1, "Quatre cercles : j'aime, j'en suis capable, je suis utile, j'en vis."], [4, "De Papiers naît une envie : lire ses courriers seule."], [5, "Elle la pose entre « j'en suis capable » et « j'en vis »."]],
-  p04: [[1, "D'abord « j'en vis », ensuite « j'en suis capable »."], [3, "Sur ses lignes, elle glisse « Lire » vers la droite."], [4, "« Lire » arrive en tête de ce qui compte pour elle."]],
+  p03: [[1, "Quatre cercles : j'aime, j'en suis capable, je suis utile, j'en vis."], [4, "De Papiers naît une envie : comprendre ses courriers seule."], [5, "Elle la pose entre « j'en suis capable » et « j'en vis »."]],
+  p04: [[1, "D'abord « j'en vis », ensuite « j'en suis capable »."], [3, "Sur ses lignes, elle glisse « Comprendre » vers la droite."], [4, "« Comprendre » arrive en tête de ce qui compte pour elle."]],
   p05: [[0, "Amina, au centre, choisit qui l'éclaire."], [4, "Salma répond en arabe ; les regards se superposent.", 'salma'], [5, "La bande montre où chacun se situe."]],
   p06: [[1, "Le chemin d'Amina, saison après saison."], [4, "Et si le rendez-vous à la CAF était repoussé ? Une copie se joue."], [6, "Rien n'a bougé ; elle emporte son plan."]],
   p07: [[0, "Sa difficulté reste privée, tant qu'elle ne choisit pas de la partager.", 'amina'], [2, "Amina dit oui : elle apporte le sujet.", 'amina'], [3, "Le sujet entre à l'ordre du jour."]],
@@ -340,7 +341,7 @@ const NOTES = {
   p09: [[0, "Le même Ikigai, au pluriel."], [2, "Aïcha et Bruno placent la carte différemment.", 'bruno'], [3, "Les deux avis restent visibles ; le groupe écrit ce qu'il veut voir changer."]],
   p10: [[1, "Le groupe range six critères ; cinq personnes donnent leur avis."], [4, "Chacun place seul, puis tout se révèle.", 'karim'], [6, "Les écarts restent visibles ; le groupe décide."]],
   p11: [[0, "Trois solutions sur la table."], [1, "Placées sur deux lignes : effet, faisabilité."], [2, "Engagement : un atelier chaque mardi."]],
-  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes lisent seules leurs courriers."]]
+  p12: [[2, "Le suivi : qui porte quoi, et quand."], [3, "Amina relie l'atelier à son chemin.", 'amina'], [4, "Au printemps, trois personnes comprennent seules leurs courriers."]]
 };
 const PHASES = ['a', 'g', 'p'];
 /* ---------- Le récit, écran par écran : une phrase, un portrait, un « pourquoi ? » ---------- */
@@ -360,17 +361,17 @@ defineScene('p02', 'amina', [
 defineScene('p03', 'amina', [
   { ph: 'a', r: "Aimer, j'en suis capable, être utile, en vivre.", c: "L'Ikigai, avec le même geste qu'au Bilan : prendre, poser.", do: h => h.hide('i-pas', 'i-mis', 'i-pro', 'i-voc') },
   { ph: 'a', r: "Passion, Mission, Profession, Vocation.", c: "Les croisements sont nommés avec des mots, jamais des coordonnées.", do: h => h.show('i-pas', 'i-mis', 'i-pro', 'i-voc') },
-  { ph: 'g', r: "De Papiers naît une idée.", c: "Les idées viennent d'Amina, jamais de l'application.", do: h => { h.show('lire'); h.say('Je voudrais lire mes courriers seule.', 'أريد أن أقرأ رسائلي وحدي.', null, 'amina'); } },
+  { ph: 'g', r: "De Papiers naît une idée.", c: "Les idées viennent d'Amina, jamais de l'application.", do: h => { h.show('lire'); h.say('Je voudrais comprendre mes courriers seule.', 'أريد أن أفهم رسائلي وحدي.', null, 'amina'); } },
   { ph: 'g', r: "Elle la prend : les cercles s'éclairent.", c: "Les destinations se montrent d'elles-mêmes.", do: h => { h.say(null); h.cls('lire', 'lifted'); h.glow(true, 'c1', 'c2', 'c3', 'c4'); h.touch('lire'); } },
   { ph: 'g', r: "Sous son doigt : Profession.", c: "La position est un geste, pas une mesure.", do: h => { h.move('lire', 's-pro'); h.cls('i-pro', 'big'); } },
-  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say("« Lire mes courriers seule », entre « j'en suis capable » et « j'en vis ».", '« أقرأ رسائلي وحدي »، بين « أنا قادرة » و« أعيش منه ».'); } }
+  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say("« Comprendre mes courriers seule », entre « j'en suis capable » et « j'en vis ».", '« أفهم رسائلي وحدي »، بين « أنا قادرة » و« أعيش منه ».'); } }
 ]);
 defineScene('p04', 'amina', [
   { ph: 'a', r: "Qu'est-ce qui compte le plus ?", c: "On range les critères, jamais les Cartes." },
   { ph: 'a', r: "D'abord en vivre, ensuite j'en suis capable.", c: "Un ordre en mots, sans chiffre ; deux axes peuvent partager un rang.", do: h => { h.put('cr-vivre', 'r1'); h.put('cr-sait', 'r2'); h.put('cr-aime', 'r3'); h.put('cr-utile', 'r3'); h.say("D'abord, gagner ma vie.", 'أوّلاً، أن أكسب عيشي.', null, 'amina'); } },
   { ph: 'g', r: "Les lignes s'empilent dans cet ordre.", c: "La plus importante en haut, la plus marquée. L'application ne calcule rien.", do: h => { h.say(null); h.hide('paneA'); h.show('paneB'); } },
-  { ph: 'g', r: "Elle glisse « Lire » vers la droite.", c: "On dit « plus à droite que… », jamais une note.", do: h => { h.left('m1', 86); h.touch('m1'); h.text('live', '« Lire » passe devant Formation.', '« أقرأ » قبل « التكوين ».'); } },
-  { ph: 'p', r: "« Lire » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Lire » compte beaucoup pour toi.', '« أقرأ » مهمّة جداً بالنسبة لكِ.'); } }
+  { ph: 'g', r: "Elle glisse « Comprendre » vers la droite.", c: "On dit « plus à droite que… », jamais une note.", do: h => { h.left('m1', 86); h.touch('m1'); h.text('live', '« Comprendre » passe devant Formation.', '« أفهم » قبل « التكوين ».'); } },
+  { ph: 'p', r: "« Comprendre » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Comprendre » compte beaucoup pour toi.', '« أفهم » مهمّة جداً بالنسبة لكِ.'); } }
 ]);
 defineScene('p05', 'amina', [
   { ph: 'a', r: "Amina au centre. Elle choisit qui l'éclaire.", c: "C'est elle qui invite, et sur quoi. Personne ne voit son dossier." },
@@ -428,7 +429,7 @@ defineScene('p12', 'lea', [
   { r: "Une attente, une condition.", c: "La dépendance se trace sans reproche.", do: h => h.show('dep', 'cond', 'perm', 'jeudi', 'c-dep', 'c-cond') },
   { r: "Ce que nous portons : des prénoms, un rythme.", c: "On remarque les prénoms, jamais un total.", do: h => { h.hide('c-dep', 'c-cond'); h.show('carry'); } },
   { r: "Amina relie l'atelier à son chemin.", c: "Un seul sens : c'est elle qui choisit ce qui entre.", who: 'amina', do: h => { h.hide('carry'); h.show('inset'); h.cls('link', 'hl'); h.cls('tue', 'hl'); h.say('Je le relie à mon chemin.', 'أربطها بطريقي.', null, 'amina'); } },
-  { r: "Trois personnes lisent seules leurs courriers.", c: "Le réel reboucle : retour au constat pour les relances.", do: h => { h.say(null); h.hide('inset'); h.show('res'); } }
+  { r: "Trois personnes comprennent seules leurs courriers.", c: "Le réel reboucle : retour au constat pour les relances.", do: h => { h.say(null); h.hide('inset'); h.show('res'); } }
 ]);
 const FIL = { p02: 1, p03: 2, p04: 3, p06: 4, p07: 5, p11: 6 };
 
@@ -457,6 +458,9 @@ function activate(i, fromUser = true) {
   // navigation
   const sceneEl = s.closest('[data-scene]'); const sid = sceneEl ? sceneEl.dataset.scene : null;
   $$('[data-nav]').forEach(a => a.setAttribute('aria-current', String(a.dataset.nav === sid)));
+  // L'ancre de l'adresse suit la rubrique courante (sans ajouter d'entrée à l'historique)
+  const slugNow = sid ? Object.keys(SLUG).find(k => SLUG[k] === sid) : '';
+  if (('#' + slugNow) !== (location.hash || '#')) history.replaceState(null, '', slugNow ? '#' + slugNow : location.pathname + location.search);
   // Menu qui déborde (mobile) : on fait glisser l'item courant au centre.
   const navCur = $(`[data-nav="${sid}"]`), row = navCur && navCur.closest('.nav-row');
   if (row && row.scrollWidth > row.clientWidth + 1) {
@@ -664,7 +668,6 @@ fit();
 Object.values(scenes).forEach(sc => { sc.apply(0, false); $$('.dots i', sc.root)[0].classList.add('on'); });
 addEventListener('resize', () => { fit(); });
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
-const SLUG = { cartes: 'p01', ressenti: 'p02', envies: 'p03', priorites: 'p04', regards: 'p05', chemin: 'p06', sujets: 'p07', constat: 'p08', cap: 'p09', choix: 'p10', actions: 'p11', suivi: 'p12' };
 const hash = SLUG[location.hash.slice(1)] || location.hash.slice(1);
 setTimeout(() => {
   if (hash && scenes[hash]) { const first = $('.note', scenes[hash].root); goStop(stops.indexOf(first)); }
