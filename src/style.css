@@ -751,3 +751,5 @@ footer .by{color:#565f6f}
 @media (hover:hover){
   .topnav .grp a:not([aria-current="true"]):hover,.nav-home:hover{background:color-mix(in srgb,var(--lav) 22%,transparent)}
 }
+
+.howto-more{margin-bottom:-14px}
