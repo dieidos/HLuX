@@ -764,3 +764,7 @@ footer .by{color:#565f6f}
 .next-link{margin:0 0 6px 8px}
 /* Mobile : « Faites défiler ou Suivant ▸ » passe sous le bouton Plein écran */
 @media (max-width:680px){.fs-inline:not([hidden]){display:block}.fs-inline .fs-link{margin-right:0}}
+/* Pied de page : Harmonia LuX et dieidos aux couleurs exactes du logo, comme le menu et la couverture */
+footer .wm b:nth-child(1),footer .by i:nth-of-type(1){color:#ffd965}
+footer .wm b:nth-child(2),footer .by i:nth-of-type(2){color:#8faadc}
+footer .wm b:nth-child(3),footer .by i:nth-of-type(3){color:#a9d18e}
