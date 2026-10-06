@@ -265,7 +265,7 @@ const WHY = {
     { k: "Une Carte garde son identité, sa provenance et son historique, du premier geste jusqu'à l'engagement du CHRS." }
   ],
   p02: [
-    { k: "Les états sont des lieux, pas un menu ; « ça va » reste toujours visible, sans geste.", g: "Quand Amina parle, rien n'est enregistré ; refuser l'écoute, c'est simplement ne pas toucher le micro.", f: "PP · recueil des attentes, des besoins et des éléments de situation." },
+    { k: "Les états sont des lieux, pas un menu ; « ça va » reste toujours visible, sans geste.", g: "Parler au micro reste un choix : Amina peut aussi se contenter de toucher une carte. Ce qu'elle dit n'est jamais enregistré.", f: "PP · recueil des attentes, des besoins et des éléments de situation." },
     { k: "Ce qu'on peut prendre se voit au repos ; les destinations s'éclairent dès la prise." },
     { k: "Le geste se voit sans lire : carte soulevée, traînée, point de contact." },
     { k: "Changer d'état, c'est déplacer la carte : aucun autre chemin. Annuler, c'est le même geste à l'envers.", g: "Aucun écran de validation, aucune note : la personne n'est jamais évaluée." },
@@ -359,7 +359,7 @@ const NOTE_WHY = {
     ["Une Carte garde son identité, sa provenance et son historique, jusqu'au Projet d'Établissement.", "Ce qui est écrit sur Amina lui est montré, dans ses mots et dans sa langue.", "CASF L311-3 : droit à l'information et accès aux informations qui la concernent."]
   ],
   p02: [
-    ["Les états sont des lieux, pas un menu ; « ça va » reste toujours visible.", "Quand Amina parle, rien n'est enregistré ; refuser l'écoute, c'est simplement ne pas toucher le micro.", "Projet personnalisé : recueil des attentes, des besoins et des éléments de situation."],
+    ["Les états sont des lieux, pas un menu ; « ça va » reste toujours visible.", "Parler au micro reste un choix : Amina peut aussi se contenter de toucher une carte. Ce qu'elle dit n'est jamais enregistré.", "Projet personnalisé : recueil des attentes, des besoins et des éléments de situation."],
     ["Ce qu'on peut prendre se voit ; les destinations s'éclairent dès la prise, le geste se lit sans texte.", "Aucune note ni score : poser une carte n'évalue jamais la personne.", "Accessibilité : gestes simples, pictos et FALC, dans l'esprit de la loi de 2005."],
     ["Changer d'état, c'est déplacer la carte ; annuler, c'est le même geste à l'envers.", "Le verbatim est gardé ; la version simple s'affiche à côté, jamais à sa place.", "RGPD : des données exactes, minimales, et rectifiables par la personne."]
   ],
