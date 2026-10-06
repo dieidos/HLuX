@@ -691,3 +691,8 @@ body.deep .lbl.kind{display:inline-flex}
   .topnav .grp a i{font-size:21px}
   .topnav .grp a small{font-size:11px}
 }
+@media (max-width:680px){
+  .topnav .grp{gap:8px;padding:2px 8px}
+  .topnav .grp a{flex:none;min-width:56px;padding:2px 6px}
+  .topnav .wrap.nav-row{gap:10px}
+}
