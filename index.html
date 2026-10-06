@@ -1992,6 +1992,9 @@ if (allBtn) allBtn.addEventListener('click', e => {
   e.stopPropagation(); const open = !document.body.classList.contains('deep');
   document.body.classList.toggle('deep', open); allBtn.setAttribute('aria-pressed', String(open)); allBtn.textContent = open ? 'Version courte' : 'En savoir plus';
 });
+// À chaque ouverture (y compris retour arrière depuis le cache), on repart en version courte.
+const shortVersion = () => { document.body.classList.remove('deep'); if (allBtn) { allBtn.setAttribute('aria-pressed', 'false'); allBtn.textContent = 'En savoir plus'; } };
+shortVersion(); addEventListener('pageshow', shortVersion);
 /* ---------- Plein écran, là où le navigateur le permet ---------- */
 const fsBtn = $('[data-go="fs"]');
 if (fsBtn && document.fullscreenEnabled) {
