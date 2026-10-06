@@ -76,7 +76,7 @@ const STEPS = {
   pp: [['🃏 Cartes','🃏 بطاقاتي'],['😊 Ressenti','😊 إحساسي'],['🌈 Envies','🌈 رغباتي'],['⭐ Priorités','⭐ أولوياتي'],['👥 Regards','👥 نظرات'],['🛤️ Chemin','🛤️ طريقي']],
   pe: [['📥 Sujets'],['🔎 Constat'],['🧭 Cap'],['⚖️ Choix'],['🛠️ Actions'],['📅 Suivi']]
 };
-const AIDS = [['listen','🔊 Écouter','🔊 استمع'],['simple','💬 Plus simple','💬 أبسط'],['lang','🌐 Langue','🌐 اللغة']];
+const AIDS = [['listen','🔊 Écouter','🔊 استماع'],['simple','💬 Plus simple','💬 أبسط'],['lang','🌐 Langue','🌐 اللغة']];
 $$('.app').forEach(app => {
   const side = app.classList.contains('pe') ? 'pe' : app.classList.contains('pro') ? 'pro' : 'pp';
   const body = document.createElement('div'); body.className = 'app-body';
@@ -363,14 +363,14 @@ defineScene('p03', 'amina', [
   { ph: 'g', r: "De Papiers naît une idée.", c: "Les idées viennent d'Amina, jamais de l'application.", do: h => { h.show('lire'); h.say('Je voudrais lire mes courriers seule.', 'أريد أن أقرأ رسائلي وحدي.', null, 'amina'); } },
   { ph: 'g', r: "Elle la prend : les cercles s'éclairent.", c: "Les destinations se montrent d'elles-mêmes.", do: h => { h.say(null); h.cls('lire', 'lifted'); h.glow(true, 'c1', 'c2', 'c3', 'c4'); h.touch('lire'); } },
   { ph: 'g', r: "Sous son doigt : Profession.", c: "La position est un geste, pas une mesure.", do: h => { h.move('lire', 's-pro'); h.cls('i-pro', 'big'); } },
-  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say('« Lire mes courriers seule » près de Profession.', '« أقرأ رسائلي وحدي » قرب « مهنة ».'); } }
+  { ph: 'p', r: "Posée. Elle pourra la déplacer.", c: "Une hypothèse reste vivante ; seul l'écart par le bord est définitif.", do: h => { h.cls('lire', 'lifted', false); h.glow(false, 'c1', 'c2', 'c3', 'c4'); h.cls('i-pro', 'big', false); h.hide('trail', 'touch'); h.say("« Lire mes courriers seule », entre « j'en suis capable » et « j'en vis ».", '« أقرأ رسائلي وحدي »، بين « أنا قادرة » و« أعيش منه ».'); } }
 ]);
 defineScene('p04', 'amina', [
   { ph: 'a', r: "Qu'est-ce qui compte le plus ?", c: "On range les critères, jamais les Cartes." },
   { ph: 'a', r: "D'abord en vivre, ensuite j'en suis capable.", c: "Un ordre en mots, sans chiffre ; deux axes peuvent partager un rang.", do: h => { h.put('cr-vivre', 'r1'); h.put('cr-sait', 'r2'); h.put('cr-aime', 'r3'); h.put('cr-utile', 'r3'); h.say("D'abord, gagner ma vie.", 'أوّلاً، أن أكسب عيشي.', null, 'amina'); } },
   { ph: 'g', r: "Les lignes s'empilent dans cet ordre.", c: "La plus importante en haut, la plus marquée. L'application ne calcule rien.", do: h => { h.say(null); h.hide('paneA'); h.show('paneB'); } },
   { ph: 'g', r: "Elle glisse « Lire » vers la droite.", c: "On dit « plus à droite que… », jamais une note.", do: h => { h.left('m1', 86); h.touch('m1'); h.text('live', '« Lire » passe devant Formation.', '« أقرأ » قبل « التكوين ».'); } },
-  { ph: 'p', r: "« Lire » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Lire » est portée par tes lignes hautes.', '« أقرأ » قويّة في خطوطكِ العليا.'); } }
+  { ph: 'p', r: "« Lire » tient à droite, en haut.", c: "À droite sur les lignes hautes : l'idée est vraiment portée.", do: h => { h.left('m2', 74); h.left('m3', 39); h.left('m4', 62); h.hide('touch'); h.text('live', ''); h.say('« Lire » compte beaucoup pour toi.', '« أقرأ » مهمّة جداً بالنسبة لكِ.'); } }
 ]);
 defineScene('p05', 'amina', [
   { ph: 'a', r: "Amina au centre. Elle choisit qui l'éclaire.", c: "C'est elle qui invite, et sur quoi. Personne ne voit son dossier." },
@@ -393,7 +393,7 @@ defineScene('p06', 'amina', [
 defineScene('p07', 'aicha', [
   { r: "Au CHRS, sa difficulté reste à elle.", c: "Le collectif ne reçoit jamais un dossier individuel.", who: 'amina' },
   { r: "Sa phrase, et une version pour tous.", c: "Amina voit exactement ce que verront les autres.", who: 'amina', do: h => h.show('v-coll', 'consent') },
-  { r: "Amina dit oui. Elle apporte le sujet.", c: "Le consentement est situé ; « pas maintenant » reste possible.", who: 'amina', do: h => { h.cls('yes', 'hl'); h.say("Oui, j'apporte.", 'نعم، أُقدّمه.', null, 'amina'); } },
+  { r: "Amina dit oui. Elle apporte le sujet.", c: "Le consentement est situé ; « pas maintenant » reste possible.", who: 'amina', do: h => { h.cls('yes', 'hl'); h.say("Oui, j'apporte.", 'نعم، أشاركه.', null, 'amina'); } },
   { r: "Le sujet entre à l'ordre du jour.", c: "La même Carte, avec sa provenance : du jaune au vert.", do: h => { h.hide('consent'); h.put('sujet', 'agenda'); h.hide('v-coll'); h.say('On en parle mardi.', null, null, 'aicha'); } }
 ]);
 defineScene('p08', 'aicha', [
