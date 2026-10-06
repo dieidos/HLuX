@@ -657,16 +657,24 @@ const shortVersion = () => { document.body.classList.remove('deep'); if (allBtn)
 shortVersion(); addEventListener('pageshow', shortVersion);
 /* ---------- Plein écran, là où le navigateur le permet ---------- */
 const fsBtn = $('[data-go="fs"]');
+// Pictos : étendre (coins vers l'extérieur) / replier (coins vers l'intérieur)
+const FS_ICON = {
+  on: '<svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  off: '<svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>'
+};
 if (fsBtn && document.fullscreenEnabled) {
   fsBtn.hidden = false;
   const fsInline = $('.fs-inline'), fsLink = $('[data-go="fs2"]');
-  if (fsInline && fsLink) {
-    fsInline.hidden = false;
-    fsLink.addEventListener('click', e => { e.stopPropagation(); fsBtn.click(); });
-    document.addEventListener('fullscreenchange', () => { fsLink.textContent = document.fullscreenElement ? '⛶ Quitter le plein écran' : '⛶ Plein écran'; });
-  }
+  const paint = () => {
+    const full = !!document.fullscreenElement;
+    fsBtn.innerHTML = full ? FS_ICON.off : FS_ICON.on;
+    fsBtn.setAttribute('aria-label', full ? 'Quitter le plein écran' : 'Plein écran'); fsBtn.title = fsBtn.getAttribute('aria-label');
+    if (fsLink) fsLink.innerHTML = (full ? FS_ICON.off : FS_ICON.on) + (full ? ' Quitter le plein écran' : ' Plein écran');
+  };
+  if (fsInline && fsLink) { fsInline.hidden = false; fsLink.addEventListener('click', e => { e.stopPropagation(); fsBtn.click(); }); }
   fsBtn.addEventListener('click', e => { e.stopPropagation(); (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => hint("Le plein écran n'est pas disponible ici.")); });
-  document.addEventListener('fullscreenchange', () => { fsBtn.setAttribute('aria-label', document.fullscreenElement ? 'Quitter le plein écran' : 'Plein écran'); fit(); });
+  document.addEventListener('fullscreenchange', () => { paint(); fit(); });
+  paint();
 }
 /* ---------- Démarrage ---------- */
 refreshAll();

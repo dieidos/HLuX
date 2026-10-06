@@ -741,3 +741,7 @@ footer .by{color:#565f6f}
 /* Lien « Plein écran » dans la consigne de lecture */
 .fs-link{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--violet-d);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .fs-link:hover{color:var(--violet)}
+
+/* Pictos plein écran */
+.fs-ico{width:1.15em;height:1.15em;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.fs-btn .fs-ico{width:20px;height:20px}
