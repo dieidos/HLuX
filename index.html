@@ -753,6 +753,15 @@ body.deep .lbl.kind{display:inline-flex}
 .app .wm{font-family:Quicksand,var(--f-display);font-weight:700;letter-spacing:.05em;text-shadow:none;-webkit-text-stroke:0;background:none}
 .app .wm b{font-weight:700}
 .app .wm b:nth-child(1){color:#ffd965}.app .wm b:nth-child(2){color:#8faadc}.app .wm b:nth-child(3){color:#a9d18e}
+/* Menu : l'item courant se signale par le seul fond lavande */
+.topnav .grp a[aria-current="true"]::before{content:none;display:none}
+/* Accessibilité (audit WCAG AA) : contrastes des petits textes */
+.stepper span{color:#555f70}
+.whatif .copy,.tab.on{background:#6d4f88}
+.fiction{color:#565f6f}
+footer .by{color:#565f6f}
+.storyboard button:not(.on){color:#565f6f}
+.views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
 
 </style>
 </head>
@@ -964,7 +973,7 @@ body.deep .lbl.kind{display:inline-flex}
         <div class="line"><span class="chip me" style="left:30%">✓</span></div>
         <small>قليلاً ←→ كثيراً</small>
         <span class="aid" style="align-self:flex-start">قول أبسط</span>
-        <span class="aid" style="align-self:flex-start;background:#8c6aa8;color:#fff">أرسل رأيي</span>
+        <span class="aid" style="align-self:flex-start;background:#6d4f88;color:#fff">أرسل رأيي</span>
       </div></div>
       <div class="views fade off" data-k="views" data-view="mine">
         <div class="tabs">
@@ -1243,7 +1252,7 @@ body.deep .lbl.kind{display:inline-flex}
 </div></section>
 
 <section class="epilogue on-violet stop" data-stop="epilogue"><div class="wrap">
-  <div class="eyebrow" style="color:#e7dcf1">Épilogue · au printemps</div>
+  <div class="eyebrow" style="color:#f3ecf9">Épilogue · au printemps</div>
   <h2>Le fil se referme</h2>
   <div class="epi-scene"><span class="pv xl" data-persona="amina"></span><p class="scene-txt">Amina ouvre sa lettre de la CAF.</p></div>
   <div class="loop">
@@ -1391,7 +1400,7 @@ function refreshAll() {
   $$('[data-fr]').forEach(refresh);
   $$('.app').forEach(app => {
     const ar = settings.lang === 'ar';
-    app.dataset.lang = ar ? 'ar' : 'fr';
+    app.dataset.lang = ar ? 'ar' : 'fr'; app.lang = ar ? 'ar' : 'fr';
     if (app.hasAttribute('data-rtl')) app.dir = ar ? 'rtl' : 'ltr';
   });
   $$('[data-picto-label]').forEach(t => { const p = PICTOS[t.dataset.pictoLabel]; t.textContent = settings.lang === 'ar' ? p.ar : p.fr; });
@@ -1529,7 +1538,7 @@ function defineScene(id, who, steps) {
 /* ---------- « pourquoi ? » : conception, garde-fou, cadre (repris des V1 à V3) ---------- */
 const WHY = {
   p01: [
-    { k: "On entre, on n'administre pas : pas de sas, pas de formulaire long, jamais de mot de passe.", g: "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne.", f: "PP · expression et participation de la personne." },
+    { k: "On entre, on n'administre pas : pas de sas, pas de formulaire long, jamais de mot de passe.", g: "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", f: "PP · expression et participation de la personne." },
     { k: "Une question, trois grands choix : l'accès vient avant toute explication.", g: "Écouter, version simple et langue sont là sur chaque écran, dès le départ." },
     { k: "La Carte se crée en parlant, en écrivant ou en choisissant une image.", g: "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle." },
     { k: "Une Carte garde son identité, sa provenance et son historique, du premier geste jusqu'à l'engagement du CHRS." }
@@ -1624,7 +1633,7 @@ function whyHTML(id, j, fallback) {
 /* ---------- « En savoir plus » : 🎨 Conception · 🛡️ Garde-fou · 📚 Cadre, pour chacun des 36 textes ---------- */
 const NOTE_WHY = {
   p01: [
-    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
+    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
     ["Une Carte se crée en parlant, en écrivant ou en choisissant une image.", "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle.", "Recommandation HAS (ex-Anesm) « Les attentes de la personne et le projet personnalisé »."],
     ["Une Carte garde son identité, sa provenance et son historique, jusqu'au Projet d'Établissement.", "Ce qui est écrit sur Amina lui est montré, dans ses mots et dans sa langue.", "CASF L311-3 : droit à l'information et accès aux informations qui la concernent."]
   ],

@@ -121,7 +121,7 @@ function refreshAll() {
   $$('[data-fr]').forEach(refresh);
   $$('.app').forEach(app => {
     const ar = settings.lang === 'ar';
-    app.dataset.lang = ar ? 'ar' : 'fr';
+    app.dataset.lang = ar ? 'ar' : 'fr'; app.lang = ar ? 'ar' : 'fr';
     if (app.hasAttribute('data-rtl')) app.dir = ar ? 'rtl' : 'ltr';
   });
   $$('[data-picto-label]').forEach(t => { const p = PICTOS[t.dataset.pictoLabel]; t.textContent = settings.lang === 'ar' ? p.ar : p.fr; });
@@ -259,7 +259,7 @@ function defineScene(id, who, steps) {
 /* ---------- « pourquoi ? » : conception, garde-fou, cadre (repris des V1 à V3) ---------- */
 const WHY = {
   p01: [
-    { k: "On entre, on n'administre pas : pas de sas, pas de formulaire long, jamais de mot de passe.", g: "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne.", f: "PP · expression et participation de la personne." },
+    { k: "On entre, on n'administre pas : pas de sas, pas de formulaire long, jamais de mot de passe.", g: "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", f: "PP · expression et participation de la personne." },
     { k: "Une question, trois grands choix : l'accès vient avant toute explication.", g: "Écouter, version simple et langue sont là sur chaque écran, dès le départ." },
     { k: "La Carte se crée en parlant, en écrivant ou en choisissant une image.", g: "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle." },
     { k: "Une Carte garde son identité, sa provenance et son historique, du premier geste jusqu'à l'engagement du CHRS." }
@@ -354,7 +354,7 @@ function whyHTML(id, j, fallback) {
 /* ---------- « En savoir plus » : 🎨 Conception · 🛡️ Garde-fou · 📚 Cadre, pour chacun des 36 textes ---------- */
 const NOTE_WHY = {
   p01: [
-    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
+    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "Les données d'Amina restent sur son téléphone ou sur la tablette, pas en ligne, sauf ce qu'elle choisit de partager.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
     ["Une Carte se crée en parlant, en écrivant ou en choisissant une image.", "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle.", "Recommandation HAS (ex-Anesm) « Les attentes de la personne et le projet personnalisé »."],
     ["Une Carte garde son identité, sa provenance et son historique, jusqu'au Projet d'Établissement.", "Ce qui est écrit sur Amina lui est montré, dans ses mots et dans sa langue.", "CASF L311-3 : droit à l'information et accès aux informations qui la concernent."]
   ],

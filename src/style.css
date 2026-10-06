@@ -723,3 +723,12 @@ body.deep .lbl.kind{display:inline-flex}
 .app .wm{font-family:Quicksand,var(--f-display);font-weight:700;letter-spacing:.05em;text-shadow:none;-webkit-text-stroke:0;background:none}
 .app .wm b{font-weight:700}
 .app .wm b:nth-child(1){color:#ffd965}.app .wm b:nth-child(2){color:#8faadc}.app .wm b:nth-child(3){color:#a9d18e}
+/* Menu : l'item courant se signale par le seul fond lavande */
+.topnav .grp a[aria-current="true"]::before{content:none;display:none}
+/* Accessibilité (audit WCAG AA) : contrastes des petits textes */
+.stepper span{color:#555f70}
+.whatif .copy,.tab.on{background:#6d4f88}
+.fiction{color:#565f6f}
+footer .by{color:#565f6f}
+.storyboard button:not(.on){color:#565f6f}
+.views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
