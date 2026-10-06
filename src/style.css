@@ -746,7 +746,7 @@ footer .by{color:#565f6f}
 .fs-ico{width:1.15em;height:1.15em;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .fs-btn .fs-ico{width:20px;height:20px}
 /* Menu : fond lavande au survol, y compris sur le logo HLuX */
-.nav-home{padding:3px 5px;border-radius:12px;transition:background-color .15s}
+.nav-home{padding:5px 10px;border-radius:14px;transition:background-color .15s}
 .topnav .grp a{transition:background-color .15s}
 @media (hover:hover){
   .topnav .grp a:not([aria-current="true"]):hover,.nav-home:hover{background:color-mix(in srgb,var(--lav) 22%,transparent)}
