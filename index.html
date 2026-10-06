@@ -768,6 +768,10 @@ footer .by{color:#565f6f}
 [data-scene="p04"] .lines .line .chip.me,[data-scene="p05"] .vlines .line .chip.me{top:34%;z-index:3}
 [data-scene="p04"] .lines .line .chip:not(.me),[data-scene="p05"] .vlines .line .chip:not(.me){top:66%}
 
+/* Lien « Plein écran » dans la consigne de lecture */
+.fs-link{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--violet-d);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.fs-link:hover{color:var(--violet)}
+
 </style>
 </head>
 <body>
@@ -808,7 +812,7 @@ footer .by{color:#565f6f}
       <div class="half pe"><h3>🏛️ Projet d'Établissement</h3>
         <ol><li><a href="#sujets"><span>📥</span>Sujets</a></li><li><a href="#constat"><span>🔎</span>Constat</a></li><li><a href="#cap"><span>🧭</span>Cap</a></li><li><a href="#choix"><span>⚖️</span>Choix</a></li><li><a href="#actions"><span>🛠️</span>Actions</a></li><li><a href="#suivi"><span>📅</span>Suivi</a></li></ol></div>
     </div>
-    <p class="howto">Faites défiler · ou <b>Suivant ▸</b></p>
+    <p class="howto">Faites défiler · ou <b>Suivant ▸</b><span class="fs-inline" hidden> · <button type="button" class="fs-link" data-go="fs2">⛶ Plein écran</button></span></p>
   </div>
 </section>
 
@@ -1943,6 +1947,12 @@ shortVersion(); addEventListener('pageshow', shortVersion);
 const fsBtn = $('[data-go="fs"]');
 if (fsBtn && document.fullscreenEnabled) {
   fsBtn.hidden = false;
+  const fsInline = $('.fs-inline'), fsLink = $('[data-go="fs2"]');
+  if (fsInline && fsLink) {
+    fsInline.hidden = false;
+    fsLink.addEventListener('click', e => { e.stopPropagation(); fsBtn.click(); });
+    document.addEventListener('fullscreenchange', () => { fsLink.textContent = document.fullscreenElement ? '⛶ Quitter le plein écran' : '⛶ Plein écran'; });
+  }
   fsBtn.addEventListener('click', e => { e.stopPropagation(); (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => hint("Le plein écran n'est pas disponible ici.")); });
   document.addEventListener('fullscreenchange', () => { fsBtn.setAttribute('aria-label', document.fullscreenElement ? 'Quitter le plein écran' : 'Plein écran'); fit(); });
 }

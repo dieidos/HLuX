@@ -659,6 +659,12 @@ shortVersion(); addEventListener('pageshow', shortVersion);
 const fsBtn = $('[data-go="fs"]');
 if (fsBtn && document.fullscreenEnabled) {
   fsBtn.hidden = false;
+  const fsInline = $('.fs-inline'), fsLink = $('[data-go="fs2"]');
+  if (fsInline && fsLink) {
+    fsInline.hidden = false;
+    fsLink.addEventListener('click', e => { e.stopPropagation(); fsBtn.click(); });
+    document.addEventListener('fullscreenchange', () => { fsLink.textContent = document.fullscreenElement ? '⛶ Quitter le plein écran' : '⛶ Plein écran'; });
+  }
   fsBtn.addEventListener('click', e => { e.stopPropagation(); (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => hint("Le plein écran n'est pas disponible ici.")); });
   document.addEventListener('fullscreenchange', () => { fsBtn.setAttribute('aria-label', document.fullscreenElement ? 'Quitter le plein écran' : 'Plein écran'); fit(); });
 }

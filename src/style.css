@@ -737,3 +737,7 @@ footer .by{color:#565f6f}
 /* Lignes : l'idée d'Amina (« Comprendre », plus longue) passe au-dessus, les autres en dessous — plus de chevauchement */
 [data-scene="p04"] .lines .line .chip.me,[data-scene="p05"] .vlines .line .chip.me{top:34%;z-index:3}
 [data-scene="p04"] .lines .line .chip:not(.me),[data-scene="p05"] .vlines .line .chip:not(.me){top:66%}
+
+/* Lien « Plein écran » dans la consigne de lecture */
+.fs-link{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--violet-d);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.fs-link:hover{color:var(--violet)}
