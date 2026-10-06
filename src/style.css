@@ -732,3 +732,5 @@ body.deep .lbl.kind{display:inline-flex}
 footer .by{color:#565f6f}
 .storyboard button:not(.on){color:#565f6f}
 .views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
+/* Menu (desktop) : un peu d'air entre l'icône et le mot */
+@media (min-width:681px){.topnav .grp a{gap:3px}.topnav .grp a i{line-height:1.1}}

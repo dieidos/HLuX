@@ -83,7 +83,7 @@ $$('.app').forEach(app => {
   while (app.firstChild) body.appendChild(app.firstChild);
   const on = +app.dataset.on;
   const proj = side === 'pp' ? '<span class="proj" data-ar="مشروعي" data-falc="Mon projet">Mon projet</span>'
-    : side === 'pe' ? '<span class="proj">Projet d\'Établissement 2027–2031</span>' : '<span class="proj">Mes accompagnements · Sarah</span>';
+    : side === 'pe' ? '<span class="proj" title="Projet d\'Établissement 2027–2031">Notre projet</span>' : '<span class="proj">Mes accompagnements · Sarah</span>';
   const steps = side === 'pro' ? '' : '<div class="stepper">' + STEPS[side].map((s, i) =>
     `<span class="${i === on ? 'on' : ''}"${s[1] ? ` data-ar="${s[1]}"` : ''}>${s[0]}</span>`).join('') + '</div>';
   const top = document.createElement('div'); top.className = 'app-top';

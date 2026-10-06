@@ -762,6 +762,8 @@ body.deep .lbl.kind{display:inline-flex}
 footer .by{color:#565f6f}
 .storyboard button:not(.on){color:#565f6f}
 .views[data-view="mine"] .tab[data-tab="mine"],.views[data-view="salma"] .tab[data-tab="salma"],.views[data-view="both"] .tab[data-tab="both"],.views[data-view="sarah"] .tab[data-tab="sarah"]{background:#6d4f88}
+/* Menu (desktop) : un peu d'air entre l'icône et le mot */
+@media (min-width:681px){.topnav .grp a{gap:3px}.topnav .grp a i{line-height:1.1}}
 
 </style>
 </head>
@@ -1362,7 +1364,7 @@ $$('.app').forEach(app => {
   while (app.firstChild) body.appendChild(app.firstChild);
   const on = +app.dataset.on;
   const proj = side === 'pp' ? '<span class="proj" data-ar="مشروعي" data-falc="Mon projet">Mon projet</span>'
-    : side === 'pe' ? '<span class="proj">Projet d\'Établissement 2027–2031</span>' : '<span class="proj">Mes accompagnements · Sarah</span>';
+    : side === 'pe' ? '<span class="proj" title="Projet d\'Établissement 2027–2031">Notre projet</span>' : '<span class="proj">Mes accompagnements · Sarah</span>';
   const steps = side === 'pro' ? '' : '<div class="stepper">' + STEPS[side].map((s, i) =>
     `<span class="${i === on ? 'on' : ''}"${s[1] ? ` data-ar="${s[1]}"` : ''}>${s[0]}</span>`).join('') + '</div>';
   const top = document.createElement('div'); top.className = 'app-top';
