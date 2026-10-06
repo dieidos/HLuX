@@ -558,6 +558,12 @@ function activate(i, fromUser = true) {
   // navigation
   const sceneEl = s.closest('[data-scene]'); const sid = sceneEl ? sceneEl.dataset.scene : null;
   $$('[data-nav]').forEach(a => a.setAttribute('aria-current', String(a.dataset.nav === sid)));
+  // Menu qui déborde (mobile) : on fait glisser l'item courant au centre.
+  const navCur = $(`[data-nav="${sid}"]`), row = navCur && navCur.closest('.nav-row');
+  if (row && row.scrollWidth > row.clientWidth + 1) {
+    const r = navCur.getBoundingClientRect(), rr = row.getBoundingClientRect();
+    row.scrollTo({ left: row.scrollLeft + r.left - rr.left - (rr.width - r.width) / 2, behavior: 'smooth' });
+  }
   // fil des Cartes
   let lit = 0;
   Object.entries(FIL).forEach(([id, m]) => {
