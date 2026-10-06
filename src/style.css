@@ -753,3 +753,6 @@ footer .by{color:#565f6f}
 }
 
 .howto-more{margin-bottom:-14px}
+/* Schéma « Deux projets » : même survol lavande que le menu */
+.half li a{transition:background-color .15s,box-shadow .15s}
+@media (hover:hover){.half li a:hover{background:color-mix(in srgb,var(--lav) 30%,var(--surface2));box-shadow:0 2px 8px rgba(0,0,0,.08)}}
