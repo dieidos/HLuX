@@ -707,3 +707,7 @@ body.deep .lbl.kind{display:inline-flex}
 .nav-home .wm b:nth-child(2),:root .nav-home .wm b:nth-child(2){color:#8faadc}
 .nav-home .wm b:nth-child(3),:root .nav-home .wm b:nth-child(3){color:#a9d18e}
 .nav-home .wm{font-size:14px;letter-spacing:.02em;text-shadow:0 0 1px rgba(45,29,61,.75),0 1px 1px rgba(45,29,61,.35)}
+/* Rubrique courante : surlignage discret, identique mobile et ordinateur */
+.topnav .grp a[aria-current="true"],.topnav .grp.pp a[aria-current="true"],.topnav .grp.pe a[aria-current="true"]{outline:none;box-shadow:none;background:color-mix(in srgb,var(--lav) 38%,transparent)}
+.topnav .grp a[aria-current="true"]::before{content:"";position:absolute;left:22%;right:22%;bottom:2px;height:3px;border-radius:3px;background:var(--violet)}
+.topnav .grp a[aria-current="true"] small{color:var(--ink)}
