@@ -502,7 +502,11 @@ setInterval(() => { if (pending === null && scrollY !== lastY) { lastY = scrollY
 function goStop(i) {
   i = Math.max(0, Math.min(stops.length - 1, i));
   const el = stops[i], r = el.getBoundingClientRect();
-  const target = Math.max(0, scrollY + r.top + Math.min(r.height, innerHeight) / 2 - lineY());
+  // Les notes se centrent sur la ligne de lecture ; les sections (portrait, parties, charnière, épilogue) s'alignent par le haut, sous le menu
+  const navH = ($('.topnav') || { offsetHeight: 0 }).offsetHeight;
+  const target = el.classList.contains('note')
+    ? Math.max(0, scrollY + r.top + Math.min(r.height, innerHeight) / 2 - lineY())
+    : Math.max(0, scrollY + r.top - navH - 16);
   pending = i; activate(i);
   if (Math.abs(target - scrollY) < 2) { pending = null; return; }
   scrollTo({ top: target, behavior: RM.matches ? 'auto' : 'smooth' });
