@@ -354,64 +354,64 @@ function whyHTML(id, j, fallback) {
 /* ---------- « En savoir plus » : 🎨 Conception · 🛡️ Garde-fou · 📚 Cadre, pour chacun des 36 textes ---------- */
 const NOTE_WHY = {
   p01: [
-    ["On entre, on n'administre pas : un prénom choisi, une phrase, et c'est parti.", "À tout moment, Amina peut dire « je ne suis pas d'accord » : corriger, parler à quelqu'un, ou arrêter pour maintenant.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
+    ["Pour entrer, il suffit d'un prénom et d'une phrase.", "À tout moment, Amina peut dire « je ne suis pas d'accord » : corriger, parler à quelqu'un, ou arrêter pour maintenant.", "Loi 2002-2 et CASF L311-3 : libre choix et participation directe de la personne à son projet."],
     ["Une Carte se crée en parlant, en écrivant ou en choisissant une image.", "Sarah n'écrit pas à la place d'Amina : la parole d'origine est gardée telle quelle.", "Recommandation HAS (ex-Anesm) « Les attentes de la personne et le projet personnalisé »."],
     ["Une Carte garde son identité, sa provenance et son historique, jusqu'au Projet d'Établissement.", "Ce qui est écrit sur Amina lui est montré, dans ses mots et dans sa langue.", "CASF L311-3 : droit à l'information et accès aux informations qui la concernent."]
   ],
   p02: [
-    ["Les états sont des lieux, pas un menu ; « ça va » reste toujours visible.", "Parler au micro reste un choix : Amina peut aussi se contenter de toucher une carte. Ce qu'elle dit n'est jamais enregistré.", "Projet personnalisé : recueil des attentes, des besoins et des éléments de situation."],
-    ["Ce qu'on peut prendre se voit ; les destinations s'éclairent dès la prise, le geste se lit sans texte.", "Poser une carte dit où l'on en est : c'est un repère, pas une note.", "Accessibilité : gestes simples, pictos et FALC, dans l'esprit de la loi de 2005."],
+    ["Amina range ses cartes dans trois coins de l'écran ; « ça va » reste toujours à portée de main.", "Parler au micro reste un choix : Amina peut aussi se contenter de toucher une carte. Ce qu'elle dit n'est jamais enregistré.", "Projet personnalisé : recueil des attentes, des besoins et des éléments de situation."],
+    ["Quand Amina prend une carte, les endroits où la poser s'allument.", "En posant une carte, Amina dit simplement où elle en est aujourd'hui.", "Accessibilité : gestes simples, pictos et FALC, dans l'esprit de la loi de 2005."],
     ["Changer d'état, c'est déplacer la carte ; annuler, c'est le même geste à l'envers.", "Le verbatim est gardé ; la version simple s'affiche à côté, en complément.", "RGPD : des données exactes, minimales, et rectifiables par la personne."]
   ],
   p03: [
     ["L'Ikigai reprend le geste du Bilan ; ses croisements se nomment avec des mots.", "Les cercles parlent de ce que la personne aime et dont elle est capable : on part de ses forces.", "Projet personnalisé : aspirations, souhaits et possibilités envisagées."],
-    ["Une hypothèse naît d'une Carte et en garde le lien.", "L'application ne propose aucune hypothèse : tout vient d'Amina ou de la séance.", "CASF L311-3 : libre choix des prestations et de l'accompagnement."],
-    ["La position est un geste, pas une mesure ; une hypothèse posée reste déplaçable.", "L'écarter par le bord est le seul geste irréversible, et l'écran le dit clairement.", "Recommandation HAS : co-construire le projet avec la personne, à partir de ses souhaits."]
+    ["Une hypothèse naît d'une Carte et en garde le lien.", "Les idées viennent d'Amina, ou de la séance avec Sarah.", "CASF L311-3 : libre choix des prestations et de l'accompagnement."],
+    ["Amina place ses idées du doigt et peut les déplacer quand elle veut.", "L'écarter par le bord est le seul geste irréversible, et l'écran le dit clairement.", "Recommandation HAS : co-construire le projet avec la personne, à partir de ses souhaits."]
   ],
   p04: [
     ["On range les quatre axes ; les Cartes gardent toutes leur valeur, les critères organisent la lecture.", "« Je ne sais pas encore » est une réponse à part entière.", "Projet personnalisé : des priorités exprimées par la personne elle-même."],
-    ["Les lignes s'empilent dans l'ordre des rangs ; la phrase suit le geste : « plus à droite que… ».", "Ni chiffre ni curseur : l'application ne calcule aucun classement.", "Recommandation HAS : la personne hiérarchise ses attentes, avec l'appui des professionnels."],
-    ["À droite sur les lignes hautes, l'idée est vraiment portée ; réglé une fois, révisable toujours.", "Ni total ni pourcentage : la phrase dit ce qui a changé, en mots.", "Le projet personnalisé est réévalué régulièrement avec la personne, au moins chaque année."]
+    ["Les lignes s'empilent dans l'ordre des rangs ; la phrase suit le geste : « plus à droite que… ».", "C'est Amina qui range, à la main.", "Recommandation HAS : la personne hiérarchise ses attentes, avec l'appui des professionnels."],
+    ["À droite sur les lignes hautes, l'idée est vraiment portée ; réglé une fois, révisable toujours.", "Ce qui a changé se raconte avec des mots.", "Le projet personnalisé est réévalué régulièrement avec la personne, au moins chaque année."]
   ],
   p05: [
     ["Amina choisit qui l'éclaire et sur quoi : chacun dans sa langue, par son canal.", "Chaque invité voit seulement l'hypothèse qui le concerne ; le dossier reste à Amina.", "CASF L311-3 : confidentialité des informations ; L311-5-1 : la personne de confiance."],
     ["L'invitée reçoit le même geste ; les regards s'affichent en onglets, une fois réunis.", "On voit qui a répondu ; les contenus se découvrent ensemble, et le silence est une réponse acceptable.", "Les proches sont associés à l'initiative de la personne, à ses côtés."],
-    ["La bande va de la marque la plus à gauche à la plus à droite ; l'ordre de Sarah réempile les lignes.", "Aucune moyenne ; Sarah ne propose qu'en séance, à deux, depuis un carnet sans indicateur.", "Projet personnalisé : co-construction, coordination et regards croisés."]
+    ["La bande va de la marque la plus à gauche à la plus à droite ; l'ordre de Sarah réempile les lignes.", "Sarah fait ses propositions en séance, avec Amina, à partir de son carnet.", "Projet personnalisé : co-construction, coordination et regards croisés."]
   ],
   p06: [
     ["Au repos : le chemin, ses étapes, le temps ; ◆ une décision d'Amina, ● un événement du monde.", "Le détail vit dans le toucher : l'écran reste léger pour la personne.", "Projet personnalisé : objectifs, modalités d'accompagnement et plan d'action."],
-    ["On essaie un futur sur une copie : le cadre en pointillé dit qu'on joue.", "Le vrai chemin reste intact ; rien n'est décidé par l'application.", "Contrat de séjour et avenant : des objectifs et des prestations révisables."],
+    ["On essaie un futur sur une copie : le cadre en pointillé dit qu'on joue.", "Le vrai chemin ne bouge pas : c'est Amina qui décide.", "Contrat de séjour et avenant : des objectifs et des prestations révisables."],
     ["Deux sorties, toujours explicites ; puis le plan, en quatre tuiles et dans ses mots.", "Son dossier lui appartient : récit amendable (« ce n'est pas comme ça que je le dirais ») et export, même si le compte de la structure est désactivé.", "RGPD : droit d'accès et droit à la portabilité des données (article 20)."]
   ],
   p07: [
     ["Le collectif ne reçoit jamais un dossier individuel.", "Seul passe ce que la personne choisit d'apporter, sous la forme qu'elle choisit.", "Projet d'Établissement : participation, expression collective et saisine."],
-    ["Les deux versions côte à côte : Amina voit exactement ce que verront les autres.", "Consentement situé : quoi, pour qui, pourquoi ; « pas maintenant » reste possible.", "RGPD : un consentement libre, éclairé, spécifique et révocable."],
-    ["La même Carte, avec sa provenance, passe du jaune au vert.", "Les présents ne portent aucun statut ; une absence est dite sans reproche.", "CASF L311-6 : conseil de la vie sociale, ou autres formes de participation."]
+    ["Les deux versions côte à côte : Amina voit exactement ce que verront les autres.", "Amina sait ce qu'elle partage, avec qui et pourquoi ; elle peut aussi dire « pas maintenant ».", "RGPD : un consentement libre, éclairé, spécifique et révocable."],
+    ["La même Carte, avec sa provenance, passe du jaune au vert.", "Tout le monde est à la même table ; une absence se dit simplement.", "CASF L311-6 : conseil de la vie sociale, ou autres formes de participation."]
   ],
   p08: [
     ["La même table que le Bilan, au pluriel ; la tablette circule et la parole se voit.", "L'animation est un mandat du groupe : elle se retire et se redonne.", "Recommandation Anesm (2010) : un diagnostic partagé pour élaborer le projet d'établissement."],
-    ["Chaque carte porte sa source : parole consentie, équipe, CVS.", "Chaque parole reste attribuée : aucune n'est noyée dans une synthèse anonyme.", "Une démarche participative : personnes accompagnées, professionnels et partenaires."],
+    ["Chaque carte porte sa source : parole consentie, équipe, CVS.", "Chaque parole garde le nom de qui l'a dite.", "Une démarche participative : personnes accompagnées, professionnels et partenaires."],
     ["Qualification : situation individuelle, signal à vérifier, difficulté répétée, enjeu confirmé ; puis relecture à voix haute.", "Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat.", "Référentiel HAS d'évaluation : appuyer les décisions sur l'expression des personnes."]
   ],
   p09: [
     ["Le même Ikigai, au pluriel ; « nous en vivons », ce sont les moyens et les financements.", "Les orientations partent du constat partagé, porté par plusieurs voix.", "CASF L311-8 : un projet d'établissement établi pour cinq ans au plus."],
-    ["Placements à tour de rôle ou à main levée, guidés par l'animatrice.", "Deux placements revendiqués restent visibles : pas de moyenne des positions.", "CASF L311-8 : le conseil de la vie sociale est consulté sur le projet."],
-    ["Le changement attendu est formulé simplement, pour pouvoir être observé.", "Le vécu individuel éclaire ; la règle collective se décide ensemble.", "Des changements observables : la base de l'évaluation de la qualité."]
+    ["Placements à tour de rôle ou à main levée, guidés par l'animatrice.", "Quand deux personnes placent différemment, les deux positions restent à l'écran.", "CASF L311-8 : le conseil de la vie sociale est consulté sur le projet."],
+    ["Le changement attendu est formulé simplement, pour pouvoir être observé.", "La règle collective se décide ensemble, à partir de ce que chacun vit.", "Des changements observables : la base de l'évaluation de la qualité."]
   ],
   p10: [
-    ["Le geste d'Amina, avec six critères du métier ; cinq regards autour d'une orientation.", "Chaque voix garde sa marque : aucune majorité automatique, aucun score global.", "Projet d'Établissement : priorisation et arbitrage des enjeux."],
-    ["Chacun place seul, sur la tablette qui passe ou sur son mobile, puis tout se révèle.", "On voit qui a placé ; les positions se révèlent ensemble, puis on discute les écarts, sans vote.", "Une délibération attribuée : direction, personnes accompagnées, CVS, professionnels."],
-    ["Les bandes nomment qui converge avec qui ; la décision devient une phrase du groupe.", "Le désaccord reste ouvert ; aucun calcul ne le tranche.", "Traçabilité : la décision garde sa provenance, du constat aux lignes."]
+    ["Le geste d'Amina, avec six critères du métier ; cinq regards autour d'une orientation.", "Chaque avis reste signé ; c'est la discussion qui tranche.", "Projet d'Établissement : priorisation et arbitrage des enjeux."],
+    ["Chacun place seul, sur la tablette qui passe ou sur son mobile, puis tout se révèle.", "On voit qui a déjà placé ; on découvre les positions ensemble, puis on en parle.", "Une délibération attribuée : direction, personnes accompagnées, CVS, professionnels."],
+    ["Les bandes nomment qui converge avec qui ; la décision devient une phrase du groupe.", "Un désaccord reste sur la table jusqu'à ce que le groupe en parle.", "Traçabilité : la décision garde sa provenance, du constat aux lignes."]
   ],
   p11: [
-    ["Plusieurs solutions avant un engagement : on ne fige pas la première idée.", "Les solutions sont jugées d'abord sur leur effet pour les personnes.", "Projet d'Établissement : objectifs opérationnels et plan d'action."],
-    ["Les mêmes lignes et la même bande que le 360° d'Amina.", "Les regards se croisent sans se moyenner : un écart de faisabilité reste visible.", "Recommandation Anesm : décliner les orientations en actions concrètes."],
-    ["La Carte-engagement porte le fil depuis Papiers, la parole d'Amina.", "L'engagement a des porteurs nommés et une date de revue, pas seulement une intention.", "Un plan d'action suivi dans le temps, dans le Projet d'Établissement."]
+    ["On cherche plusieurs solutions avant de s'engager.", "Les solutions sont jugées d'abord sur leur effet pour les personnes.", "Projet d'Établissement : objectifs opérationnels et plan d'action."],
+    ["Les mêmes lignes et la même bande que le 360° d'Amina.", "Quand l'équipe et les personnes jugent la faisabilité différemment, l'écart reste affiché.", "Recommandation Anesm : décliner les orientations en actions concrètes."],
+    ["La Carte-engagement porte le fil depuis Papiers, la parole d'Amina.", "Chaque engagement a des noms et une date pour en reparler.", "Un plan d'action suivi dans le temps, dans le Projet d'Établissement."]
   ],
   p12: [
-    ["La grammaire de Mon chemin, au pluriel : couloirs, décisions, événements, porteurs.", "On remarque les prénoms : chacun apporte ce qu'il peut, sans compte.", "Projet d'Établissement : pilotage, suivi et évaluation."],
+    ["La grammaire de Mon chemin, au pluriel : couloirs, décisions, événements, porteurs.", "On voit les prénoms de ceux qui s'engagent ; chacun apporte ce qu'il peut.", "Projet d'Établissement : pilotage, suivi et évaluation."],
     ["Un seul sens : le collectif ne lit jamais le chemin d'Amina.", "C'est elle qui y fait entrer ce qu'il propose, d'un geste, depuis son propre espace.", "Loi 2002-2 : le projet de la personne et le projet d'établissement se répondent."],
-    ["Le réel reboucle : quand le résultat ne suffit pas, il revient au constat.", "Aucun écart durable entre l'écrit et le vécu ne reste invisible.", "Évaluation de la qualité des ESSMS tous les cinq ans, selon le référentiel HAS."]
+    ["Si le résultat ne suffit pas, on revient au constat.", "Quand ce qui est écrit et ce qui est vécu s'éloignent, cela se voit.", "Évaluation de la qualité des ESSMS tous les cinq ans, selon le référentiel HAS."]
   ]
 };
 function whyNote(id, k) {
@@ -426,7 +426,7 @@ const NOTES = {
   p02: [[0, "Trois lieux : ça va, je ne sais pas, difficile."], [2, "Amina prend Papiers et la glisse vers « difficile »."], [4, "Posée. Sa phrase est gardée, mot pour mot."]],
   p03: [[1, "Quatre cercles : j'aime, j'en suis capable, je suis utile, j'en vis."], [4, "De Papiers naît une envie : lire ses courriers seule."], [5, "Elle la pose près de Profession."]],
   p04: [[1, "D'abord « j'en vis », ensuite « j'en suis capable »."], [3, "Sur ses lignes, elle glisse « Lire » vers la droite."], [4, "« Lire » est portée par ses lignes hautes."]],
-  p05: [[0, "Amina, au centre, choisit qui l'éclaire."], [4, "Salma répond en arabe ; les regards se superposent.", 'salma'], [5, "La bande montre l'écart, sans moyenne."]],
+  p05: [[0, "Amina, au centre, choisit qui l'éclaire."], [4, "Salma répond en arabe ; les regards se superposent.", 'salma'], [5, "La bande montre où chacun se situe."]],
   p06: [[1, "Le chemin d'Amina, saison après saison."], [4, "Et si le récépissé arrivait après mars ? Une copie se joue."], [6, "Rien n'a bougé ; elle emporte son plan."]],
   p07: [[0, "Au CHRS, sa difficulté reste la sienne.", 'amina'], [2, "Amina dit oui : elle apporte le sujet.", 'amina'], [3, "Le sujet entre à l'ordre du jour."]],
   p08: [[1, "Aïcha a la parole ; la tablette circule."], [2, "Bruno pose une carte de l'équipe.", 'bruno'], [4, "Deux sources : difficulté répétée."]],
