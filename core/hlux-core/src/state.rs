@@ -346,7 +346,7 @@ impl Reducer<FacilityAct> for FacilityReducer {
         }
         match act.clone() {
             FacilityAct::AgendaItem { item, title, source, session, picto } => {
-                if let Some(p) = picto {
+                if let Some(p) = generic_picto(picto) {
                     s.agenda_pictos.insert(item.clone(), p);
                 }
                 s.agenda.push((item, title, source, session));
@@ -358,7 +358,7 @@ impl Reducer<FacilityAct> for FacilityReducer {
             FacilityAct::FindingPlaced { finding, title, zone, source, author, picto } => {
                 // Déplacer une carte garde sa qualification : seul le groupe la change (FindingQualified).
                 let level = s.findings.get(&finding).map(|f| f.level).unwrap_or(Qualification::Individual);
-                let picto = picto.or_else(|| s.findings.get(&finding).and_then(|f| f.picto.clone()));
+                let picto = generic_picto(picto).or_else(|| s.findings.get(&finding).and_then(|f| f.picto.clone()));
                 s.findings.insert(finding, Finding { title, zone, source, author, level, picto });
             }
             FacilityAct::FindingQualified { finding, level } => {
@@ -440,4 +440,9 @@ impl Reducer<FacilityAct> for FacilityReducer {
     fn key_said(&self, _said: &str) -> Option<String> {
         None
     }
+}
+
+/// Seul le nom d'une image générique (« papiers », « logement »…) passe au collectif : jamais un texte libre.
+fn generic_picto(p: Option<String>) -> Option<String> {
+    p.filter(|k| !k.is_empty() && k.len() <= 32 && k.chars().all(|c| c.is_ascii_lowercase() || c == '_'))
 }

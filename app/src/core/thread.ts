@@ -62,7 +62,9 @@ export function threadPassed(card: Id, p: ProjectState, f: FacilityState | null)
 /** Les Cartes que les gestes de la séance ont prises (dans l'ordre). */
 export function chosenCards(taken: string[], entries: Entry[], since: number, known: Record<string, unknown>): string[] {
   const out = [...taken];
+  const undone = new Set(entries.flatMap((e) => (e.undone !== undefined ? [e.undone] : [])));
   for (const e of entries.slice(since)) {
+    if (undone.has(e.rank)) continue;
     const a = e.act as { card?: string | null; from_card?: string | null } | undefined;
     for (const id of [a?.card, a?.from_card]) if (id && known[id] && !out.includes(id)) out.push(id);
   }

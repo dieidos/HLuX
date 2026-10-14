@@ -46,7 +46,7 @@ test('sur un téléphone, aucun écran ne déborde sur le côté', async ({ page
     await page.waitForTimeout(400);
     const f = await overflowing(page);
     // Et pas de bouton dans un bouton : un lecteur d'écran ne saurait pas lequel il touche.
-    const nested = await page.evaluate(() => [...document.querySelectorAll('button button, [role=button] [role=button], a a')].map((e) => (e.textContent ?? '').trim().slice(0, 30)).slice(0, 3));
+    const nested = await page.evaluate(() => [...document.querySelectorAll('button button, [role=button] [role=button], a a, a [role=button], [role=button] a, button a, a button')].map((e) => (e.textContent ?? '').trim().slice(0, 30)).slice(0, 3));
     if (f.length || nested.length) faults[screen.source] = [...f, ...nested.map((n) => `imbriqué:${n}`)];
   }
   expect(faults).toEqual({});

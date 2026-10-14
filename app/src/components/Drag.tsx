@@ -96,7 +96,7 @@ export function Zone({ id, onDrop, style, children, label, accepts }: { id: stri
 }
 
 /** Une carte que l'on prend et que l'on pose. */
-export function Draggable({ id, children, label }: { id: string; children: ReactNode; label: string }) {
+export function Draggable({ id, children, label, hint }: { id: string; children: ReactNode; label: string; /** ce que le lecteur d'écran dit en plus (un rang, une place) */ hint?: string }) {
   const d = useDrag();
   const [pos] = useState(() => new Animated.ValueXY()); // valeur animée stable, sans ref lue au rendu
   // La traînée et le point de contact : d'où part la carte, où est le doigt (Atlas, écran 02).
@@ -130,7 +130,7 @@ export function Draggable({ id, children, label }: { id: string; children: React
           />
         ) : null}
         <Animated.View style={[{ transform: pos.getTranslateTransform() }, held && st.lifted]}>
-          <Pressable onPress={() => (held ? d.drop() : d.take(id))} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: held }}>
+          <Pressable onPress={() => (held ? d.drop() : d.take(id))} accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} accessibilityState={{ selected: held }}>
             {children}
           </Pressable>
           {trail ? <View pointerEvents="none" style={[st.contact, { left: trail.x - 14, top: trail.y - 14 }]} /> : null}

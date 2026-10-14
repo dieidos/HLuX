@@ -7,6 +7,8 @@ import { create } from 'zustand';
 import { useFacilityState } from './useFacility';
 import { useProject, useProjectState } from './useProject';
 import { chosenCards, threadPassed } from './thread';
+import { useAids } from './useAids';
+import { PICTOS, type PictoKey } from '../design/pictos';
 
 export const useThread = create<{ taken: string[]; since: number; take: (card: string) => void }>((set, get) => ({
   taken: [],
@@ -26,8 +28,13 @@ export function useThreadCards(): ThreadCard[] {
   const p = useProjectState();
   const entries = useProject((s) => s.entries);
   const f = useFacilityState();
+  const ar = useAids((a) => a.lang) === 'ar';
   return useMemo(
-    () => chosenCards(taken, entries, since, p.cards).map((id) => ({ id, title: p.cards[id].title, picto: p.cards[id].picto, passed: threadPassed(id, p, f) })),
-    [taken, since, entries, p, f],
+    () => chosenCards(taken, entries, since, p.cards).map((id) => {
+      const c = p.cards[id];
+      const title = ar && c.origin === 'picture' && c.picto && PICTOS[c.picto as PictoKey] ? PICTOS[c.picto as PictoKey].ar : c.title;
+      return { id, title, picto: c.picto, passed: threadPassed(id, p, f) };
+    }),
+    [taken, since, entries, p, f, ar],
   );
 }

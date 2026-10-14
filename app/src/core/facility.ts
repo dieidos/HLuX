@@ -3,6 +3,9 @@
 
 import type { Feeling, Id, Lean, LinkKind, NodeKind, Rank, Spot } from './acts';
 
+/** Seul le nom d'une image générique (« papiers »…) passe au collectif : jamais un texte libre (comme le cœur Rust). */
+const genericPicto = (p: string | null | undefined): string | null => (p && /^[a-z_]{1,32}$/.test(p) ? p : null);
+
 export type Source = 'consented_word' | 'team' | 'cvs';
 export type Qualification = 'individual' | 'signal' | 'repeated' | 'confirmed';
 export type Criterion = 'effect' | 'rights' | 'feasibility' | 'urgency' | 'cooperation' | 'resources';
@@ -62,11 +65,11 @@ const orientation = (s: FacilityState, id: Id) =>
 
 function fold(s: FacilityState, a: FacilityAct): void {
   switch (a.act) {
-    case 'agenda_item': s.agenda.push({ item: a.item, title: a.title, source: a.source, session: a.session, picto: a.picto ?? null }); break;
+    case 'agenda_item': s.agenda.push({ item: a.item, title: a.title, source: a.source, session: a.session, picto: genericPicto(a.picto) }); break;
     case 'attendance': s.attendance = { session: a.session, present: a.present, absent: a.absent, facilitator: a.facilitator }; break;
     case 'floor_given': s.floor = a.to; break;
     // Déplacer une carte garde sa qualification : seul le groupe la change (finding_qualified).
-    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: s.findings[a.finding]?.level ?? 'individual', picto: a.picto ?? s.findings[a.finding]?.picto ?? null }; break;
+    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: s.findings[a.finding]?.level ?? 'individual', picto: genericPicto(a.picto) ?? s.findings[a.finding]?.picto ?? null }; break;
     case 'finding_qualified': if (s.findings[a.finding]) s.findings[a.finding].level = a.level; break;
     case 'mandate_set': s.mandate = a.to; break;
     case 'cap_placed': {

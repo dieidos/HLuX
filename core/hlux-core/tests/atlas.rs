@@ -73,6 +73,9 @@ fn le_collectif_valide_ce_que_l_aide_propose_et_deplacer_garde_la_qualification(
     assert_eq!(e.facility_state().findings["c1"].level, Qualification::Confirmed);
     // L'image venue de la Carte reste sur la carte déplacée.
     assert_eq!(e.facility_state().findings["c1"].picto.as_deref(), Some("papiers"));
+    // Un texte libre à la place d'une image ne passe pas.
+    e.act_facility(&Who::hand("bruno"), FacilityAct::FindingPlaced { finding: "c9".into(), title: "x".into(), zone: Feeling::Unsure, source: Source::Team, author: "Bruno".into(), picto: Some("Amina a peur".into()) }).unwrap();
+    assert_eq!(e.facility_state().findings["c9"].picto, None);
 
     let p = e.act_facility(&Who::machine(), FacilityAct::FindingPlaced { finding: "c2".into(), title: "Proposé".into(), zone: Feeling::Unsure, source: Source::Team, author: "".into(), picto: None }).unwrap();
     assert_eq!(e.pending_facility().len(), 1, "la proposition attend l'animateur");

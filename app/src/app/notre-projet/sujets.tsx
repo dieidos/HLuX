@@ -2,6 +2,7 @@
 // Seul passe ce qu'elle choisit d'apporter, sous la forme qu'elle choisit ; « Pas maintenant » reste
 // possible. Le sujet entre à l'ordre du jour, avec sa source ; la Carte passe du jaune au vert.
 
+import { PICTOS } from '../../design/pictos';
 import { More } from '../../components/More';
 import { Picto } from '../../components/Picto';
 import { useThreadCards } from '../../core/useThread';
@@ -65,7 +66,7 @@ export default function Sujets() {
     }
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
     actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
-    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session, picto: card.picto });
+    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session, picto: card.picto && card.picto in PICTOS ? card.picto : null });
     tell(tNow("Oui, j'apporte. Le sujet entre à l'ordre du jour.", 'نعم، أقدّمه. يدخل الموضوع جدول الأعمال.', "Oui. Le sujet va au groupe."), pathname);
   };
   // « Pas maintenant » : rien ne passe, et la Carte le garde dans son parcours.

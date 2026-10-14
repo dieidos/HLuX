@@ -102,7 +102,7 @@ export default function Choix() {
                 <Text style={st.rank}>{rl}</Text>
                 <View style={st.row}>
                   {ranked.filter(([c]) => (f.criteria[c] ?? 'not_yet') === r).map(([c, label]) => (
-                    <Draggable key={c} id={c} label={label}>
+                    <Draggable key={c} id={c} label={label} hint={rl === '?' ? 'Pas encore rangé. Le prendre, puis le poser dans un rang.' : `Rang : ${rl}. Le prendre, puis le poser ailleurs pour changer.`}>
                       {/* Le critère se range au geste (prendre, poser), comme en 04 — pas de bouton dans le bouton. */}
                       <View style={st.rankRow}>
                         <Text style={st.crit}>{label}</Text>

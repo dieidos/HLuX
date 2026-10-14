@@ -5,7 +5,7 @@ import { Link, usePathname } from 'expo-router';
 import type { ReactNode } from 'react';
 import { I18nManager, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import {say, useAids, useFamily, useLive, useRegister, useWords } from '../core/useAids';
+import {say, useAids, useFamily, useLive, useRegister, useT, useWords } from '../core/useAids';
 import { PersonMenu } from './PersonMenu';
 import { Picto } from './Picto';
 import { useThreadCards } from '../core/useThread';
@@ -54,12 +54,13 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const live = useLive();
   const me = useMe();
   const thread = useThreadCards();
+  const tw = useT();
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
         {me.id ? <View style={st.home}><Wordmark /></View> : <Link href="/" accessibilityLabel={reg === 'ar' && facing ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>}
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
-        <ThreadPill />
+        <ThreadPill facing={facing} />
         <PersonMenu />
         {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
         <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>
@@ -67,8 +68,10 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
             const on = path === href;
             // Le fil : chaque étape traversée par une Carte choisie porte sa petite image (l'Atlas les allume).
             const lit = me.id ? thread.filter((c) => c.passed.includes(href)) : [];
+            // Devant le groupe, jamais le titre d'une Carte (ses mots à elle) : les images seulement.
+            const hint = lit.length ? (facing ? tw(`Passées par ici : ${lit.map((c) => c.title).join(', ')}`, `مرّت من هنا: ${lit.map((c) => c.title).join('، ')}`) : tw(`${lit.length} Carte(s) passée(s) par ici`, `${lit.length} بطاقة مرّت من هنا`)) : undefined;
             return (
-              <Link key={href} href={href as never} accessibilityState={{ selected: on }} accessibilityHint={lit.length ? `Passées par ici : ${lit.map((c) => c.title).join(', ')}` : undefined} style={[st.step, lit.length > 0 && st.stepLit, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
+              <Link key={href} href={href as never} accessibilityState={{ selected: on }} accessibilityHint={hint} style={[st.step, lit.length > 0 && st.stepLit, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
                 <View style={st.stepRow}>
                   {lit.slice(-3).map((c) => (c.picto ? <Picto key={c.id} name={c.picto} size={16} label={false} /> : <Text key={c.id} style={st.stepTxt}>●</Text>))}
                   <Text style={[st.stepTxt, { fontFamily: bold }, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
@@ -92,17 +95,21 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
 }
 
 /** Le fil, dans le bandeau : les images des Cartes choisies (les trois dernières, puis « +n »). */
-function ThreadPill() {
+function ThreadPill({ facing }: { facing: boolean }) {
   const cards = useThreadCards();
+  const t = useT();
   const me = useMe();
   const path = usePathname();
   if (!me.id || !cards.length) return null;
   const shown = cards.slice(-3);
+  const names = cards.map((c) => c.title).join(t(', ', '، '));
+  const count = t(`${cards.length} Carte${cards.length > 1 ? 's' : ''}`, `${cards.length} بطاقة`, `${cards.length} carte${cards.length > 1 ? 's' : ''}`);
   const here = cards.some((c) => c.passed.includes(path));
   return (
-    <View style={[st.pill, here && st.pillHere]} accessibilityLabel={`Le fil : ${cards.map((c) => c.title).join(', ')}`}>
+    <View style={[st.pill, here && st.pillHere]} accessibilityLabel={facing ? t(`Le fil : ${names}`, `الخيط: ${names}`, `Mes cartes : ${names}`) : t(`Le fil : ${count}`, `الخيط: ${count}`)}>
       {shown.map((c) => (c.picto ? <Picto key={c.id} name={c.picto} size={22} label={false} /> : <Text key={c.id}>🃏</Text>))}
-      <Text style={st.pillTxt} numberOfLines={1}>{cards.length === 1 ? cards[0].title : `${cards.length} Cartes`}</Text>
+      {/* Devant le groupe, les images seulement : le titre d'une Carte, ce sont ses mots à elle. */}
+      <Text style={st.pillTxt} numberOfLines={1}>{facing && cards.length === 1 ? names : count}</Text>
     </View>
   );
 }
@@ -136,8 +143,6 @@ function Aid({ on, label, onPress, font }: { on: boolean; label: string; onPress
 const st = StyleSheet.create({
   page: { flex: 1, backgroundColor: C.bg },
   top: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line, zIndex: 20 },
-  other: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: S.radiusPill, borderWidth: 2, backgroundColor: C.surface },
-  otherTxt: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   home: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, minHeight: S.touch, justifyContent: 'center' },
   proj: { fontFamily: F.bold, color: C.ink, fontSize: 15 },
   stepper: { flex: 1, flexDirection: 'row', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap' },

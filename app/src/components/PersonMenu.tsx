@@ -3,7 +3,7 @@
 // et ce qui servait rarement (copie, départ, changer de personne, fermer la séance) s'ouvre à la demande.
 import { Link, router, usePathname } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { needsBackup } from '../core/profiles';
 import { useT, useWords } from '../core/useAids';
@@ -42,8 +42,11 @@ export function PersonMenu() {
         <Text style={st.toggleTxt}>{w('hello')} {me.name} 👋</Text>
         <Text style={st.toggleTxt}>{waiting ? ' •' : ''} ▾</Text>
       </Pressable>
-      {open ? (
-        <View style={[st.panel, { maxHeight: height * 0.75, width: Math.min(400, width - 32) }]}>
+      {/* Une fenêtre au-dessus de l'écran (et non un panneau qui déborde) : sur Android, un toucher hors
+          des limites du parent ne passerait pas. Toucher à côté, ou « retour », la referme. */}
+      <Modal visible={open} transparent animationType="none" onRequestClose={() => setOpen(false)}>
+        <Pressable style={st.backdrop} onPress={() => setOpen(false)} accessibilityLabel={t('Fermer le menu', 'إغلاق القائمة')} />
+        <View style={[st.panel, { maxHeight: height * 0.8, width: Math.min(400, width - 32) }]}>
           <ScrollView contentContainerStyle={{ gap: 10 }}>
             {/* L'autre projet, à un geste (sur la tablette ; « Notre projet » n'existe pas sur son téléphone). */}
             {path.startsWith('/notre-projet') ? (
@@ -108,16 +111,17 @@ export function PersonMenu() {
             )}
           </ScrollView>
         </View>
-      ) : null}
+      </Modal>
     </View>
   );
 }
 
 const st = StyleSheet.create({
-  wrap: { position: 'relative', zIndex: 20 },
+  wrap: {},
+  backdrop: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, backgroundColor: C.scrim },
   toggle: { flexDirection: 'row', alignItems: 'center', minHeight: S.touch, paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.pp.soft, borderWidth: 1, borderColor: C.pp.value },
   toggleTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
-  panel: { position: 'absolute', top: S.touch + 8, end: 0, padding: 14, borderRadius: S.radius, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, shadowColor: C.ink, shadowOpacity: 0.12, shadowRadius: 16, elevation: 8 },
+  panel: { position: 'absolute', top: 72, end: 16, padding: 14, borderRadius: S.radius, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, shadowColor: C.ink, shadowOpacity: 0.12, shadowRadius: 16, elevation: 8 },
   box: { gap: 8, padding: 12, borderRadius: 12, backgroundColor: C.surface2 },
   item: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 12, backgroundColor: C.surface2, borderWidth: 1, borderColor: C.line },
   itemTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
