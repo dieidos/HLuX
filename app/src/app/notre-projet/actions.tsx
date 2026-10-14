@@ -16,11 +16,6 @@ import { band, LEANS } from '../../core/views';
 import { C, F, S } from '../../design/theme';
 
 const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
-const EXAMPLES: [string, string, string][] = [
-  ['Atelier courriers du mardi', 'binôme', 'chaque semaine'],
-  ['Binôme de lecture', 'à la demande', 'quand il faut'],
-  ['Permanence CAF', 'avec partenaire', 'chaque mois'],
-];
 
 export default function Actions() {
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
@@ -32,25 +27,35 @@ export default function Actions() {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [aided, setAided] = useState(false);
-  const [review, setReview] = useState('au printemps, avec les personnes');
+  const [review, setReview] = useState('');
+  const [modality, setModality] = useState('');
+  const [rhythm, setRhythm] = useState('');
+  const [chosen, setChosen] = useState<string | null>(null);
   const solutions = Object.entries(f.solutions);
   const decision = Object.values(f.orientations).find((o) => o.decision)?.decision;
   const commitments = Object.entries(f.commitments);
 
-  const addSolution = (t: string, m = '', r = '') => {
-    if (!t.trim()) return;
-    act(who, { act: 'solution', solution: `s-${solutions.length + 1}`, title: t.trim(), modality: m, rhythm: r });
+  const addSolution = () => {
+    if (!title.trim()) return;
+    act(who, { act: 'solution', solution: `s-${solutions.length + 1}`, title: title.trim(), modality: modality.trim(), rhythm: rhythm.trim() });
     setTitle('');
+    setModality('');
+    setRhythm('');
   };
   const lean = (sol: string, effect: boolean, l: Lean) => {
     act(who, { act: 'solution_lean', solution: sol, effect, by: who, lean: l });
     say(`${who} : ${effect ? 'effet' : 'faisabilité'}, ${LEAN_WORDS[l]}.`);
   };
+  // Le fil de l'engagement : la parole consentie qui l'a fait naître, l'orientation décidée, la solution.
+  const thread = (sol: string) => {
+    const said = f.agenda.filter((a) => a.source === 'consented_word').map((a) => a.title);
+    const oriented = Object.values(f.orientations).filter((o) => o.decision).map((o) => o.title);
+    return [...said, ...oriented, f.solutions[sol]?.title ?? '', 'engagement'].filter(Boolean);
+  };
   const commit = () => {
-    if (!text.trim() || !solutions[0]) return;
-    const thread = ['Papiers', 'Comprendre mes courriers seule', 'Comprendre les courriers', 'engagement'];
+    if (!text.trim() || !chosen) return;
     const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
-    act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: solutions[0][0], thread, review }, prov, conf);
+    act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: chosen, thread: thread(chosen), review: review.trim() }, prov, conf);
     setAided(false);
     say('Carte-engagement validée.');
     setText('');
@@ -98,16 +103,12 @@ export default function Actions() {
               ))}
             </View>
           ))}
-          {solutions.length === 0 && (
-            <View style={st.row}>
-              {EXAMPLES.map(([t, m, r]) => (
-                <Pressable key={t} onPress={() => addSolution(t, m, r)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>＋ {t}</Text></Pressable>
-              ))}
-            </View>
-          )}
+          {solutions.length === 0 && <Text style={st.small}>Plusieurs solutions avant un engagement : écrivez-les, une à une.</Text>}
           <View style={st.row}>
-            <TextInput value={title} onChangeText={setTitle} placeholder="Une autre solution…" style={st.input} accessibilityLabel="Nouvelle solution" />
-            <Pressable onPress={() => addSolution(title)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
+            <TextInput value={title} onChangeText={setTitle} placeholder="Une solution…" style={st.input} accessibilityLabel="Nouvelle solution" />
+            <TextInput value={modality} onChangeText={setModality} placeholder="comment (binôme, partenaire…)" style={st.input} accessibilityLabel="Modalité" />
+            <TextInput value={rhythm} onChangeText={setRhythm} placeholder="à quel rythme" style={st.input} accessibilityLabel="Rythme" />
+            <Pressable onPress={addSolution} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
           </View>
         </View>
 
@@ -121,7 +122,15 @@ export default function Actions() {
           ))}
           <TextInput value={text} onChangeText={setText} multiline placeholder="« Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »" style={st.input} accessibilityLabel="Texte de l'engagement" />
           <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
-          <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler" style={st.input} accessibilityLabel="Date pour en reparler" />
+          <View style={st.row}>
+            <Text style={st.small}>Pour quelle solution ?</Text>
+            {solutions.map(([id, x]) => (
+              <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: chosen === id }} onPress={() => setChosen(id)} style={[st.btn, chosen === id && st.on]}>
+                <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{x.title}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler (au printemps, avec les personnes…)" style={st.input} accessibilityLabel="Date pour en reparler" />
           <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe</Text></Pressable>
         </View>
       </ScrollView>

@@ -9,33 +9,20 @@ import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
 import { PathView } from '../../components/PathView';
-import { provenanceOf, type FacilityAct } from '../../core/facility';
+import { router } from 'expo-router';
+
+import { DragArea, Draggable, Zone } from '../../components/Drag';
+import { PathEditor } from '../../components/PathEditor';
+import { provenanceOf } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useProject, useTeam } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
-const MONTHS = ['janvier', 'février', 'mars', 'avril'];
-const LANES = ['atelier', 'CAF', 'équipe'];
-
-/** Le suivi tel que l'Atlas le montre (écran 12). */
-const ATLAS: FacilityAct[] = [
-  { act: 'node_set', node: 'decide', lane: 'atelier', kind: 'decision', label: 'décidé ensemble', when: 'janvier' },
-  { act: 'node_set', node: 'mardi', lane: 'atelier', kind: 'event', label: 'premier mardi', when: 'février' },
-  { act: 'node_set', node: 'revue', lane: 'atelier', kind: 'event', label: 'revue avec les personnes', when: 'avril' },
-  { act: 'node_set', node: 'jeudi', lane: 'atelier', kind: 'event', label: 'jeudi aussi ?', when: 'mars' },
-  { act: 'node_set', node: 'convention', lane: 'CAF', kind: 'event', label: 'convention CAF', when: 'février' },
-  { act: 'node_set', node: 'permanence', lane: 'CAF', kind: 'event', label: 'permanence CAF', when: 'mars' },
-  { act: 'node_set', node: 'fiches', lane: 'équipe', kind: 'event', label: 'fiches en FALC', when: 'février' },
-  { act: 'link_set', from: 'decide', to: 'mardi', link: { kind: 'chosen' } },
-  { act: 'link_set', from: 'mardi', to: 'revue', link: { kind: 'chosen' } },
-  { act: 'link_set', from: 'mardi', to: 'jeudi', link: { kind: 'condition', words: 'si plus de 8 viennent' } },
-  { act: 'link_set', from: 'convention', to: 'permanence', link: { kind: 'dependency', words: 'attend la convention' } },
-  { act: 'link_set', from: 'decide', to: 'fiches', link: { kind: 'chosen' } },
-  { act: 'load', load: 'atelier', name: "📮 L'atelier du mardi", carriers: ['Léa', 'Bruno'], rhythm: 'chaque semaine' },
-  { act: 'load', load: 'caf', name: '🤝 Le lien avec la CAF', carriers: ['Aïcha'], rhythm: 'quand il faut' },
-  { act: 'load', load: 'falc', name: '📝 Les fiches en FALC', carriers: ['Karim'], rhythm: 'chaque mois' },
-];
+const MONTH_NAMES = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+/** Six mois à partir du mois en cours : le temps du suivi, de gauche à droite. */
+const nextMonths = (from = new Date()) => Array.from({ length: 6 }, (_, k) => MONTH_NAMES[(from.getMonth() + k) % 12]);
+const LANES = ['actions', 'partenaires', 'équipe'];
 
 export default function Suivi() {
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
@@ -44,7 +31,10 @@ export default function Suivi() {
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const [others, setOthers] = useState(false);
-  const [moving, setMoving] = useState<{ load: string; from: string } | null>(null);
+  const [loadName, setLoadName] = useState('');
+  const [loadRhythm, setLoadRhythm] = useState('');
+  const [loadCarriers, setLoadCarriers] = useState<string[]>([]);
+  const [live, setLive] = useState('');
   const [result, setResult] = useState('');
   const [aided, setAided] = useState(false);
   const noteResult = (back: boolean) => {
@@ -53,52 +43,103 @@ export default function Suivi() {
     act(author, { act: 'result', text: result.trim(), back_to_finding: back }, prov, conf);
     setResult('');
     setAided(false);
-    if (back) say('Retour au constat.');
+    if (back) {
+      say('Retour au constat.');
+      router.push('/notre-projet/constat');
+    }
   };
   const nodes = Object.entries(f.nodes).map(([id, n]) => ({ id, ...n }));
-  const commitment = Object.values(f.commitments)[0];
+  const months = [...new Set([...nextMonths(), ...nodes.map((n) => n.when)])];
+  const lanes = [...new Set([...LANES, ...nodes.map((n) => n.lane)])];
+  const commitments = Object.entries(f.commitments);
+  const place = useProject((x) => x.setup?.name ?? '');
+  const by = opener || 'groupe';
 
-  const carry = (load: string, to: string) => {
-    if (!moving) return;
+  // Une charge passe d'un porteur à l'autre par le geste : on prend le prénom, on le pose sur un autre.
+  const carry = (dragged: string, target: string) => {
+    const [load, from] = dragged.split('|');
+    const [load2, to] = target.split('|');
+    if (load !== load2 || from === to) return;
     const l = f.loads[load];
-    const carriers = [...l.carriers.filter((c) => c !== moving.from && c !== to), to];
-    act('groupe', { act: 'load', load, name: l.name, carriers, rhythm: l.rhythm });
-    say(`${l.name} : ${moving.from} passe la main à ${to}.`);
-    setMoving(null);
+    const carriers = [...l.carriers.filter((c) => c !== from && c !== to), to];
+    act(by, { act: 'load', load, name: l.name, carriers, rhythm: l.rhythm });
+    const t = `${l.name} : ${from} passe la main à ${to}.`;
+    say(t);
+    setLive(t);
+  };
+  const addLoad = () => {
+    if (!loadName.trim() || !loadCarriers.length) return;
+    act(by, { act: 'load', load: `charge-${Object.keys(f.loads).length + 1}`, name: loadName.trim(), carriers: loadCarriers, rhythm: loadRhythm.trim() });
+    setLoadName('');
+    setLoadRhythm('');
+    setLoadCarriers([]);
   };
 
   return (
     <Screen side="pe" title="follow" question="Qui fait quoi, et quand ? Et ce qui en résulte.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
-        {nodes.length === 0 ? (
-          <Pressable onPress={() => ATLAS.forEach((a) => act('groupe', a))} style={[st.btn, st.on]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: C.onAccent }]}>Poser le suivi décidé (exemple de l’Atlas)</Text>
-          </Pressable>
+        {nodes.length > 0 ? (
+          <PathView columns={months} lanes={lanes} nodes={nodes} links={f.links} showOthers={others} />
         ) : (
-          <PathView columns={MONTHS} lanes={LANES} nodes={nodes} links={f.links} showOthers={others} />
+          <Text style={st.small}>Le chemin collectif se pose ici, étape par étape : ce qui est décidé ensemble, ce qui arrive.</Text>
         )}
+        <PathEditor
+          columns={months}
+          lanes={lanes}
+          nodes={nodes}
+          decisionLabel="décidé ensemble"
+          onAdd={(n) => {
+            const id = `suivi-${nodes.length + 1}`;
+            act(by, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when });
+            if (n.link) act(by, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
+            say(`${n.label} : posé sur le chemin collectif, ${n.when}.`);
+          }}
+        />
         <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}>
           <Text style={[st.btnTxt, others && { color: C.onAccent }]}>🌈 Conditions et dépendances</Text>
         </Pressable>
 
         <View style={st.box}>
           <Text style={st.h}>Ce que nous portons</Text>
-          {Object.entries(f.loads).map(([id, l]) => (
-            <View key={id} style={st.load}>
-              <Text style={[st.loadName, { flex: 1 }]}>{l.name}</Text>
-              <View style={st.row}>
-                {l.carriers.map((c) => (
-                  <Pressable key={c} onPress={() => setMoving({ load: id, from: c })} style={[st.chip, moving?.load === id && moving.from === c && st.on]} accessibilityRole="button" accessibilityLabel={`${c} porte ${l.name}. Toucher pour passer la main.`}>
-                    <Text style={[st.btnTxt, moving?.load === id && moving.from === c && { color: C.onAccent }]}>{c}</Text>
-                  </Pressable>
-                ))}
-                {moving?.load === id && PEOPLE.filter((p) => !l.carriers.includes(p)).map((p) => (
-                  <Pressable key={p} onPress={() => carry(id, p)} style={st.chipTo} accessibilityRole="button"><Text style={st.btnTxt}>→ {p}</Text></Pressable>
-                ))}
+          <DragArea>
+            {Object.entries(f.loads).map(([id, l]) => (
+              <View key={id} style={st.load}>
+                <Text style={[st.loadName, { flex: 1 }]}>{l.name}</Text>
+                <View style={st.row}>
+                  {l.carriers.map((c) => (
+                    <Draggable key={c} id={`${id}|${c}`} label={`${c} porte ${l.name}`}>
+                      <Text style={[st.chip, st.btnTxt]}>{c}</Text>
+                    </Draggable>
+                  ))}
+                  {PEOPLE.filter((p) => !l.carriers.includes(p)).map((p) => (
+                    <Zone key={p} id={`${id}|${p}`} label={`${p}, pour ${l.name}`} onDrop={(dragged) => carry(dragged, `${id}|${p}`)} style={st.chipTo}>
+                      <Text style={st.btnTxt}>{p}</Text>
+                    </Zone>
+                  ))}
+                </View>
+                {l.rhythm ? <Text style={st.small}>{l.rhythm}</Text> : null}
               </View>
-              <Text style={st.small}>{l.rhythm}</Text>
-            </View>
-          ))}
+            ))}
+          </DragArea>
+          {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
+          <View style={st.row}>
+            <TextInput value={loadName} onChangeText={setLoadName} placeholder="Ce que nous portons…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 200 }]} accessibilityLabel="Nouvelle charge" />
+            <TextInput value={loadRhythm} onChangeText={setLoadRhythm} placeholder="à quel rythme" style={[st.input, { minHeight: S.touch, minWidth: 160 }]} accessibilityLabel="Rythme de la charge" />
+          </View>
+          <View style={st.row}>
+            <Text style={st.small}>Qui la porte ?</Text>
+            {PEOPLE.map((p) => {
+              const on = loadCarriers.includes(p);
+              return (
+                <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setLoadCarriers(on ? loadCarriers.filter((x) => x !== p) : [...loadCarriers, p])} style={[st.btn, on && st.on]}>
+                  <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
+                </Pressable>
+              );
+            })}
+            <Pressable accessibilityRole="button" onPress={addLoad} style={[st.btn, st.on]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>＋ Une charge</Text>
+            </Pressable>
+          </View>
           <Text style={st.small}>On remarque les prénoms : chacun apporte ce qu’il peut.</Text>
         </View>
 
@@ -113,15 +154,18 @@ export default function Suivi() {
           </View>
         </View>
 
-        {commitment && (
+        {commitments.length > 0 && (
           <View style={st.box}>
             <Text style={st.h}>Proposer aux personnes</Text>
             <Text style={st.small}>Le collectif ne lit jamais leur chemin : il propose, et chacune choisit de relier, depuis son espace.</Text>
-            {Object.values(f.proposals).map((p) => <Text key={p} style={st.result}>📣 {p}</Text>)}
-            {!Object.keys(f.proposals).length && (
-              <Pressable onPress={() => act('groupe', { act: 'proposal', proposal: 'atelier-mardi', text: "L'atelier courriers du mardi" })} style={[st.btn, st.on]} accessibilityRole="button">
-                <Text style={[st.btnTxt, { color: C.onAccent }]}>Le CHRS propose : l’atelier courriers du mardi</Text>
-              </Pressable>
+            {commitments.map(([id, c]) =>
+              f.proposals[`p-${id}`] ? (
+                <Text key={id} style={st.result}>📣 {f.proposals[`p-${id}`]}</Text>
+              ) : (
+                <Pressable key={id} onPress={() => act(by, { act: 'proposal', proposal: `p-${id}`, text: c.text })} style={[st.btn, st.on]} accessibilityRole="button">
+                  <Text style={[st.btnTxt, { color: C.onAccent }]}>{place} propose : {c.text}</Text>
+                </Pressable>
+              ),
             )}
           </View>
         )}

@@ -14,7 +14,9 @@ export function cardThread(card: Id, p: ProjectState, f: FacilityState | null): 
   for (const m of c.moments.slice(1)) out.push({ step: 'Ressentie', detail: m });
   for (const i of Object.values(p.ideas)) if (i.fromCard === card) out.push({ step: 'Une envie en est née', detail: i.title });
   for (const s of Object.values(p.subjects)) if (s.card === card) out.push({ step: 'Apportée au collectif', detail: s.forCollective });
-  const joined = f ? Object.values(f.commitments).filter((e) => e.thread[0] === c.title) : [];
+  // L'engagement rejoint la Carte par la parole consentie (la phrase « pour le collectif » de son sujet).
+  const said = new Set([c.title, ...Object.values(p.subjects).filter((x) => x.card === card).map((x) => x.forCollective)]);
+  const joined = f ? Object.values(f.commitments).filter((e) => e.thread.some((t) => said.has(t))) : [];
   for (const e of joined) out.push({ step: 'Un engagement du collectif', detail: e.text });
   // La proposition du collectif, reliée par Amina à son chemin, referme le fil.
   if (joined.length) for (const l of p.linkedProposals) out.push({ step: 'Reliée à mon chemin', detail: l.proposal });

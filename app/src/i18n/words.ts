@@ -99,7 +99,7 @@ export const WORDS = {
   closedNote: { fr: 'Hors séance, les profils restent fermés. Les données restent sur cette tablette.', ar: 'خارج الجلسة، تبقى الملفات مغلقة. تبقى البيانات على هذا الجهاز اللوحي.', falc: 'Sans séance, tout reste fermé.' },
   // Copie, départ, restauration (passage 11)
   backupReminder: { fr: 'Pense à emporter une copie de ton dossier.', ar: 'تذكّري أن تأخذي نسخة من ملفّكِ.', falc: 'Garde une copie de ton dossier.' },
-  leaving: { fr: 'Je quitte le CHRS', ar: 'أغادر المركز', falc: 'Je pars' },
+  leaving: { fr: 'Je quitte l’établissement', ar: 'أغادر المؤسسة', falc: 'Je pars' },
   eraseHere: { fr: 'Effacer mon dossier de cette tablette', ar: 'محو ملفّي من هذا الجهاز اللوحي', falc: 'Effacer de la tablette' },
   eraseNote: { fr: "D'abord une copie emportée. Ce que tu as apporté au collectif reste au collectif.", ar: 'أوّلاً نسخة تأخذينها معكِ. ما قدّمتِه للمجموعة يبقى للمجموعة.', falc: "D'abord la copie. Puis on efface." },
   restore: { fr: 'Retrouver un dossier', ar: 'استعادة ملف', falc: 'Reprendre un dossier' },

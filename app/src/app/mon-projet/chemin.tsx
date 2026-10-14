@@ -8,12 +8,13 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { Screen } from '../../components/Chrome';
 import { AideButton } from '../../components/AideButton';
 import { DossierCopy } from '../../components/DossierCopy';
+import { PathEditor } from '../../components/PathEditor';
 import { PathView } from '../../components/PathView';
+import { PlanEditor } from '../../components/PlanEditor';
 import { say, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
-import type { WordKey } from '../../i18n/words';
 
 const SEASONS = ['automne', 'hiver', 'printemps', 'été'];
 const LANES = ['démarches', 'formation', 'activité', 'permis'];
@@ -25,15 +26,18 @@ export default function Chemin() {
   const act = useProject((x) => x.act);
   const [others, setOthers] = useState(false);
   const [whatIf, setWhatIf] = useState(false);
-  const [question, setQuestion] = useState('Et si le rendez-vous à la CAF était repoussé ?');
+  const [question, setQuestion] = useState('');
   const [moved, setMoved] = useState<{ node: string; when: string } | null>(null);
   const [plan, setPlan] = useState(false);
   const [story, setStory] = useState('');
   const [planWords, setPlanWords] = useState('');
   const facility = useFacilityState();
+  const place = useProject((x) => x.setup?.name ?? '');
   const proposals = Object.entries(facility.proposals).filter(([id]) => !s.linkedProposals.some((l) => l.proposal === id));
 
   const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n }));
+  // Les couloirs de l'Atlas, plus ceux que la personne a nommés.
+  const lanes = [...new Set([...LANES, ...nodes.map((n) => n.lane)])];
   const copy = nodes.map((n) => (moved && n.id === moved.node ? { ...n, when: moved.when } : n));
   const movable = nodes.filter((n) => n.kind === 'event');
   const movedNode = moved ? nodes.find((n) => n.id === moved.node) : null;
@@ -54,11 +58,29 @@ export default function Chemin() {
     <Screen side="pp" title="path" question={w('pathQuestion')}>
       <ScrollView contentContainerStyle={{ gap: 12 }}>
         {!whatIf ? (
-          <PathView columns={SEASONS} lanes={LANES} nodes={nodes} links={s.links} showOthers={others} />
+          <>
+            {nodes.length ? (
+              <PathView columns={SEASONS} lanes={lanes} nodes={nodes} links={s.links} showOthers={others} />
+            ) : (
+              <Text style={st.small}>Ton chemin commence ici : pose une première étape, avec la personne qui t’accompagne. C’est toi qui écris.</Text>
+            )}
+            <PathEditor
+              columns={SEASONS}
+              lanes={lanes}
+              nodes={nodes}
+              decisionLabel="je choisis"
+              onAdd={(n) => {
+                const id = `etape-${nodes.length + 1}`;
+                act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: false });
+                if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
+                say(`${n.label} : posée sur ton chemin, ${n.when}.`);
+              }}
+            />
+          </>
         ) : (
           <View style={{ gap: 8 }}>
             <Text style={st.copy}>{w('copyNote')}</Text>
-            <TextInput value={question} onChangeText={setQuestion} style={st.input} accessibilityLabel="Ma question Et si" />
+            <TextInput value={question} onChangeText={setQuestion} placeholder="Et si… ?" style={st.input} accessibilityLabel="Ma question Et si" />
             <View style={st.chips}>
               {movable.map((n) => (
                 <Pressable accessibilityRole="button" key={n.id} onPress={() => setMoved({ node: n.id, when: SEASONS[(SEASONS.indexOf((moved?.node === n.id ? moved.when : n.when)) + 1) % SEASONS.length] })} style={[st.pick, moved?.node === n.id && st.pickOn]}>
@@ -66,7 +88,7 @@ export default function Chemin() {
                 </Pressable>
               ))}
             </View>
-            <PathView columns={SEASONS} lanes={LANES} nodes={copy} links={s.links} showOthers dashed />
+            <PathView columns={SEASONS} lanes={lanes} nodes={copy} links={s.links} showOthers dashed />
             <AideButton kind="narrate" label="Raconter ce qui s'ouvre, ce qui se ferme" text={facts} who={me.name} onProposal={setStory} />
             {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel="Récit de la copie" /> : null}
             <View style={st.chips}>
@@ -78,7 +100,7 @@ export default function Chemin() {
 
         {proposals.map(([id, text]) => (
           <View key={id} style={st.inset}>
-            <Text style={st.tileTitle}>Le CHRS propose : {text}.</Text>
+            <Text style={st.tileTitle}>{place} propose : {text}.</Text>
             <Text style={st.small}>Le collectif ne lit jamais ton chemin. C’est toi qui y fais entrer ce qu’il propose.</Text>
             <Pressable
               onPress={() => {
@@ -102,12 +124,11 @@ export default function Chemin() {
 
         {plan && (
           <View style={st.plan}>
-            {([['planFirst', s.plan.first], ['planWaiting', s.plan.waiting.map(([a, b]) => `${a} · ${b}`)], ['planWith', s.plan.with_whom], ['planOpen', s.plan.open]] as [WordKey, string[]][]).map(([k, items]) => (
-              <View key={k} style={st.tile}>
-                <Text style={st.tileTitle}>{w(k)}</Text>
-                {items.map((i) => <Text key={i} style={st.tileItem}>{i}</Text>)}
-              </View>
-            ))}
+            <PlanEditor
+              plan={s.plan}
+              titles={{ first: w('planFirst'), waiting: w('planWaiting'), with_whom: w('planWith'), open: w('planOpen') }}
+              onChange={(plan) => act(me.id, { act: 'plan_set', plan })}
+            />
             <View style={{ flexBasis: '100%', gap: 6 }}>
               <AideButton kind="narrate" label="Dire mon plan en quelques phrases" text={planFacts} who={me.name} onProposal={setPlanWords} />
               {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel="Mon plan dans mes mots" /> : null}

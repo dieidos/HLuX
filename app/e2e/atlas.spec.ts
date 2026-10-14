@@ -262,7 +262,7 @@ test.describe('07 Sujets', () => {
   test("Sa difficulté reste privée, tant qu'elle ne choisit pas de la partager.", async ({ page }) => {
     await enter(page);
     await ours(page, /Sujets/);
-    await expect(page.getByText(/C’est bien ce que tu veux dire au CHRS \? Ton dossier reste chez toi\./)).toBeVisible();
+    await expect(page.getByText(/C’est bien ce que tu veux dire au collectif \? Ton dossier reste chez toi\./)).toBeVisible();
     // Rien n'est encore écrit pour le collectif : c'est elle qui décide.
     await expect(page.getByRole('button', { name: 'Pas maintenant' })).toBeVisible();
   });
@@ -271,7 +271,7 @@ test.describe('07 Sujets', () => {
     await enter(page);
     await ours(page, /Sujets/);
     await tap(page, '✨ Proposer une formulation générale');
-    await expect(page.getByLabel('Version pour le collectif')).toHaveValue(/Comprendre les courriers administratifs/);
+    await expect(page.getByLabel('Version pour le collectif')).toHaveValue(/est difficile pour plusieurs personnes\./);
     await expect(page.getByRole('button', { name: 'Pas maintenant' })).toBeVisible();
     await tap(page, 'Oui, j’apporte');
   });
@@ -282,7 +282,7 @@ test.describe('07 Sujets', () => {
     await tap(page, '✨ Proposer une formulation générale');
     await tap(page, 'Oui, j’apporte');
     await expect(page.getByText(/Ordre du jour/)).toBeVisible();
-    await expect(page.getByText('Comprendre les courriers administratifs est difficile pour plusieurs personnes.').first()).toBeVisible();
+    await expect(page.getByText(/Les lettres de la CAF.* est difficile pour plusieurs personnes\./).first()).toBeVisible();
   });
 });
 
@@ -358,6 +358,11 @@ test.describe('09 Cap', () => {
 
 // ── 10 Choix ───────────────────────────────────────────────────────────────────────────────────────
 
+async function orientation(page: Page, title = 'Accompagner la lecture des courriers') {
+  await fill(page, 'Nouvelle orientation', title);
+  await tap(page, '＋ Une orientation');
+}
+
 async function placeAs(page: Page, who: string, lean: string) {
   await page.getByRole('button', { name: `${who} : à venir` }).click();
   for (const r of await page.getByRole('radio', { name: lean, exact: true }).all()) await r.click();
@@ -370,14 +375,14 @@ test.describe('10 Choix', () => {
     await ours(page, /Choix/);
     await page.getByRole('button', { name: /👤 Effet attendu pour les personnes : \?/ }).click();
     await expect(page.getByRole('button', { name: /👤 Effet attendu pour les personnes : D'ABORD/ })).toBeVisible();
-    await tap(page, '＋ Une orientation');
+    await orientation(page);
     for (const v of ['Aïcha', 'Bruno', 'Karim', 'Léa', 'Le CVS']) await expect(page.getByRole('button', { name: `${v} : à venir` })).toBeVisible();
   });
 
   test('Chacun place seul, puis tout se révèle.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Choix/);
-    await tap(page, '＋ Une orientation');
+    await orientation(page);
     await placeAs(page, 'Karim', 'beaucoup');
     // On voit qui a placé, jamais où.
     await expect(page.getByRole('button', { name: 'Karim : a placé' })).toBeVisible();
@@ -389,7 +394,7 @@ test.describe('10 Choix', () => {
   test('Les écarts restent visibles ; le groupe décide.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Choix/);
-    await tap(page, '＋ Une orientation');
+    await orientation(page);
     await placeAs(page, 'Karim', 'beaucoup');
     await placeAs(page, 'Aïcha', 'peu');
     await tap(page, 'Tout révéler, ensemble');
@@ -403,22 +408,28 @@ test.describe('10 Choix', () => {
 
 // ── 11 Actions ─────────────────────────────────────────────────────────────────────────────────────
 
+async function solution(page: Page, title: string, modality = '', rhythm = '') {
+  await fill(page, 'Nouvelle solution', title);
+  if (modality) await fill(page, 'Modalité', modality);
+  if (rhythm) await fill(page, 'Rythme', rhythm);
+  await tap(page, 'Ajouter');
+}
+
 test.describe('11 Actions', () => {
   test('Trois solutions sur la table.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Actions/);
-    await tap(page, '＋ Atelier courriers du mardi');
-    for (const t of ['Binôme de lecture', 'Permanence CAF']) {
-      await fill(page, 'Nouvelle solution', t);
-      await tap(page, 'Ajouter');
-    }
-    for (const t of ['Atelier courriers du mardi', 'Binôme de lecture', 'Permanence CAF']) await expect(page.getByText(t, { exact: true })).toBeVisible();
+    await solution(page, 'Atelier courriers du mardi', 'binôme', 'chaque semaine');
+    await solution(page, 'Binôme de lecture');
+    await solution(page, 'Permanence CAF', 'avec partenaire', 'chaque mois');
+    for (const t of ['Atelier courriers du mardi', 'Binôme de lecture', 'Permanence CAF']) await expect(page.getByText(t, { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('binôme · chaque semaine')).toBeVisible();
   });
 
   test('Placées sur deux lignes : effet, faisabilité.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Actions/);
-    await tap(page, '＋ Atelier courriers du mardi');
+    await solution(page, 'Atelier courriers du mardi');
     await expect(page.getByText('REGARDS RÉUNIS · effet pour les personnes')).toBeVisible();
     await expect(page.getByText("REGARDS RÉUNIS · faisabilité pour l'équipe")).toBeVisible();
     await page.getByRole('button', { name: 'Aïcha, effet : beaucoup' }).click();
@@ -430,11 +441,13 @@ test.describe('11 Actions', () => {
   test('Engagement : un atelier chaque mardi.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Actions/);
-    await tap(page, '＋ Atelier courriers du mardi');
+    await solution(page, 'Atelier courriers du mardi');
     await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
+    await page.getByRole('radio', { name: 'Atelier courriers du mardi' }).click();
     await tap(page, 'Validée par le groupe');
     await expect(page.getByText('✓ un atelier courriers chaque mardi')).toBeVisible();
-    await expect(page.getByText(/fil : Papiers → .* → engagement/)).toBeVisible();
+    // Le fil part de la parole consentie, passe par la solution, finit à l'engagement.
+    await expect(page.getByText(/fil : Les horaires de la laverie → .*Atelier courriers du mardi → engagement/)).toBeVisible();
   });
 });
 
@@ -443,8 +456,9 @@ test.describe('11 Actions', () => {
 async function committed(page: Page, pro = 'Aïcha', person: string | null = null) {
   await enter(page, pro, person);
   await ours(page, /Actions/);
-  await tap(page, '＋ Atelier courriers du mardi');
+  await solution(page, 'Atelier courriers du mardi');
   await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
+  await page.getByRole('radio', { name: 'Atelier courriers du mardi' }).click();
   await tap(page, 'Validée par le groupe');
   await link(page, /Suivi/).click();
 }
@@ -452,21 +466,29 @@ async function committed(page: Page, pro = 'Aïcha', person: string | null = nul
 test.describe('12 Suivi', () => {
   test('Le suivi : qui porte quoi, et quand.', async ({ page }) => {
     await committed(page);
-    await tap(page, 'Poser le suivi décidé (exemple de l’Atlas)');
-    await expect(page.getByText('Ce que nous portons')).toBeVisible();
-    await expect(page.getByRole('button', { name: /porte / }).first()).toBeVisible();
+    await tap(page, '＋ Une étape');
+    await fill(page, "L'étape", 'premier mardi');
+    await tap(page, 'Poser l’étape');
+    await expect(page.getByText('premier mardi').first()).toBeVisible();
+    await fill(page, 'Nouvelle charge', "L'atelier du mardi");
+    await fill(page, 'Rythme de la charge', 'chaque semaine');
+    await page.getByRole('checkbox', { name: 'Léa' }).click();
+    await tap(page, '＋ Une charge');
     await expect(page.getByText('On remarque les prénoms : chacun apporte ce qu’il peut.')).toBeVisible();
+    // Le geste : prendre le prénom de Léa, le poser sur Bruno.
+    await drop(page, "Léa porte L'atelier du mardi", "Bruno, pour L'atelier du mardi");
+    await expect(page.getByText("L'atelier du mardi : Léa passe la main à Bruno.")).toBeVisible();
   });
 
   test("Amina relie l'atelier à son chemin.", async ({ page }) => {
     await committed(page, 'Sarah', 'Amina');
-    await tap(page, 'Le CHRS propose : l’atelier courriers du mardi');
+    await tap(page, 'CHRS Les Lilas propose : un atelier courriers chaque mardi');
     await page.locator('a[href="/"]').filter({ visible: true }).first().click();
     await expect(page.getByText('Bonjour Amina 👋').filter({ visible: true })).toBeVisible();
     await mine(page, /Chemin/);
-    await expect(page.getByText("Le CHRS propose : L'atelier courriers du mardi.")).toBeVisible();
+    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.')).toBeVisible();
     await tap(page, 'Je le relie à mon chemin');
-    await expect(page.getByText("Le CHRS propose : L'atelier courriers du mardi.")).toHaveCount(0);
+    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.')).toHaveCount(0);
   });
 
   test('Au printemps, trois personnes comprennent seules leurs courriers.', async ({ page }) => {
@@ -474,6 +496,9 @@ test.describe('12 Suivi', () => {
     await fill(page, 'Résultat', 'au printemps trois personnes comprennent seules leurs courriers');
     await tap(page, '✨ Mettre en mots le résultat');
     await tap(page, '🔁 Retour au constat');
-    await expect(page.getByText('📊 Au printemps trois personnes comprennent seules leurs courriers. → retour au constat 🔁')).toBeVisible();
+    // Le résultat ne suffit pas : on revient au constat, puis le suivi le garde, en mots.
+    await expect(page).toHaveURL(/notre-projet\/constat/);
+    await link(page, /Suivi/).click();
+    await expect(page.getByText('📊 Au printemps trois personnes comprennent seules leurs courriers. → retour au constat 🔁').filter({ visible: true })).toBeVisible();
   });
 });

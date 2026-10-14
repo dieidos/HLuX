@@ -33,7 +33,13 @@ export default function Constat() {
   const [title, setTitle] = useState('');
   const [source, setSource] = useState<Source>('team');
   const [reading, setReading] = useState('');
-  const speaker = f.floor ?? f.mandate ?? opener;
+  const speaker = f.floor ?? (f.mandate || opener);
+  const [mandating, setMandating] = useState(false);
+  const giveMandate = (to: string) => {
+    act('groupe', { act: 'mandate_set', to });
+    say(to ? `Le groupe confie l'animation à ${to}.` : "Le groupe reprend le mandat d'animation.");
+    setMandating(false);
+  };
   const session = f.attendance?.session ?? 'séance';
   // Les sujets consentis (écran 07) arrivent sur la table, à placer.
   const fromAgenda = f.agenda.filter((a) => a.source === 'consented_word' && !f.findings[a.item]);
@@ -63,6 +69,22 @@ export default function Constat() {
   return (
     <Screen side="pe" title="finding" question="Où en sommes-nous ? On croise plusieurs voix.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
+        <View style={st.row}>
+          <Text style={st.small}>{f.mandate ? `${f.mandate} anime, par mandat du groupe.` : 'Personne n’anime pour l’instant.'}</Text>
+          {f.mandate ? (
+            <Pressable accessibilityRole="button" onPress={() => giveMandate('')} style={st.btn}>
+              <Text style={st.btnTxt}>Retirer le mandat</Text>
+            </Pressable>
+          ) : null}
+          <Pressable accessibilityRole="button" accessibilityState={{ expanded: mandating }} onPress={() => setMandating(!mandating)} style={st.btn}>
+            <Text style={st.btnTxt}>{f.mandate ? 'Le confier à une autre personne' : 'Confier l’animation'}</Text>
+          </Pressable>
+          {mandating && PEOPLE.filter((p) => p !== f.mandate).map((p) => (
+            <Pressable key={p} accessibilityRole="button" onPress={() => giveMandate(p)} style={[st.btn, st.on]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{p}</Text>
+            </Pressable>
+          ))}
+        </View>
         <View style={st.row}>
           <Text style={st.floor}>🎙️ La parole est à {speaker}</Text>
           {PEOPLE.filter((p) => p !== speaker).map((p) => (

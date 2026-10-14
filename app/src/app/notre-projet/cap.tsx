@@ -28,10 +28,12 @@ export default function Cap() {
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
-  const [by, setBy] = useState(f.mandate ?? opener);
+  const [by, setBy] = useState(f.mandate || opener);
   const [title, setTitle] = useState('');
+  const [live, setLive] = useState('');
   const [change, setChange] = useState(f.expectedChange?.text ?? '');
   const [aided, setAided] = useState(false);
+  const [hands, setHands] = useState<string[] | null>(null); // null : à tour de rôle
   const sayChange = (validated: boolean) => {
     if (!change.trim()) return;
     const [author, prov, conf] = provenanceOf(aided, validated, by);
@@ -45,15 +47,41 @@ export default function Cap() {
 
   const place = (cap: string, spot: Spot, words: string) => {
     const t = f.caps[cap]?.title ?? f.findings[cap.replace(/^cap-/, '')]?.title ?? cap;
-    act(by, { act: 'cap_placed', cap, title: t, by, spot });
-    say(`${by} place « ${t} » : ${words}.`);
+    const who = hands ?? [by];
+    if (!who.length) return;
+    for (const p of who) act(p, { act: 'cap_placed', cap, title: t, by: p, spot });
+    const line = `${who.join(', ')} ${who.length > 1 ? 'placent' : 'place'} « ${t} » : ${words}.`;
+    say(line);
+    setLive(line);
   };
 
   return (
     <Screen side="pe" title="course" question="Que voulons-nous améliorer ? Le constat devient un cap, et un changement observable.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
         <View style={st.row}>
-          <Text style={st.small}>À tour de rôle, guidé par {f.mandate ?? "l'animatrice"} — place :</Text>
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: hands === null }} onPress={() => setHands(null)} style={[st.btn, hands === null && st.on]}>
+            <Text style={[st.btnTxt, hands === null && { color: C.onAccent }]}>À tour de rôle</Text>
+          </Pressable>
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: hands !== null }} onPress={() => setHands([])} style={[st.btn, hands !== null && st.on]}>
+            <Text style={[st.btnTxt, hands !== null && { color: C.onAccent }]}>À main levée</Text>
+          </Pressable>
+        </View>
+        {hands !== null && (
+          <View style={st.row}>
+            <Text style={st.small}>Qui lève la main ?</Text>
+            {PEOPLE.map((p) => {
+              const on = hands.includes(p);
+              return (
+                <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setHands(on ? hands.filter((x) => x !== p) : [...hands, p])} style={[st.btn, on && st.on]}>
+                  <Text style={[st.btnTxt, on && { color: C.onAccent }]}>✋ {p}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+        {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
+        <View style={[st.row, hands !== null && { display: 'none' }]}>
+          <Text style={st.small}>À tour de rôle, guidé par {f.mandate || "l'animatrice"} — place :</Text>
           {PEOPLE.map((p) => (
             <Pressable key={p} onPress={() => setBy(p)} style={[st.btn, by === p && st.on]} accessibilityRole="radio" accessibilityState={{ checked: by === p }}>
               <Text style={[st.btnTxt, by === p && { color: C.onAccent }]}>{p}</Text>

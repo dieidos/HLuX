@@ -10,7 +10,7 @@ import { AideRefusal, askAide } from '../../core/aides';
 import { SOURCE_WORDS } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useProjectState, useMe } from '../../core/useProject';
+import { useMe, useProject, useProjectState, useTeam } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 export default function Sujets() {
@@ -19,24 +19,70 @@ export default function Sujets() {
   const f = useFacilityState();
   const actP = useProject((x) => x.act);
   const actF = useFacility((x) => x.act);
-  const card = p.cards.papiers;
-  const subject = p.subjects.courriers;
-  const brought = f.agenda.some((a) => a.item === 'courriers');
-  const [collective, setCollective] = useState(subject?.forCollective ?? 'Comprendre les courriers administratifs est difficile pour plusieurs personnes.');
+  const team = useTeam();
+  const pro = useProject((x) => x.pro) ?? '';
+  // Quelle Carte apporter ? C'est la personne qui choisit, parmi les siennes.
+  const cards = Object.entries(p.cards);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const chosen = cardId ?? (cards.length === 1 ? cards[0][0] : null);
+  const card = chosen ? p.cards[chosen] : null;
+  const subjectId = chosen ? `sujet-${me.id}-${chosen}` : '';
+  const subject = Object.entries(p.subjects).find(([, x]) => x.card === chosen)?.[1];
+  const brought = !!chosen && f.agenda.some((a) => a.item === subjectId);
+  const [collective, setCollective] = useState('');
   const [notNow, setNotNow] = useState(false);
   const [aideMsg, setAideMsg] = useState('');
-  const session = f.attendance?.session ?? 'prochaine séance';
+  // La séance : sa date, qui est là, qui anime. Une absence se dit simplement.
+  const [date, setDate] = useState('');
+  const [present, setPresent] = useState<string[]>(pro ? [pro] : []);
+  const session = f.attendance?.session ?? '';
 
   const bring = () => {
+    if (!card || !collective.trim() || !session) return;
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
-    actP(me.id, { act: 'subject_prepared', subject: 'courriers', card: 'papiers', mine: card?.verbatim ?? '', for_collective: collective });
-    actF(me.id, { act: 'agenda_item', item: 'courriers', title: collective, source: 'consented_word', session });
+    actP(me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() });
+    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session });
     say("Oui, j'apporte. Le sujet entre à l'ordre du jour.");
+  };
+  const holdSession = () => {
+    if (!date.trim() || !present.length) return;
+    actF(pro || present[0], { act: 'attendance', session: date.trim(), present, absent: team.filter((t) => !present.includes(t)), facilitator: present.includes(pro) ? pro : present[0] });
   };
 
   return (
     <Screen side="pe" title="subjects" question="Quels sujets travailler ? Seulement si la personne le veut.">
       <ScrollView contentContainerStyle={{ gap: 16 }}>
+        {!f.attendance && (
+          <View style={st.ask}>
+            <Text style={st.h}>La séance</Text>
+            <TextInput value={date} onChangeText={setDate} placeholder="mardi 12 janvier" style={st.input} accessibilityLabel="Date de la séance" />
+            <Text style={st.small}>Qui est là ?</Text>
+            <View style={st.row}>
+              {team.map((t) => {
+                const on = present.includes(t);
+                return (
+                  <Pressable key={t} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setPresent(on ? present.filter((x) => x !== t) : [...present, t])} style={[st.btn, on && st.primary]}>
+                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{t}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Pressable accessibilityRole="button" onPress={holdSession} style={[st.btn, st.primary, { alignSelf: 'flex-start' }]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>Ouvrir l’ordre du jour</Text>
+            </Pressable>
+          </View>
+        )}
+        {cards.length === 0 && <Text style={st.small}>{me.name} n’a pas encore de Carte : rien à apporter pour l’instant.</Text>}
+        {cards.length > 1 && (
+          <View style={st.row}>
+            <Text style={st.small}>Quelle Carte apporter ?</Text>
+            {cards.map(([id, c]) => (
+              <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: chosen === id }} onPress={() => { setCardId(id); setCollective(''); setNotNow(false); }} style={[st.btn, chosen === id && st.primary]}>
+                <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{c.title}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
         {card && (
           <View style={st.sas}>
             <View style={[st.version, { borderTopColor: C.pp.value, backgroundColor: brought ? C.pe.soft : C.pp.soft }]}>
@@ -46,14 +92,14 @@ export default function Sujets() {
             <Text style={st.arrow}>→</Text>
             <View style={[st.version, { borderTopColor: C.pe.value }]}>
               <Text style={st.kicker}>POUR LE COLLECTIF</Text>
-              {brought ? <Text style={st.quote}>{collective}</Text> : (
+              {brought ? <Text style={st.quote}>{subject?.forCollective ?? collective}</Text> : (
                 <>
-                  <TextInput value={collective} onChangeText={setCollective} multiline style={st.input} accessibilityLabel="Version pour le collectif" />
+                  <TextInput value={collective} onChangeText={setCollective} multiline placeholder="Une phrase pour tous, sans nom ni détail personnel" style={st.input} accessibilityLabel="Version pour le collectif" />
                   <Pressable
                     accessibilityRole="button"
                     onPress={async () => {
                       try {
-                        const r = await askAide({ kind: 'generalize', text: card.title === 'Papiers' ? 'Comprendre les courriers administratifs' : card.verbatim });
+                        const r = await askAide({ kind: 'generalize', text: card.verbatim || card.title });
                         setCollective(r.proposal);
                         setAideMsg(r.offline ? `Exemple hors ligne (sans IA). ${me.name} relit et peut changer.` : `Proposition. ${me.name} relit et peut changer.`);
                       } catch (e) {
@@ -71,19 +117,22 @@ export default function Sujets() {
         )}
         {card && !brought && (
           <View style={st.ask}>
-            <Text style={st.question}>{me.name} · C’est bien ce que tu veux dire au CHRS ? Ton dossier reste chez toi.</Text>
+            <Text style={st.question}>{me.name} · C’est bien ce que tu veux dire au collectif ? Ton dossier reste chez toi.</Text>
             <View style={st.row}>
               <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Oui, j’apporte</Text></Pressable>
               <Pressable onPress={() => { setNotNow(true); say('Pas maintenant. Rien ne passe.'); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Pas maintenant</Text></Pressable>
             </View>
             {notNow && <Text style={st.small}>Rien ne passe. Tu pourras le proposer plus tard, si tu veux.</Text>}
+            {!session && <Text style={st.small}>D’abord la séance, plus haut : sa date et qui est là.</Text>}
+            {session && !collective.trim() && <Text style={st.small}>Écris d’abord la phrase pour le collectif.</Text>}
           </View>
         )}
 
         <View style={st.agenda}>
-          <Text style={st.h}>Ordre du jour · {session}</Text>
+          <Text style={st.h}>Ordre du jour{session ? ` · ${session}` : ''}</Text>
+          {f.agenda.length === 0 && <Text style={st.small}>Rien pour l’instant.</Text>}
           {f.agenda.map((a) => (
-            <View key={a.item} style={[st.item, a.item === 'courriers' && st.itemNew]}>
+            <View key={a.item} style={[st.item, a.item === subjectId && st.itemNew]}>
               <Text style={st.itemTitle}>{a.title}</Text>
               <Text style={st.small}>{SOURCE_WORDS[a.source]}</Text>
             </View>

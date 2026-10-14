@@ -7,13 +7,15 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
 import { DictateButton } from '../../components/DictateButton';
+import { VoicesCircle } from '../../components/VoicesCircle';
+import { Link } from 'expo-router';
 
 import { Screen } from '../../components/Chrome';
 import type { Lean, Rank } from '../../core/acts';
 import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useTeam } from '../../core/useProject';
+import { useTeam } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
 import { C, F, S } from '../../design/theme';
 
@@ -31,7 +33,6 @@ const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deu
 export default function Choix() {
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
   const PEOPLE = useTeam();
-  const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const VOICES = [...PEOPLE, 'Le CVS'];
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
@@ -42,6 +43,10 @@ export default function Choix() {
   const [dictated, setDictated] = useState('');
   const [words, setWords] = useState('');
   const [aided, setAided] = useState(false);
+  const [naming, setNaming] = useState('');
+  const [others, setOthers] = useState(false);
+  const [folded, setFolded] = useState(true);
+  const [live, setLive] = useState('');
   const o = current ? f.orientations[current] : null;
   const order: Rank[] = RANKS.map((r) => r[0]);
   const ranked = [...CRITERIA].sort((a, b) => order.indexOf(f.criteria[a[0]] ?? 'not_yet') - order.indexOf(f.criteria[b[0]] ?? 'not_yet'));
@@ -50,17 +55,21 @@ export default function Choix() {
     const next = order[(order.indexOf(f.criteria[c] ?? 'not_yet') + 1) % order.length];
     act('groupe', { act: 'criterion_ranked', criterion: c, rank: next });
   };
-  const newOrientation = () => {
-    const caps = Object.entries(f.caps);
-    const title = caps[0]?.[1].title ?? 'Accompagner la lecture des courriers';
+  // Une orientation se nomme : le groupe l'écrit, ou reprend un cap déjà posé.
+  const capTitles = Object.values(f.caps).map((c) => c.title).filter((t) => !orientations.some(([, o2]) => o2.title === t));
+  const newOrientation = (title: string) => {
+    if (!title.trim()) return;
     const id = `o-${orientations.length + 1}`;
-    act('groupe', { act: 'orientation', orientation: id, title });
+    act('groupe', { act: 'orientation', orientation: id, title: title.trim() });
     setCurrent(id);
+    setNaming('');
+    setOthers(false);
   };
   const submitPrivate = () => {
     if (!current || !placer) return;
     for (const [c, lean] of Object.entries(mine) as [Criterion, Lean][]) act(placer, { act: 'private_placement', orientation: current, criterion: c, by: placer, lean });
     say(`${placer} a placé.`);
+    setLive(`${placer} a placé. Personne ne voit où, jusqu’à la révélation.`);
     setPlacer(null);
     setMine({});
   };
@@ -68,6 +77,7 @@ export default function Choix() {
     if (!current || !o) return;
     act('groupe', { act: 'revealed', orientation: current });
     say('Tout se révèle.');
+    setLive('Tout se révèle, en même temps.');
   };
 
   // Les phrases de lecture, sans chiffre : qui se rejoint, qui voit très différemment.
@@ -98,30 +108,44 @@ export default function Choix() {
           <Text style={st.small}>Plusieurs critères peuvent partager un rang.</Text>
         </View>
 
-        <View style={st.row}>
-          {orientations.map(([id, x]) => (
-            <Pressable accessibilityRole="button" key={id} onPress={() => setCurrent(id)} style={[st.btn, current === id && st.on]}><Text style={[st.btnTxt, current === id && { color: C.onAccent }]}>🧭 {x.title}</Text></Pressable>
-          ))}
-          <Pressable accessibilityRole="button" onPress={newOrientation} style={st.btn}><Text style={st.btnTxt}>＋ Une orientation</Text></Pressable>
+        <View style={st.box}>
+          <View style={st.row}>
+            {o && <Text style={[st.btn, st.on, st.btnTxt, { color: C.onAccent, paddingTop: 10 }]}>🧭 {o.title}</Text>}
+            {orientations.length > 1 && (
+              <Pressable accessibilityRole="button" accessibilityState={{ expanded: others }} onPress={() => setOthers(!others)} style={st.btn}>
+                <Text style={st.btnTxt}>{orientations.length - 1} autre{orientations.length > 2 ? 's' : ''} ▸</Text>
+              </Pressable>
+            )}
+          </View>
+          {others && (
+            <View style={st.row}>
+              {orientations.filter(([id]) => id !== current).map(([id, x]) => (
+                <Pressable accessibilityRole="button" key={id} onPress={() => { setCurrent(id); setOthers(false); }} style={st.btn}><Text style={st.btnTxt}>🧭 {x.title}</Text></Pressable>
+              ))}
+            </View>
+          )}
+          <View style={st.row}>
+            <TextInput value={naming} onChangeText={setNaming} placeholder="Nommer une orientation…" style={[st.input, { flex: 1, minWidth: 220 }]} accessibilityLabel="Nouvelle orientation" />
+            <Pressable accessibilityRole="button" onPress={() => newOrientation(naming)} style={st.btn}><Text style={st.btnTxt}>＋ Une orientation</Text></Pressable>
+          </View>
+          {capTitles.length > 0 && (
+            <View style={st.row}>
+              <Text style={st.small}>Depuis le cap :</Text>
+              {capTitles.map((t) => (
+                <Pressable key={t} accessibilityRole="button" onPress={() => newOrientation(t)} style={st.btn}><Text style={st.btnTxt}>＋ {t}</Text></Pressable>
+              ))}
+            </View>
+          )}
         </View>
 
         {o && (
           <View style={st.box}>
-            <Text style={st.h}>🧭 {o.title} — une orientation, cinq regards</Text>
+            <Text style={st.h}>Une orientation, {VOICES.length} regards</Text>
+            {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
             {!o.revealed && (
               <>
                 <Text style={st.small}>🔒 Chacun seul, en privé — sur la tablette qui passe, ou sur son mobile.</Text>
-                <View style={st.row}>
-                  {VOICES.map((v) => {
-                    const done = o.placedBy.includes(v);
-                    return (
-                      <Pressable key={v} onPress={() => !done && setPlacer(v)} style={[st.voice, done && st.voiceDone]} accessibilityRole="button" accessibilityLabel={`${v} : ${done ? 'a placé' : 'à venir'}`}>
-                        <Text style={st.btnTxt}>{v}</Text>
-                        <Text style={st.small}>{done ? '✓ a placé' : placer === v ? '✏️ en cours' : '⏳ à venir'}</Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+                <VoicesCircle title={o.title} voices={VOICES} placed={o.placedBy} current={placer} onPick={setPlacer} />
                 {placer && (
                   <View style={st.private}>
                     <Text style={st.h}>{placer}, en privé</Text>
@@ -149,6 +173,8 @@ export default function Choix() {
                 {ranked.map(([c, label]) => {
                   const marks = o.placements.filter((p) => p.criterion === c);
                   if (!marks.length) return null;
+                  // Les lignes Aussi / Moins / pas encore rangées se replient.
+                  if (folded && ['also', 'less', 'not_yet'].includes(f.criteria[c] ?? 'not_yet')) return null;
                   const b = band(marks.map((m) => m.lean))!;
                   return (
                     <View key={c} style={st.lineRow}>
@@ -162,13 +188,21 @@ export default function Choix() {
                     </View>
                   );
                 })}
+                {ranked.some(([c]) => ['also', 'less', 'not_yet'].includes(f.criteria[c] ?? 'not_yet') && o.placements.some((p) => p.criterion === c)) && (
+                  <Pressable accessibilityRole="button" accessibilityState={{ expanded: !folded }} onPress={() => setFolded(!folded)} style={st.btn}>
+                    <Text style={st.btnTxt}>{folded ? '▾ Les lignes Aussi et Moins' : '▴ Replier Aussi et Moins'}</Text>
+                  </Pressable>
+                )}
                 <View style={st.readings}>
                   {readings.filter((r) => r.converge).map((r) => <Text key={r.text} style={st.conv}>CONVERGENCES · {r.text}</Text>)}
                   {readings.filter((r) => !r.converge).map((r) => <Text key={r.text} style={st.diff}>À DISCUTER · {r.text}</Text>)}
                 </View>
                 <Text style={st.h}>Notre décision</Text>
                 {o.decision ? (
-                  <Text style={st.decision}>✓ {o.decision.words}</Text>
+                  <>
+                    <Text style={st.decision}>✓ {o.decision.words}</Text>
+                    <Link href="/notre-projet/actions" style={[st.btn, st.on, st.btnTxt, { color: C.onAccent, alignSelf: 'flex-start', paddingTop: 10 }]}>Vers les actions ▸</Link>
+                  </>
                 ) : (
                   <>
                     <TextInput value={dictated} onChangeText={setDictated} placeholder="Ce que le groupe dit…" multiline style={st.input} accessibilityLabel="Décision dictée" />
