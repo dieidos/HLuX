@@ -9,7 +9,7 @@ import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
 import type { Lean, Rank } from '../../core/acts';
-import type { Criterion } from '../../core/facility';
+import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { band, LEANS } from '../../core/views';
@@ -36,6 +36,7 @@ export default function Choix() {
   const [mine, setMine] = useState<Partial<Record<Criterion, Lean>>>({});
   const [dictated, setDictated] = useState('');
   const [words, setWords] = useState('');
+  const [aided, setAided] = useState(false);
   const o = current ? f.orientations[current] : null;
   const order: Rank[] = RANKS.map((r) => r[0]);
   const ranked = [...CRITERIA].sort((a, b) => order.indexOf(f.criteria[a[0]] ?? 'not_yet') - order.indexOf(f.criteria[b[0]] ?? 'not_yet'));
@@ -129,7 +130,7 @@ export default function Choix() {
                         ))}
                       </View>
                     ))}
-                    <Pressable accessibilityRole="button" onPress={submitPrivate} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>J'ai placé</Text></Pressable>
+                    <Pressable accessibilityRole="button" onPress={submitPrivate} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>J’ai placé</Text></Pressable>
                   </View>
                 )}
                 <Text style={st.small}>👁️ On voit qui a placé ; les positions se dévoilent ensemble.</Text>
@@ -167,8 +168,12 @@ export default function Choix() {
                   <>
                     <TextInput value={dictated} onChangeText={setDictated} placeholder="Ce que le groupe dit…" multiline style={st.input} accessibilityLabel="Décision dictée" />
                     <TextInput value={words} onChangeText={setWords} placeholder="La phrase validée (reformulée)…" multiline style={st.input} accessibilityLabel="Décision reformulée" />
-                    <AideButton kind="phrase" label="Reformuler la phrase dictée" text={dictated} who="Le groupe" onProposal={setWords} />
-                    <Pressable accessibilityRole="button" onPress={() => dictated.trim() && act('groupe', { act: 'decision', orientation: current!, dictated: dictated.trim(), words: (words || dictated).trim() })} style={[st.btn, st.on]}>
+                    <AideButton kind="phrase" label="Reformuler la phrase dictée" text={dictated} who="Le groupe" onProposal={(p) => { setWords(p); setAided(true); }} />
+                    <Pressable accessibilityRole="button" onPress={() => {
+                      if (!dictated.trim()) return;
+                      const [author, prov, conf] = provenanceOf(aided && !!words.trim(), true, 'groupe');
+                      act(author, { act: 'decision', orientation: current!, dictated: dictated.trim(), words: (words || dictated).trim() }, prov, conf);
+                    }} style={[st.btn, st.on]}>
                       <Text style={[st.btnTxt, { color: '#fff' }]}>Validée par le groupe · vers les actions</Text>
                     </Pressable>
                   </>

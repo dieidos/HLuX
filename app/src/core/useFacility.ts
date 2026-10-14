@@ -21,7 +21,8 @@ function seedLilas(): FEntry[] {
 
 interface FacilityStore {
   entries: FEntry[];
-  act: (author: string, act: FacilityAct) => FEntry;
+  /** `generated` + `confirmedBy` : une proposition de l'IA validée par des humains ; `hypothesis` : pas encore validée. */
+  act: (author: string, act: FacilityAct, provenance?: FEntry['provenance'], confirmedBy?: string) => FEntry;
   undo: (author: string, rank: number) => void;
 }
 
@@ -29,8 +30,8 @@ export const useFacility = create<FacilityStore>()(
   persist(
     (set, get) => ({
       entries: seedLilas(),
-      act: (author, act) => {
-        const e: FEntry = { rank: get().entries.length, author, provenance: 'by_hand', act };
+      act: (author, act, provenance = 'by_hand', confirmedBy) => {
+        const e: FEntry = { rank: get().entries.length, author, provenance, act, ...(confirmedBy ? { confirmedBy } : {}) };
         set({ entries: [...get().entries, e] });
         return e;
       },

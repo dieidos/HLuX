@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { I18nManager, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { say, useAids, useFamily, useRegister, useWords } from '../core/useAids';
+import { useMe, useProject } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 import type { WordKey } from '../i18n/words';
 
@@ -67,12 +68,14 @@ export function AidsBar({ side }: { side: 'pp' | 'pe' }) {
   const w = useWords();
   const bold = useFamily(true);
   const { listen, simple, lang, toggle, switchLang } = useAids();
+  const me = useMe();
+  const pro = useProject((s) => s.pro);
   return (
     <View style={st.aids}>
       <Aid on={listen} label={w('listen')} font={bold} onPress={() => toggle('listen')} />
       <Aid on={simple} label={w('simpler')} font={bold} onPress={() => toggle('simple')} />
       {side === 'pp' && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
-      <Text style={st.who}>{side === 'pp' ? `Amina · ${w('withSarah')}` : 'CHRS Les Lilas'}</Text>
+      <Text style={st.who}>{side === 'pp' ? `${me.name} · ${w('withPro')} ${pro ?? ''}` : 'CHRS Les Lilas'}</Text>
     </View>
   );
 }

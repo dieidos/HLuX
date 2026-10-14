@@ -10,7 +10,7 @@ import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
 import { FEELING_WORDS } from '../../core/project';
 import { say, useWords } from '../../core/useAids';
-import { useProject, useProjectState } from '../../core/useProject';
+import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
@@ -21,6 +21,7 @@ const ZONES: [Feeling, WordKey, string][] = [
 ];
 
 export default function Ressenti() {
+  const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const act = useProject((x) => x.act);
@@ -28,7 +29,7 @@ export default function Ressenti() {
   const [said, setSaid] = useState<{ text: string; rank: number } | null>(null);
 
   const place = (card: string, feeling: Feeling) => {
-    const e = act('amina', { act: 'card_felt', card, feeling, when: "aujourd'hui" });
+    const e = act(me.id, { act: 'card_felt', card, feeling, when: "aujourd'hui" });
     const text = `${s.cards[card].title} va dans « ${FEELING_WORDS[feeling]} ».`;
     setSaid({ text, rank: e.rank });
     say(text);
@@ -60,7 +61,7 @@ export default function Ressenti() {
       {said && (
         <View style={st.said} accessibilityLiveRegion="polite">
           <Text style={st.saidTxt}>{said.text}</Text>
-          <Pressable onPress={() => { undo('amina', said.rank); setSaid(null); }} style={st.undo} accessibilityRole="button">
+          <Pressable onPress={() => { undo(me.id, said.rank); setSaid(null); }} style={st.undo} accessibilityRole="button">
             <Text style={st.undoTxt}>↶ Annuler</Text>
           </Pressable>
         </View>

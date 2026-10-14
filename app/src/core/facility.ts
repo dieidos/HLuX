@@ -31,7 +31,7 @@ export type FacilityAct =
   | { act: 'result'; text: string; back_to_finding: boolean }
   | { act: 'proposal'; proposal: Id; text: string };
 
-export interface FEntry { rank: number; author: string; provenance: 'by_hand' | 'dictated' | 'hypothesis' | 'generated'; undone?: number; act?: FacilityAct }
+export interface FEntry { rank: number; author: string; provenance: 'by_hand' | 'dictated' | 'hypothesis' | 'generated'; confirmedBy?: string; undone?: number; act?: FacilityAct }
 
 export interface FacilityState {
   agenda: { item: Id; title: string; source: Source; session: string }[];
@@ -113,3 +113,9 @@ export const SOURCE_WORDS: Record<Source, string> = { consented_word: '🗣️ p
 export const QUALIF_WORDS: Record<Qualification, string> = {
   individual: 'situation individuelle', signal: 'signal à vérifier', repeated: 'difficulté répétée', confirmed: 'enjeu collectif confirmé',
 };
+
+/** Qui a écrit le texte validé : l'IA (validée par le groupe) quand l'aide a servi, sinon le groupe à la main. */
+export function provenanceOf(aided: boolean, validated: boolean, by: string): [string, FEntry['provenance'], string | undefined] {
+  if (!aided) return [by, 'by_hand', undefined];
+  return validated ? ['hlux-ia', 'generated', by] : ['hlux-ia', 'hypothesis', undefined];
+}

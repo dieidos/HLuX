@@ -9,6 +9,7 @@ import { AideButton } from '../../components/AideButton';
 import { Screen } from '../../components/Chrome';
 import type { Lean } from '../../core/acts';
 import { say } from '../../core/useAids';
+import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { band, LEANS } from '../../core/views';
 import { C, F, S } from '../../design/theme';
@@ -27,6 +28,7 @@ export default function Actions() {
   const [who, setWho] = useState('Aïcha');
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
+  const [aided, setAided] = useState(false);
   const [review, setReview] = useState('au printemps, avec les personnes');
   const solutions = Object.entries(f.solutions);
   const decision = Object.values(f.orientations).find((o) => o.decision)?.decision;
@@ -44,7 +46,9 @@ export default function Actions() {
   const commit = () => {
     if (!text.trim() || !solutions[0]) return;
     const thread = ['Papiers', 'Comprendre mes courriers seule', 'Comprendre les courriers', 'engagement'];
-    act('groupe', { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: solutions[0][0], thread, review });
+    const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
+    act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: solutions[0][0], thread, review }, prov, conf);
+    setAided(false);
     say('Carte-engagement validée.');
     setText('');
   };
@@ -113,7 +117,7 @@ export default function Actions() {
             </View>
           ))}
           <TextInput value={text} onChangeText={setText} multiline placeholder="« Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »" style={st.input} accessibilityLabel="Texte de l'engagement" />
-          <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={setText} />
+          <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
           <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler" style={st.input} accessibilityLabel="Date pour en reparler" />
           <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Validée par le groupe</Text></Pressable>
         </View>

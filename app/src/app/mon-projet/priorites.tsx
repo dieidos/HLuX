@@ -10,7 +10,7 @@ import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Circle, Rank } from '../../core/acts';
 import { lineKey } from '../../core/project';
 import { say, useWords } from '../../core/useAids';
-import { useProject, useProjectState } from '../../core/useProject';
+import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
@@ -21,6 +21,7 @@ const RANKS: [Rank, WordKey][] = [['first', 'first'], ['then', 'then'], ['also',
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
 
 export default function Priorites() {
+  const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const act = useProject((x) => x.act);
@@ -33,7 +34,7 @@ export default function Priorites() {
   const ranked = [...AXES].sort((x, y) => ORDER.indexOf(rankOf(x[0]) ?? 'not_yet') - ORDER.indexOf(rankOf(y[0]) ?? 'not_yet'));
 
   const orderOn = (axis: Circle) => {
-    const stored = s.lines[lineKey(axis, 'amina')] ?? [];
+    const stored = s.lines[lineKey(axis, me.id)] ?? [];
     const ids = ideas.map(([id]) => id);
     return [...stored.filter((id) => ids.includes(id)), ...ids.filter((id) => !stored.includes(id))];
   };
@@ -44,7 +45,7 @@ export default function Priorites() {
     const j = i + dir;
     if (j < 0 || j >= order.length) return;
     [order[i], order[j]] = [order[j], order[i]];
-    act('amina', { act: 'line_ordered', axis, author: 'amina', order });
+    act(me.id, { act: 'line_ordered', axis, author: me.id, order });
     const other = s.ideas[order[i]].title;
     const t = dir === 1 ? `« ${s.ideas[id].title} » passe devant ${other}.` : `« ${s.ideas[id].title} » se tient plus à gauche que ${other}.`;
     setLive(t);
@@ -67,7 +68,7 @@ export default function Priorites() {
             {RANKS.map(([r, k]) => (
               <Zone key={r} id={r} label={w(k)} style={st.rankRow}
                 onDrop={(axis) => {
-                  act('amina', { act: 'axis_ranked', axis: axis as Circle, rank: r });
+                  act(me.id, { act: 'axis_ranked', axis: axis as Circle, rank: r });
                   say(`${w(AXES.find((a) => a[0] === axis)![1])} : ${w(k)}.`);
                 }}>
                 <Text style={st.rankLabel}>{w(k)}</Text>

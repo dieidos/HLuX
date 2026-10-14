@@ -65,4 +65,5 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npx tsc --noEmit
+          npx eslint src
           npx vitest run

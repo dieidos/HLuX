@@ -28,7 +28,7 @@ export default function Invite() {
   const inv = s.invitations[id];
   const [leans, setLeans] = useState<Partial<Record<Circle, Lean>>>({});
   const [word, setWord] = useState('');
-  if (!inv) return <View style={st.page}><Text style={st.title}>Ce lien s'est reposé.</Text><Text style={st.small}>Les liens d'invitation vivent peu de temps, pour protéger la personne qui invite.</Text></View>;
+  if (!inv) return <View style={st.page}><Text style={st.title}>Ce lien s’est reposé.</Text><Text style={st.small}>Les liens d’invitation vivent peu de temps, pour protéger la personne qui invite.</Text></View>;
   const ar = inv.lang === 'ar';
   const t = (x: { fr: string; ar: string }) => (ar ? x.ar : x.fr);
   const idea = s.ideas[inv.idea];

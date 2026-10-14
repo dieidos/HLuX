@@ -9,7 +9,7 @@ import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
 import { PathView } from '../../components/PathView';
-import type { FacilityAct } from '../../core/facility';
+import { provenanceOf, type FacilityAct } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { C, F, S } from '../../design/theme';
@@ -43,6 +43,15 @@ export default function Suivi() {
   const [others, setOthers] = useState(false);
   const [moving, setMoving] = useState<{ load: string; from: string } | null>(null);
   const [result, setResult] = useState('');
+  const [aided, setAided] = useState(false);
+  const noteResult = (back: boolean) => {
+    if (!result.trim()) return;
+    const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
+    act(author, { act: 'result', text: result.trim(), back_to_finding: back }, prov, conf);
+    setResult('');
+    setAided(false);
+    if (back) say('Retour au constat.');
+  };
   const nodes = Object.entries(f.nodes).map(([id, n]) => ({ id, ...n }));
   const commitment = Object.values(f.commitments)[0];
 
@@ -60,7 +69,7 @@ export default function Suivi() {
       <ScrollView contentContainerStyle={{ gap: 12 }}>
         {nodes.length === 0 ? (
           <Pressable onPress={() => ATLAS.forEach((a) => act('groupe', a))} style={[st.btn, st.on]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: '#fff' }]}>Poser le suivi décidé (exemple de l'Atlas)</Text>
+            <Text style={[st.btnTxt, { color: '#fff' }]}>Poser le suivi décidé (exemple de l’Atlas)</Text>
           </Pressable>
         ) : (
           <PathView columns={MONTHS} lanes={LANES} nodes={nodes} links={f.links} showOthers={others} />
@@ -87,17 +96,17 @@ export default function Suivi() {
               <Text style={st.small}>{l.rhythm}</Text>
             </View>
           ))}
-          <Text style={st.small}>On remarque les prénoms : chacun apporte ce qu'il peut.</Text>
+          <Text style={st.small}>On remarque les prénoms : chacun apporte ce qu’il peut.</Text>
         </View>
 
         <View style={st.box}>
           <Text style={st.h}>Ce qui en résulte</Text>
           {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
           <TextInput value={result} onChangeText={setResult} multiline placeholder="« Au printemps : 5 personnes chaque mardi, 3 comprennent seules leurs courriers. Les relances restent dures. »" style={st.input} accessibilityLabel="Résultat" />
-          <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={setResult} />
+          <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
           <View style={st.row}>
-            <Pressable onPress={() => { if (result.trim()) { act('groupe', { act: 'result', text: result.trim(), back_to_finding: false }); setResult(''); } }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
-            <Pressable onPress={() => { if (result.trim()) { act('groupe', { act: 'result', text: result.trim(), back_to_finding: true }); setResult(''); say('Retour au constat.'); } }} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>🔁 Retour au constat</Text></Pressable>
+            <Pressable onPress={() => noteResult(false)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
+            <Pressable onPress={() => noteResult(true)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>🔁 Retour au constat</Text></Pressable>
           </View>
         </View>
 
@@ -108,7 +117,7 @@ export default function Suivi() {
             {Object.values(f.proposals).map((p) => <Text key={p} style={st.result}>📣 {p}</Text>)}
             {!Object.keys(f.proposals).length && (
               <Pressable onPress={() => act('groupe', { act: 'proposal', proposal: 'atelier-mardi', text: "L'atelier courriers du mardi" })} style={[st.btn, st.on]} accessibilityRole="button">
-                <Text style={[st.btnTxt, { color: '#fff' }]}>Le CHRS propose : l'atelier courriers du mardi</Text>
+                <Text style={[st.btnTxt, { color: '#fff' }]}>Le CHRS propose : l’atelier courriers du mardi</Text>
               </Pressable>
             )}
           </View>

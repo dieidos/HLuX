@@ -11,11 +11,12 @@ import { AideRefusal, askAide } from '../../core/aides';
 import { cardThread } from '../../core/thread';
 import { useFacilityState } from '../../core/useFacility';
 import { say, useWords } from '../../core/useAids';
-import { usePending, useProject, useProjectState } from '../../core/useProject';
+import { usePending, useProject, useProjectState, useMe } from '../../core/useProject';
 import { PICTOS, type PictoKey } from '../../design/pictos';
 import { C, F, S } from '../../design/theme';
 
 export default function Cartes() {
+  const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const f = useFacilityState();
@@ -48,7 +49,7 @@ export default function Cartes() {
   const create = () => {
     if (!text.trim() && !picto) return;
     const id = `carte-${Object.keys(s.cards).length + 1}`;
-    act('amina', {
+    act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
       picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : 'written', said_with: 'Sarah', when: "aujourd'hui",
     });
@@ -97,8 +98,8 @@ export default function Cartes() {
               <View key={e.rank} style={st.proposal}>
                 <Text style={st.simpler}>Proposition : {e.act && 'text' in e.act ? e.act.text : ''}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, 'amina'); setAideMsg('Validé par Amina.'); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Je valide</Text></Pressable>
-                  <Pressable accessibilityRole="button" onPress={() => { undo('amina', e.rank); setAideMsg('Écartée.'); }} style={st.btn}><Text style={st.btnTxt}>Non merci</Text></Pressable>
+                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, me.id); setAideMsg(`Validé par ${me.name}.`); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Je valide</Text></Pressable>
+                  <Pressable accessibilityRole="button" onPress={() => { undo(me.id, e.rank); setAideMsg('Écartée.'); }} style={st.btn}><Text style={st.btnTxt}>Non merci</Text></Pressable>
                 </View>
               </View>
             ))}

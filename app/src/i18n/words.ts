@@ -10,7 +10,7 @@ export const WORDS = {
   listen: { fr: '🔊 Écouter', ar: '🔊 استماع', falc: '🔊 Écouter' },
   simpler: { fr: '💬 Plus simple', ar: '💬 أبسط', falc: '💬 Plus simple' },
   language: { fr: '🌐 Langue', ar: '🌐 اللغة', falc: '🌐 Langue' },
-  withSarah: { fr: 'avec Sarah', ar: 'مع سارة', falc: 'avec Sarah' },
+  withPro: { fr: 'avec', ar: 'مع', falc: 'avec' },
   // Étapes du Projet Personnalisé
   cards: { fr: '🃏 Cartes', ar: '🃏 بطاقاتي', falc: '🃏 Cartes' },
   feeling: { fr: '😊 Ressenti', ar: '😊 إحساسي', falc: '😊 Ressenti' },
@@ -63,7 +63,7 @@ export const WORDS = {
   littleMuch: { fr: 'peu ←→ beaucoup', ar: 'قليلاً ←→ كثيراً', falc: 'un peu ←→ beaucoup' },
   // 05 Regards
   viewsQuestion: { fr: "Qui peut m'aider à choisir ? Nous comparons nos regards.", ar: 'من يساعدني على الاختيار؟ نقارن نظراتنا.', falc: 'Qui peut m’aider ?' },
-  sheInvites: { fr: "c'est elle qui invite", ar: 'هي من تدعو', falc: 'Amina invite' },
+  sheInvites: { fr: "c'est elle qui invite", ar: 'هي من تدعو', falc: 'Elle invite' },
   inSession: { fr: 'en séance · toutes les idées', ar: 'في الجلسة · كلّ الأفكار', falc: 'avec moi, en séance' },
   invited: { fr: 'invitée', ar: 'مدعوّة', falc: 'invitée' },
   answered: { fr: 'a répondu ✓', ar: 'أجابت ✓', falc: 'a répondu ✓' },
@@ -77,6 +77,16 @@ export const WORDS = {
   wide: { fr: '💬 bande large : à en parler', ar: 'شريط عريض: لنتحدّث', falc: '💬 on en parle' },
   revealTogether: { fr: 'Découvrir les regards ensemble', ar: 'نكتشف النظرات معاً', falc: 'Voir ensemble' },
   silenceOk: { fr: 'Le silence est une réponse acceptable.', ar: 'الصمت جواب مقبول.', falc: 'On peut ne pas répondre.' },
+  // Séance locale et profils (passage 10)
+  whoOpens: { fr: 'Qui ouvre la séance ?', ar: 'مَن يفتح الجلسة؟', falc: 'Qui commence ?' },
+  whoIsHere: { fr: 'Qui est là ?', ar: 'مَن هنا؟', falc: 'Qui est là ?' },
+  newPerson: { fr: 'Une nouvelle personne', ar: 'شخص جديد', falc: 'Une nouvelle personne' },
+  firstName: { fr: 'Son prénom', ar: 'الاسم', falc: 'Le prénom' },
+  oneSentence: { fr: 'Une phrase, pour commencer', ar: 'جملة واحدة للبدء', falc: 'Une phrase' },
+  enter: { fr: 'Entrer', ar: 'دخول', falc: 'Entrer' },
+  changePerson: { fr: 'Changer de personne', ar: 'تغيير الشخص', falc: 'Une autre personne' },
+  closeSession: { fr: 'Fermer la séance', ar: 'إغلاق الجلسة', falc: 'Finir' },
+  closedNote: { fr: 'Hors séance, les profils restent fermés. Les données restent sur cette tablette.', ar: 'خارج الجلسة، تبقى الملفات مغلقة. تبقى البيانات على هذا الجهاز اللوحي.', falc: 'Sans séance, tout reste fermé.' },
   // 06 Chemin
   pathQuestion: { fr: "Où je vais, et quand ? Les autres chemins s'ouvrent si je le demande.", ar: 'إلى أين أذهب، ومتى؟ الطرق الأخرى تُفتح إذا طلبتُ.', falc: 'Mon chemin.' },
   otherPaths: { fr: '🌈 Autres chemins', ar: '🌈 طرق أخرى', falc: '🌈 Autres chemins' },

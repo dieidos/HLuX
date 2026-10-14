@@ -90,7 +90,7 @@ export default function Constat() {
           </View>
           {fromAgenda.length > 0 && (
             <View style={st.tray}>
-              <Text style={st.small}>Venu de l'ordre du jour, à placer :</Text>
+              <Text style={st.small}>Venu de l’ordre du jour, à placer :</Text>
               {fromAgenda.map((a) => (
                 <Draggable key={a.item} id={a.item} label={a.title}><View style={st.card}><Text style={st.cardTitle}>{a.title}</Text><Text style={st.small}>{SOURCE_WORDS[a.source]}</Text></View></Draggable>
               ))}
@@ -104,7 +104,7 @@ export default function Constat() {
           ))}
           <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Poser</Text></Pressable>
         </View>
-        <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l'a dite.</Text>
+        <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l’a dite.</Text>
         <View style={st.tray}>
           <Text style={st.cardTitle}>Relire le constat à voix haute</Text>
           <TextInput value={reading || draft} onChangeText={setReading} multiline style={st.input} accessibilityLabel="Relecture du constat" />

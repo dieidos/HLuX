@@ -92,7 +92,7 @@ export function Zone({ id, onDrop, style, children, label }: { id: string; onDro
 /** Une carte que l'on prend et que l'on pose. */
 export function Draggable({ id, children, label }: { id: string; children: ReactNode; label: string }) {
   const d = useDrag();
-  const pos = useRef(new Animated.ValueXY()).current;
+  const [pos] = useState(() => new Animated.ValueXY()); // valeur animée stable, sans ref lue au rendu
   const pan = Gesture.Pan()
     .runOnJS(true)
     .onStart(() => d.take(id))

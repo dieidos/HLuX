@@ -10,10 +10,11 @@ import { AideRefusal, askAide } from '../../core/aides';
 import { SOURCE_WORDS } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useProjectState } from '../../core/useProject';
+import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 export default function Sujets() {
+  const me = useMe();
   const p = useProjectState();
   const f = useFacilityState();
   const actP = useProject((x) => x.act);
@@ -28,8 +29,8 @@ export default function Sujets() {
 
   const bring = () => {
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
-    actP('amina', { act: 'subject_prepared', subject: 'courriers', card: 'papiers', mine: card?.verbatim ?? '', for_collective: collective });
-    actF('amina', { act: 'agenda_item', item: 'courriers', title: collective, source: 'consented_word', session });
+    actP(me.id, { act: 'subject_prepared', subject: 'courriers', card: 'papiers', mine: card?.verbatim ?? '', for_collective: collective });
+    actF(me.id, { act: 'agenda_item', item: 'courriers', title: collective, source: 'consented_word', session });
     say("Oui, j'apporte. Le sujet entre à l'ordre du jour.");
   };
 
@@ -54,7 +55,7 @@ export default function Sujets() {
                       try {
                         const r = await askAide({ kind: 'generalize', text: card.title === 'Papiers' ? 'Comprendre les courriers administratifs' : card.verbatim });
                         setCollective(r.proposal);
-                        setAideMsg(r.offline ? 'Exemple hors ligne (sans IA). Amina relit et peut changer.' : 'Proposition. Amina relit et peut changer.');
+                        setAideMsg(r.offline ? `Exemple hors ligne (sans IA). ${me.name} relit et peut changer.` : `Proposition. ${me.name} relit et peut changer.`);
                       } catch (e) {
                         setAideMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu.");
                       }
@@ -70,9 +71,9 @@ export default function Sujets() {
         )}
         {card && !brought && (
           <View style={st.ask}>
-            <Text style={st.question}>Amina · C'est bien ce que tu veux dire au CHRS ? Ton dossier reste chez toi.</Text>
+            <Text style={st.question}>{me.name} · C’est bien ce que tu veux dire au CHRS ? Ton dossier reste chez toi.</Text>
             <View style={st.row}>
-              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Oui, j'apporte</Text></Pressable>
+              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Oui, j’apporte</Text></Pressable>
               <Pressable onPress={() => { setNotNow(true); say('Pas maintenant. Rien ne passe.'); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Pas maintenant</Text></Pressable>
             </View>
             {notNow && <Text style={st.small}>Rien ne passe. Tu pourras le proposer plus tard, si tu veux.</Text>}
@@ -91,7 +92,7 @@ export default function Sujets() {
         {f.attendance && (
           <View style={st.row}>
             {f.attendance.present.map((n) => <Text key={n} style={st.chip}>{n}{n === f.attendance!.facilitator ? ' · anime' : ''}</Text>)}
-            {f.attendance.absent.map((n) => <Text key={n} style={[st.chip, st.absent]}>{n} · absente, c'est normal</Text>)}
+            {f.attendance.absent.map((n) => <Text key={n} style={[st.chip, st.absent]}>{n} · absente, c’est normal</Text>)}
           </View>
         )}
       </ScrollView>

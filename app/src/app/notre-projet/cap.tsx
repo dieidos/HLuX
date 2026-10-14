@@ -11,6 +11,7 @@ import { Screen } from '../../components/Chrome';
 import { Ikigai } from '../../components/Ikigai';
 import type { Circle, Crossing, Spot } from '../../core/acts';
 import { say } from '../../core/useAids';
+import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { C, F, S } from '../../design/theme';
 
@@ -27,6 +28,12 @@ export default function Cap() {
   const [by, setBy] = useState(f.mandate ?? 'Aïcha');
   const [title, setTitle] = useState('');
   const [change, setChange] = useState(f.expectedChange?.text ?? '');
+  const [aided, setAided] = useState(false);
+  const sayChange = (validated: boolean) => {
+    if (!change.trim()) return;
+    const [author, prov, conf] = provenanceOf(aided, validated, by);
+    act(author, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated }, prov, conf);
+  };
 
   const caps = Object.entries(f.caps);
   // Les constats confirmés ou répétés peuvent devenir un cap.
@@ -77,15 +84,15 @@ export default function Cap() {
           </View>
         </DragArea>
         {caps.some(([, c]) => new Set(c.placements.filter((p) => p.spot.at !== 'tray').map((p) => JSON.stringify(p.spot))).size > 1) && (
-          <Text style={st.note}>Deux placements · à discuter. Les deux positions restent à l'écran.</Text>
+          <Text style={st.note}>Deux placements · à discuter. Les deux positions restent à l’écran.</Text>
         )}
         <View style={st.change}>
           <Text style={st.h}>Changement attendu</Text>
           <TextInput value={change} onChangeText={setChange} multiline placeholder="« Chaque personne comprend ses courriers, ou sait qui l'aide à les lire. »" style={st.input} accessibilityLabel="Changement attendu" />
-          <AideButton kind="phrase" label="Mettre en mots ce que le groupe a dit" text={change} who="Le groupe" onProposal={setChange} />
+          <AideButton kind="phrase" label="Mettre en mots ce que le groupe a dit" text={change} who="Le groupe" onProposal={(p) => { setChange(p); setAided(true); }} />
           <View style={st.row}>
-            <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: false })} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
-            <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: true })} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => sayChange(false)} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => sayChange(true)} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>
           </View>
           {f.expectedChange && <Text style={st.small}>{f.expectedChange.validated ? '✓ validé' : 'à discuter'} : {f.expectedChange.text}</Text>}
         </View>

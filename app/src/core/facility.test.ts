@@ -1,7 +1,7 @@
 // Parité avec `core/hlux-core/tests/atlas.rs` (écrans 09 et 10).
 import { describe, expect, it } from 'vitest';
 
-import { facilityStanding, type FacilityAct, type FEntry } from './facility';
+import { facilityStanding, provenanceOf, type FacilityAct, type FEntry } from './facility';
 
 const run = (acts: FacilityAct[]): FEntry[] => acts.map((act, rank) => ({ rank, author: 'x', provenance: 'by_hand', act }));
 
@@ -33,5 +33,17 @@ describe("Projet d'Établissement", () => {
       { act: 'finding_qualified', finding: 'f', level: 'repeated' },
     ]));
     expect(s.findings.f.level).toBe('repeated');
+  });
+});
+
+describe("Provenance d'un texte de groupe", () => {
+  it("écrit à la main : le groupe en est l'auteur", () => {
+    expect(provenanceOf(false, true, 'groupe')).toEqual(['groupe', 'by_hand', undefined]);
+  });
+  it("proposé par l'IA puis validé : généré, confirmé par le groupe", () => {
+    expect(provenanceOf(true, true, 'groupe')).toEqual(['hlux-ia', 'generated', 'groupe']);
+  });
+  it("proposé par l'IA, pas encore validé : en attente", () => {
+    expect(provenanceOf(true, false, 'Aïcha')).toEqual(['hlux-ia', 'hypothesis', undefined]);
   });
 });

@@ -10,16 +10,16 @@ import { Screen } from '../../components/Chrome';
 import type { Circle, Lang, Lean, Rank } from '../../core/acts';
 import { lineKey } from '../../core/project';
 import { say, useWords } from '../../core/useAids';
-import { useProject, useProjectState } from '../../core/useProject';
+import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { band, leanOf } from '../../core/views';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
 const AXES: [Circle, WordKey][] = [['living', 'living'], ['able', 'able'], ['love', 'love'], ['useful', 'useful']];
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
-const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
 
 export default function Regards() {
+  const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const act = useProject((x) => x.act);
@@ -39,7 +39,7 @@ export default function Regards() {
   const send = () => {
     if (!guest.trim() || !idea) return;
     const id = `inv-${invitations.length + 1}`;
-    act('amina', { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires: 'dans 7 jours' });
+    act(me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires: 'dans 7 jours' });
     say(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`);
     setForm(false); setGuest(''); setRelation(''); setIdea(null);
   };
@@ -50,13 +50,13 @@ export default function Regards() {
         <View key={axis} style={st.line}>
           <Text style={st.axis}>{w(k)}</Text>
           {ideas.map(([id, i]) => {
-            const mine = leanOf(s.lines[lineKey(axis, 'amina')] ?? ideas.map(([x]) => x), id);
+            const mine = leanOf(s.lines[lineKey(axis, me.id)] ?? ideas.map(([x]) => x), id);
             const theirs = invitations
               .filter(([, inv]) => inv.idea === id && inv.answered && (who === 'together' || who === inv.guest))
               .map(([, inv]) => [inv.guest, inv.leans.find(([a]) => a === axis)?.[1]] as const)
               .filter(([, l]) => l) as [string, Lean][];
             if (who !== 'mine' && who !== 'together' && theirs.length === 0) return null;
-            const marks: [string, Lean][] = [...(who === 'mine' || who === 'together' ? [['Amina', mine ?? 'middle'] as [string, Lean]] : []), ...theirs];
+            const marks: [string, Lean][] = [...(who === 'mine' || who === 'together' ? [[me.name, mine ?? 'middle'] as [string, Lean]] : []), ...theirs];
             const b = who === 'together' ? band(marks.map((m) => m[1])) : null;
             return (
               <View key={id} style={st.ideaRow}>
@@ -66,7 +66,7 @@ export default function Regards() {
                     <View style={[st.band, { left: `${(['little', 'middle', 'much'].indexOf(b.from) * 100) / 3}%`, width: `${((['little', 'middle', 'much'].indexOf(b.to) - ['little', 'middle', 'much'].indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? '#a9d18e88' : '#f08a7e66' }]} />
                   )}
                   {marks.map(([name, l]) => (
-                    <Text key={name} style={[st.mark, { left: `${(['little', 'middle', 'much'].indexOf(l) * 100) / 3 + 4}%` }, name !== 'Amina' && st.markOther]}>{name}</Text>
+                    <Text key={name} style={[st.mark, { left: `${(['little', 'middle', 'much'].indexOf(l) * 100) / 3 + 4}%` }, name !== me.name && st.markOther]}>{name}</Text>
                   ))}
                 </View>
               </View>
@@ -82,7 +82,7 @@ export default function Regards() {
     <Screen side="pp" title="views" question={w('viewsQuestion')}>
       <ScrollView contentContainerStyle={{ gap: 14 }}>
         <View style={st.ring}>
-          <View style={st.center}><Text style={st.name}>Amina</Text><Text style={st.small}>{w('sheInvites')}</Text></View>
+          <View style={st.center}><Text style={st.name}>{me.name}</Text><Text style={st.small}>{w('sheInvites')}</Text></View>
           <View style={st.sat}><Text style={st.name}>Sarah</Text><Text style={st.small}>{w('inSession')}</Text></View>
           {invitations.map(([id, inv]) => (
             <View key={id} style={st.sat}>
@@ -97,7 +97,7 @@ export default function Regards() {
         <Text style={st.small}>{w('onlyHerIdea')} {w('silenceOk')}</Text>
 
         {!s.viewsRevealed ? (
-          <Pressable onPress={() => { act('amina', { act: 'views_revealed' }); say('Les regards se découvrent ensemble.'); }} style={[st.btn, st.primary]} accessibilityRole="button">
+          <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); say('Les regards se découvrent ensemble.'); }} style={[st.btn, st.primary]} accessibilityRole="button">
             <Text style={[st.btnTxt, { color: '#fff' }]}>{w('revealTogether')}</Text>
           </Pressable>
         ) : (
@@ -138,7 +138,7 @@ export default function Regards() {
                 <Pressable accessibilityRole="button" key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? 'en français' : 'بالعربية'}</Text></Pressable>
               ))}
             </View>
-            <Text style={st.small}>Lien temporaire, sans compte. Il s'envoie par SMS, WhatsApp ou mail depuis la tablette.</Text>
+            <Text style={st.small}>Lien temporaire, sans compte. Il s’envoie par SMS, WhatsApp ou mail depuis la tablette.</Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Inviter</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>

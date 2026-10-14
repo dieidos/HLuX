@@ -10,11 +10,12 @@ import { DragArea, Draggable, Zone } from '../../components/Drag';
 import { Ikigai } from '../../components/Ikigai';
 import type { Spot } from '../../core/acts';
 import { say, useWords } from '../../core/useAids';
-import { useProject, useProjectState } from '../../core/useProject';
+import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
 export default function Envies() {
+  const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const act = useProject((x) => x.act);
@@ -23,13 +24,13 @@ export default function Envies() {
   const [from, setFrom] = useState<string | null>(null);
 
   const place = (idea: string, spot: Spot, words: string) => {
-    act('amina', { act: 'idea_placed', idea, spot });
+    act(me.id, { act: 'idea_placed', idea, spot });
     const t = `${s.ideas[idea].title} : ${words}.`;
     say(t);
   };
   const create = () => {
     if (!title.trim()) return;
-    act('amina', { act: 'idea_created', idea: `idee-${Object.keys(s.ideas).length + 1}`, title: title.trim(), from_card: from, in_session: false });
+    act(me.id, { act: 'idea_created', idea: `idee-${Object.keys(s.ideas).length + 1}`, title: title.trim(), from_card: from, in_session: false });
     setAdding(false); setTitle(''); setFrom(null);
   };
   const at = (spot: Spot) =>
