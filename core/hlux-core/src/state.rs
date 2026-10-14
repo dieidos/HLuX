@@ -47,6 +47,8 @@ pub struct Invitation {
     pub axes: Vec<Circle>,
     pub lang: Lang,
     pub expires: String,
+    pub channel: Option<Channel>,
+    pub idea_text: Option<String>,
     /// La réponse n'est lisible qu'après « Nos regards réunis ».
     pub answered: bool,
     pub leans: Vec<(Circle, Lean)>,
@@ -159,10 +161,10 @@ impl Reducer<ProjectAct> for ProjectReducer {
                 s.lines.insert(line_key(axis, &author), order);
             }
             ProjectAct::CompanionOrder { by, ranks } => s.companion_order = Some((by, ranks)),
-            ProjectAct::InvitationSent { invitation, guest, relation, idea, axes, lang, expires } => {
+            ProjectAct::InvitationSent { invitation, guest, relation, idea, axes, lang, expires, channel, idea_text } => {
                 s.invitations.insert(
                     invitation,
-                    Invitation { guest, relation, idea, axes, lang, expires, answered: false, leans: vec![], word: None },
+                    Invitation { guest, relation, idea, axes, lang, expires, channel, idea_text, answered: false, leans: vec![], word: None },
                 );
             }
             ProjectAct::InvitationAnswered { invitation, leans, word } => {

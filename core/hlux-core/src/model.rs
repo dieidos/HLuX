@@ -42,6 +42,18 @@ pub enum Lang {
     Ar,
 }
 
+/// Écran 05 — par où part l'invitation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Channel {
+    /// un SMS envoyé depuis la tablette
+    Sms,
+    /// un courriel
+    Mail,
+    /// en séance, sur la tablette
+    InSession,
+}
+
 /// Écran 03 — les quatre cercles (au singulier pour Amina, au pluriel pour le collectif).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

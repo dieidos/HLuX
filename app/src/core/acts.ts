@@ -14,6 +14,8 @@ export type Spot =
   | { at: 'discarded' };
 export type Rank = 'first' | 'then' | 'also' | 'less' | 'not_yet';
 export type Lean = 'little' | 'middle' | 'much';
+/** Écran 05 — par où part l'invitation. */
+export type Channel = 'sms' | 'mail' | 'in_session';
 export type NodeKind = 'decision' | 'event';
 export type LinkKind =
   | { kind: 'chosen' }
@@ -38,7 +40,7 @@ export type ProjectAct =
   | { act: 'axis_ranked'; axis: Circle; rank: Rank }
   | { act: 'line_ordered'; axis: Circle; author: string; order: Id[] }
   | { act: 'companion_order'; by: string; ranks: [Circle, Rank][] }
-  | { act: 'invitation_sent'; invitation: Id; guest: string; relation: string; idea: Id; axes: Circle[]; lang: Lang; expires: string }
+  | { act: 'invitation_sent'; invitation: Id; guest: string; relation: string; idea: Id; axes: Circle[]; lang: Lang; expires: string; channel?: Channel | null; idea_text?: string | null }
   | { act: 'invitation_answered'; invitation: Id; leans: [Circle, Lean][]; word: string | null }
   | { act: 'views_revealed' }
   | { act: 'node_set'; node: Id; lane: string; kind: NodeKind; label: string; when: string; thread: boolean }

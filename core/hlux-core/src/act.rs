@@ -56,7 +56,14 @@ pub enum ProjectAct {
         idea: Id,
         axes: Vec<Circle>,
         lang: Lang,
+        /// Échéance (date ISO) : passé ce jour, l'invitation est expirée et le lien se repose.
         expires: String,
+        /// Par où part le lien (absent dans les journaux d'avant le 2026-10-14).
+        #[serde(default)]
+        channel: Option<Channel>,
+        /// L'idée dans la langue de l'invité, confirmée par la personne qui invite.
+        #[serde(default)]
+        idea_text: Option<String>,
     },
     /// Réponse d'un invité : un penchant par axe, et un mot libre facultatif.
     InvitationAnswered { invitation: Id, leans: Vec<(Circle, Lean)>, word: Option<String> },

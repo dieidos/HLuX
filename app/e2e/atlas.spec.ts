@@ -88,7 +88,7 @@ test.describe('02 Ressenti', () => {
     await expect(page.getByRole('button', { name: '↶ Annuler' })).toBeVisible();
     await link(page, /Cartes/).click();
     await tap(page, 'Papiers');
-    await expect(page.getByText('« Les lettres de la CAF, je les laisse fermées. »')).toBeVisible();
+    await expect(page.getByText('« Les lettres de la CAF, je les laisse fermées. »').filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByLabel('Le fil de la Carte')).toContainText("Ressentie · aujourd'hui · dans « c'est difficile »");
   });
 });
@@ -180,6 +180,8 @@ async function inviteSalma(page: Page, from = 'home') {
   await fill(page, 'Lien', 'ma sœur');
   await tap(page, 'Formation');
   await tap(page, 'بالعربية');
+  // Sans connexion, la traduction ne s'invente pas : on écrit l'idée en arabe.
+  await fill(page, "L'idée en arabe", 'التكوين');
   await tap(page, 'Inviter');
 }
 

@@ -16,12 +16,19 @@ import { usePending, useProject, useProjectState, useMe } from '../../core/usePr
 import { PICTOS, type PictoKey } from '../../design/pictos';
 import { C, F, S } from '../../design/theme';
 
+/** La provenance d'une Carte : comment elle est née. */
+/** `lang="ar"` sur le web (react-native-web le transmet ; les types de React Native ne le connaissent pas). */
+const AR = { lang: 'ar' } as object;
+const ORIGIN = { spoken: '🗣️ dite', written: '✍️ écrite', picture: '🖼️ choisie en image' } as const;
+
 export default function Cartes() {
   const me = useMe();
   const w = useWords();
   const s = useProjectState();
   const f = useFacilityState();
   const act = useProject((x) => x.act);
+  const pro = useProject((x) => x.pro);
+  const brought = new Set(Object.values(s.subjects).map((x) => x.card));
   const confirm = useProject((x) => x.confirm);
   const undo = useProject((x) => x.undo);
   const pending = usePending();
@@ -53,7 +60,7 @@ export default function Cartes() {
     const id = `carte-${Object.keys(s.cards).length + 1}`;
     act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
-      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: 'Sarah', when: "aujourd'hui",
+      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: "aujourd'hui",
     });
     say('Ta Carte est créée.');
     setAdding(false); setText(''); setPicto(null); setSpoken(false);
@@ -64,7 +71,7 @@ export default function Cartes() {
       <ScrollView contentContainerStyle={st.grid}>
         {Object.entries(s.cards).map(([id, c]) => (
           <Pressable accessibilityRole="button" key={id} onPress={() => { setOpen(id); say(c.verbatim || c.title); }} accessibilityLabel={c.title}>
-            <CardView card={c} />
+            <CardView card={c} brought={brought.has(id)} />
           </Pressable>
         ))}
         <Pressable onPress={() => setAdding(true)} style={st.new} accessibilityRole="button">
@@ -81,6 +88,8 @@ export default function Cartes() {
             <Text style={st.bigTitle}>{big.title}</Text>
             {big.verbatim ? <Text style={st.verbatim}>« {big.verbatim} »</Text> : null}
             {big.simpler ? <Text style={st.simpler}>Plus simple : {big.simpler}</Text> : null}
+            {big.translations.ar ? <Text style={[st.simpler, { writingDirection: "rtl" }]} {...AR}>🌐 {big.translations.ar}</Text> : null}
+            <Text style={st.chip}>{ORIGIN[big.origin]}{big.saidWith ? ` · avec ${big.saidWith}` : ''}{brought.has(open!) ? ' · 🟢 apportée au collectif' : ''}</Text>
             {!big.feeling && <Text style={st.chip}>{w('notPlaced')}</Text>}
             <Text style={st.muted}>{w('keepsAll')}</Text>
             <View style={st.thread} accessibilityLabel="Le fil de la Carte">

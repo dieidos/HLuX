@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Entry } from './acts';
-import { pending, standing } from './project';
+import { expired, pending, standing } from './project';
 import { seedAmina } from './seed';
 
 const N = seedAmina().length;
@@ -44,3 +44,14 @@ describe('Projet Personnalisé', () => {
     expect(standing(confirmed).cards.papiers.awaitingValidation).toBe(false);
   });
 });
+
+describe('Invitations', () => {
+  it("passé l'échéance, l'invitation est expirée ; les anciennes, en mots, n'expirent pas", () => {
+    const base = { guest: 'Salma', relation: '', idea: 'x', axes: [], lang: 'ar' as const, channel: null, ideaText: null, answered: false, leans: [], word: null };
+    const now = new Date('2026-10-14T12:00:00Z');
+    expect(expired({ ...base, expires: '2026-10-10' }, now)).toBe(true);
+    expect(expired({ ...base, expires: '2026-10-20' }, now)).toBe(false);
+    expect(expired({ ...base, expires: 'dans 7 jours' }, now)).toBe(false);
+  });
+});
+

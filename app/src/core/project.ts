@@ -2,7 +2,7 @@
 // ⛳ Jusqu'au pont UniFFI (lot 2), l'app rejoue elle-même le journal ; la logique suit
 //    `core/hlux-core/src/state.rs`. Les tests (`project.test.ts`) tiennent la parité sur le fil d'Amina.
 
-import type { Circle, Entry, Feeling, Id, Lang, Lean, NodeKind, LinkKind, Origin, Plan, ProjectAct, Rank, Spot } from './acts';
+import type { Channel, Circle, Entry, Feeling, Id, Lang, Lean, NodeKind, LinkKind, Origin, Plan, ProjectAct, Rank, Spot } from './acts';
 
 export interface Card {
   title: string;
@@ -21,8 +21,12 @@ export interface Card {
 export interface Idea { title: string; fromCard: Id | null; inSession: boolean; spot: Spot }
 export interface Invitation {
   guest: string; relation: string; idea: Id; axes: Circle[]; lang: Lang; expires: string;
+  channel: Channel | null; ideaText: string | null;
   answered: boolean; leans: [Circle, Lean][]; word: string | null;
 }
+
+/** Une invitation dont l'échéance (date ISO) est passée : le lien se repose. Les anciennes, en mots, n'expirent pas. */
+export const expired = (i: Invitation, now: Date) => /^\d{4}-\d{2}-\d{2}/.test(i.expires) && new Date(i.expires).getTime() < now.getTime();
 export interface PathNode { lane: string; kind: NodeKind; label: string; when: string; thread: boolean }
 
 export interface ProjectState {
@@ -91,7 +95,10 @@ function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
     case 'line_ordered': s.lines[lineKey(a.axis, a.author)] = a.order; break;
     case 'companion_order': s.companionOrder = { by: a.by, ranks: a.ranks }; break;
     case 'invitation_sent':
-      s.invitations[a.invitation] = { guest: a.guest, relation: a.relation, idea: a.idea, axes: a.axes, lang: a.lang, expires: a.expires, answered: false, leans: [], word: null };
+      s.invitations[a.invitation] = {
+        guest: a.guest, relation: a.relation, idea: a.idea, axes: a.axes, lang: a.lang, expires: a.expires,
+        channel: a.channel ?? null, ideaText: a.idea_text ?? null, answered: false, leans: [], word: null,
+      };
       break;
     case 'invitation_answered':
       if (s.invitations[a.invitation]) Object.assign(s.invitations[a.invitation], { answered: true, leans: a.leans, word: a.word });

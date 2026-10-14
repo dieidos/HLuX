@@ -14,14 +14,21 @@ interface Props {
   /** Qui relit et valide : « le groupe », « Amina »… */
   who: string;
   onProposal: (proposal: string) => void;
+  /** La langue visée (traduction). */
+  lang?: 'fr' | 'ar';
 }
 
-export function AideButton({ kind, label, text, who, onProposal }: Props) {
+export function AideButton({ kind, label, text, who, onProposal, lang }: Props) {
   const [msg, setMsg] = useState('');
   const run = async () => {
     try {
       setMsg('…');
-      const r = await askAide({ kind, text });
+      const r = await askAide({ kind, text, lang });
+      // Hors ligne, une traduction ne s'invente pas : on la laisse écrire.
+      if (r.offline && kind === 'translate') {
+        setMsg('Sans connexion, pas de traduction : écris-la toi-même.');
+        return;
+      }
       onProposal(r.proposal);
       setMsg(`${r.offline ? 'Exemple hors ligne (sans IA)' : 'Proposition'}. ${who} relit, change si besoin, puis valide.`);
     } catch (e) {

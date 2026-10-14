@@ -6,9 +6,10 @@ import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { AideButton } from '../../components/AideButton';
 import { Screen } from '../../components/Chrome';
-import type { Circle, Lang, Lean, Rank } from '../../core/acts';
-import { lineKey } from '../../core/project';
+import type { Channel, Circle, Lang, Lean, Rank } from '../../core/acts';
+import { expired, lineKey } from '../../core/project';
 import { say, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { band, leanOf } from '../../core/views';
@@ -17,6 +18,8 @@ import type { WordKey } from '../../i18n/words';
 
 const AXES: [Circle, WordKey][] = [['living', 'living'], ['able', 'able'], ['love', 'love'], ['useful', 'useful']];
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
+
+const CHANNELS: Record<Channel, string> = { sms: '📱 SMS', mail: '✉️ mail', in_session: '🤝 en séance' };
 
 export default function Regards() {
   const me = useMe();
@@ -29,6 +32,9 @@ export default function Regards() {
   const [relation, setRelation] = useState('');
   const [idea, setIdea] = useState<string | null>(null);
   const [lang, setLang] = useState<Lang>('fr');
+  const [channel, setChannel] = useState<Channel>('sms');
+  const [ideaText, setIdeaText] = useState('');
+  const [days, setDays] = useState(7);
 
   const ideas = Object.entries(s.ideas).filter(([, i]) => i.spot.at !== 'discarded');
   const invitations = Object.entries(s.invitations);
@@ -38,10 +44,13 @@ export default function Regards() {
 
   const send = () => {
     if (!guest.trim() || !idea) return;
+    // En arabe, l'idée part dans la langue de l'invité, confirmée par la personne qui invite.
+    if (lang === 'ar' && !ideaText.trim()) return;
     const id = `inv-${invitations.length + 1}`;
-    act(me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires: 'dans 7 jours' });
+    const expires = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    act(me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires, channel, idea_text: lang === 'ar' ? ideaText.trim() : null });
     say(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`);
-    setForm(false); setGuest(''); setRelation(''); setIdea(null);
+    setForm(false); setGuest(''); setRelation(''); setIdea(null); setIdeaText('');
   };
 
   const lines = (ranks: Partial<Record<Circle, Rank>>, who: 'mine' | 'together' | string) => (
@@ -88,8 +97,11 @@ export default function Regards() {
             <View key={id} style={st.sat}>
               <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
               <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? 'en arabe' : 'en français'}</Text>
-              <Text style={[st.status, inv.answered && st.statusOk]}>{inv.answered ? w('answered') : `${w('invited')} · ${w('notYetAnswered')}`}</Text>
-              {!inv.answered && <Link href={`/invite/${id}`} style={st.link}>Ouvrir le lien invité</Link>}
+              <Text style={[st.status, inv.answered && st.statusOk]}>
+                {inv.answered ? w('answered') : expired(inv, new Date()) ? 'expirée · le lien s’est reposé' : `${w('invited')} · ${w('notYetAnswered')}`}
+                {inv.channel ? ` · ${CHANNELS[inv.channel]}` : ''}
+              </Text>
+              {!inv.answered && !expired(inv, new Date()) && <Link href={`/invite/${id}`} style={st.link}>Ouvrir le lien invité</Link>}
             </View>
           ))}
           <Pressable onPress={() => setForm(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('invite')}</Text></Pressable>
@@ -123,7 +135,7 @@ export default function Regards() {
 
       {form && (
         <View style={st.overlay}>
-          <View style={st.sheet}>
+          <ScrollView style={st.sheetScroll} contentContainerStyle={st.sheet}>
             <Text style={st.sheetTitle}>{w('invite')}</Text>
             <TextInput value={guest} onChangeText={setGuest} placeholder="Prénom (ex. Salma)" style={st.input} accessibilityLabel="Prénom" />
             <TextInput value={relation} onChangeText={setRelation} placeholder="Lien (ex. ma sœur)" style={st.input} accessibilityLabel="Lien" />
@@ -138,12 +150,28 @@ export default function Regards() {
                 <Pressable accessibilityRole="button" key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? 'en français' : 'بالعربية'}</Text></Pressable>
               ))}
             </View>
-            <Text style={st.small}>Lien temporaire, sans compte. Il s’envoie par SMS, WhatsApp ou mail depuis la tablette.</Text>
+            {lang === 'ar' && idea ? (
+              <View style={{ gap: 6 }}>
+                <TextInput value={ideaText} onChangeText={setIdeaText} placeholder="L'idée, en arabe" style={[st.input, { writingDirection: 'rtl' }]} accessibilityLabel="L'idée en arabe" />
+                <AideButton kind="translate" lang="ar" label="Traduire l'idée" text={s.ideas[idea].title} who={me.name} onProposal={setIdeaText} />
+              </View>
+            ) : null}
+            <View style={st.chips}>
+              {(Object.keys(CHANNELS) as Channel[]).map((c) => (
+                <Pressable accessibilityRole="radio" accessibilityState={{ checked: channel === c }} key={c} onPress={() => setChannel(c)} style={[st.pick, channel === c && st.pickOn]}><Text style={st.btnTxt}>{CHANNELS[c]}</Text></Pressable>
+              ))}
+            </View>
+            <View style={st.chips}>
+              {[3, 7, 14].map((d) => (
+                <Pressable accessibilityRole="radio" accessibilityState={{ checked: days === d }} key={d} onPress={() => setDays(d)} style={[st.pick, days === d && st.pickOn]}><Text style={st.btnTxt}>{d} jours</Text></Pressable>
+              ))}
+            </View>
+            <Text style={st.small}>Lien temporaire, sans compte : passé ce délai, il se repose. Rien d’autre que cette idée n’est montré.</Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Inviter</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
-          </View>
+          </ScrollView>
         </View>
       )}
     </Screen>
@@ -199,7 +227,9 @@ const st = StyleSheet.create({
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
   pickOn: { borderColor: C.violet, backgroundColor: C.violetSoft },
   overlay: { position: 'absolute', inset: 0, backgroundColor: C.scrim, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  sheet: { width: '100%', maxWidth: 560, gap: 10, padding: 24, borderRadius: 20, backgroundColor: C.surface },
+  // Le formulaire défile si l'écran est petit : « Inviter » reste toujours atteignable.
+  sheetScroll: { width: '100%', maxWidth: 560, maxHeight: '100%', borderRadius: 20, backgroundColor: C.surface },
+  sheet: { gap: 10, padding: 24 },
   sheetTitle: { fontFamily: F.display, fontSize: 24, color: C.ink },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },
 });
