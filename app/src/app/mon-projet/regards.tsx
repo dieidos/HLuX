@@ -2,6 +2,7 @@
 // dans sa langue. On voit qui a répondu, jamais le contenu, jusqu'à « découvrir ensemble ».
 // Puis quatre lectures : Mon regard · Le regard de… · Nos regards réunis · Avec l'ordre de la professionnelle.
 
+import { freshId } from '../../core/ids';
 import {Link, usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -51,7 +52,7 @@ export default function Regards() {
     if (!guest.trim() || !idea) return;
     // En arabe, l'idée part dans la langue de l'invité, confirmée par la personne qui invite.
     if (lang === 'ar' && !ideaText.trim()) return;
-    const id = `inv-${invitations.length + 1}`;
+    const id = freshId(`inv-${me.id}`, Object.keys(s.invitations));
     const expires = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString().slice(0, 10);
     const aided = lang === 'ar' && ideaAided;
     act(aided ? 'hlux-ia' : me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires, channel, idea_text: lang === 'ar' ? ideaText.trim() : null }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);

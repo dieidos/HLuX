@@ -5,6 +5,7 @@ import { MIN_WORDS } from '../core/backup';
 export const REFUSALS_AR: Record<string, string> = {
   'Rien à reformuler.': 'لا شيء لإعادة صياغته.',
   "Ce texte parle de santé : il reste sur l'appareil, l'aide IA ne l'envoie pas.": 'هذا النص يتحدّث عن الصحّة: يبقى على الجهاز، ولا ترسله المساعدة.',
+  "Ce texte contient un numéro ou une adresse : il reste sur l'appareil.": 'هذا النص فيه رقم أو عنوان: يبقى على الجهاز.',
   "L'aide n'a pas répondu. Rien n'a changé.": 'لم تُجب المساعدة. لم يتغيّر شيء.',
   [`La phrase doit avoir au moins ${MIN_WORDS} mots.`]: `يجب أن تكون الجملة من ${MIN_WORDS} كلمات على الأقلّ.`,
   "Ce fichier n'est pas un dossier HLuX.": 'هذا الملف ليس ملفّاً من HLuX.',

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
-import { AideRefusal, askAide } from '../../core/aides';
+import { AideRefusal, askAide, guard } from '../../core/aides';
 import { SOURCE_WORDS } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
@@ -41,6 +41,12 @@ export default function Sujets() {
 
   const bring = () => {
     if (!card || !collective.trim() || !session) return;
+    try {
+      guard(collective);
+    } catch (e) {
+      setAideMsg(e instanceof AideRefusal ? e.message : '');
+      return;
+    }
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
     actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
     actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session });

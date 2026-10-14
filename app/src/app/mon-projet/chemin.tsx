@@ -13,6 +13,7 @@ import { PathEditor } from '../../components/PathEditor';
 import { PathView } from '../../components/PathView';
 import { PlanEditor } from '../../components/PlanEditor';
 import { seasonsFrom } from '../../core/dates';
+import { freshId } from '../../core/ids';
 import {tNow, tell, useT, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
@@ -90,7 +91,7 @@ export default function Chemin() {
                 if (last) undo(me.id, last.rank);
               }}
               onAdd={(n) => {
-                const id = `etape-${nodes.length + 1}`;
+                const id = freshId('etape', Object.keys(s.nodes));
                 act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: n.thread });
                 if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
                 tell(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`), pathname);

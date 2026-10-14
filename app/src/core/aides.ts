@@ -25,7 +25,19 @@ export class AideRefusal extends Error {
 }
 
 // Garde « données de santé » : rien de cela ne part vers dieidos, qui n'est pas hébergeur HDS.
-const HEALTH = /\b(sant[ée]|malad\w*|m[ée]dic\w*|traitement|h[ôo]pital|diagnostic\w*|handicap\w*|enceinte|grossesse|psychiatr\w*|d[ée]pression|addiction|alcool|drogue|th[ée]rapie|ordonnance|vih|cancer|diab[èe]te)\b/i;
+// ⚠️ Pas de `\b` : en JavaScript, il ne voit pas les lettres accentuées ni l'arabe (« santé » passait).
+// Les bords de mot sont des lettres Unicode (`\p{L}`), et l'arabe a sa propre liste (racines courantes).
+const WORD = (w: string) => `(?<!\\p{L})(?:${w})(?!\\p{L})`;
+const HEALTH_FR = [
+  'sant[ée]', 'malad\\p{L}*', 'm[ée]dic\\p{L}*', 'm[ée]decins?', 'docteur\\p{L}*', 'infirmi\\p{L}*', 'soins?', 'traitements?',
+  'h[ôo]pita\\p{L}*', 'urgences', 'diagnostic\\p{L}*', 'handicap\\p{L}*', 'enceinte', 'grossesse', 'psy\\p{L}*', 'd[ée]press\\p{L}*',
+  'addiction\\p{L}*', 'alcool\\p{L}*', 'drogues?', 'th[ée]rapie\\p{L}*', 'ordonnances?', 'vih', 'sida', 'cancer\\p{L}*',
+  'diab[èe]t\\p{L}*', 'pharmacie\\p{L}*', 'opération', 'chirurg\\p{L}*', 'mutuelle', 'cmu', 'css',
+];
+const HEALTH_AR = ['صح[ةت]', 'مرض', 'مريض', 'دواء', 'أدوية', 'طبيب', 'مستشفى', 'علاج', 'حامل', 'حمل', 'نفسي', 'اكتئاب', 'إدمان', 'سرطان', 'سكري'];
+const HEALTH = new RegExp(`${HEALTH_FR.map(WORD).join('|')}|${HEALTH_AR.join('|')}`, 'iu');
+// Coordonnées : un numéro de téléphone ou une adresse électronique ne partent pas non plus.
+const CONTACT = /(?:\+?\d[\d .-]{7,}\d)|(?:[\p{L}\d._%+-]+@[\p{L}\d.-]+\.\p{L}{2,})/u;
 
 /** Les prénoms connus sont remplacés avant l'envoi, et rétablis au retour. */
 export function pseudonymize(text: string, names: string[]): { text: string; restore: (s: string) => string } {
@@ -44,6 +56,7 @@ export function pseudonymize(text: string, names: string[]): { text: string; res
 export function guard(text: string): void {
   if (!text.trim()) throw new AideRefusal('Rien à reformuler.');
   if (HEALTH.test(text)) throw new AideRefusal("Ce texte parle de santé : il reste sur l'appareil, l'aide IA ne l'envoie pas.");
+  if (CONTACT.test(text)) throw new AideRefusal("Ce texte contient un numéro ou une adresse : il reste sur l'appareil.");
 }
 
 /** L'exemple hors ligne : sans IA, déterministe, et dit comme tel. */

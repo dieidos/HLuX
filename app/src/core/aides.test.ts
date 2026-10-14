@@ -10,6 +10,12 @@ describe('Aides IA', () => {
   it('la garde santé bloque avant tout envoi', () => {
     expect(() => guard('Je dois aller à l’hôpital pour mon traitement.')).toThrow(AideRefusal);
     expect(() => guard('Les lettres de la CAF, je les laisse fermées.')).not.toThrow();
+    // Les mots accentués et l'arabe : `\b` les laissait passer (défaut corrigé le 2026-10-14).
+    for (const t of ['Santé', 'ma santé', 'le médecin', 'un psy', 'Hôpital', 'صحة', 'عند الطبيب', 'دواء']) expect(() => guard(t), t).toThrow(AideRefusal);
+    for (const t of ['Les papiers', 'Comprendre', 'mon logement', 'الأوراق']) expect(() => guard(t), t).not.toThrow();
+    // Un numéro ou une adresse ne part pas non plus.
+    expect(() => guard('Appelle-moi au 06 12 34 56 78')).toThrow(/numéro ou une adresse/);
+    expect(() => guard('écris à amina@example.org')).toThrow(/numéro ou une adresse/);
   });
 
   it('pseudonymise les prénoms et les rétablit au retour', () => {

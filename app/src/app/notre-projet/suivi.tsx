@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import { PathEditor } from '../../components/PathEditor';
 import { provenanceOf } from '../../core/facility';
+import { freshId } from '../../core/ids';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useProject, useTeam } from '../../core/useProject';
@@ -98,7 +99,7 @@ export default function Suivi() {
             if (last) undoF(by, last.rank);
           }}
           onAdd={(n) => {
-            const id = `suivi-${nodes.length + 1}`;
+            const id = freshId('suivi', Object.keys(f.nodes));
             act(by, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when });
             if (n.link) act(by, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
             say(`${n.label} : posé sur le chemin collectif, ${n.when}.`);
