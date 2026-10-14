@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
+import { AideRefusal, askAide } from '../../core/aides';
 import { SOURCE_WORDS } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
@@ -22,6 +23,7 @@ export default function Sujets() {
   const brought = f.agenda.some((a) => a.item === 'courriers');
   const [collective, setCollective] = useState(subject?.forCollective ?? 'Comprendre les courriers administratifs est difficile pour plusieurs personnes.');
   const [notNow, setNotNow] = useState(false);
+  const [aideMsg, setAideMsg] = useState('');
   const session = f.attendance?.session ?? 'prochaine séance';
 
   const bring = () => {
@@ -44,7 +46,24 @@ export default function Sujets() {
             <View style={[st.version, { borderTopColor: C.pe.value }]}>
               <Text style={st.kicker}>POUR LE COLLECTIF</Text>
               {brought ? <Text style={st.quote}>{collective}</Text> : (
-                <TextInput value={collective} onChangeText={setCollective} multiline style={st.input} accessibilityLabel="Version pour le collectif" />
+                <>
+                  <TextInput value={collective} onChangeText={setCollective} multiline style={st.input} accessibilityLabel="Version pour le collectif" />
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={async () => {
+                      try {
+                        const r = await askAide({ kind: 'generalize', text: card.title === 'Papiers' ? 'Comprendre les courriers administratifs' : card.verbatim });
+                        setCollective(r.proposal);
+                        setAideMsg(r.offline ? 'Exemple hors ligne (sans IA). Amina relit et peut changer.' : 'Proposition. Amina relit et peut changer.');
+                      } catch (e) {
+                        setAideMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu.");
+                      }
+                    }}
+                    style={[st.btn, { alignSelf: 'flex-start' }]}>
+                    <Text style={st.btnTxt}>✨ Proposer une formulation générale</Text>
+                  </Pressable>
+                  {aideMsg ? <Text style={st.small}>{aideMsg}</Text> : null}
+                </>
               )}
             </View>
           </View>
