@@ -10,6 +10,7 @@ import { BackupRefusal, exportDossier, MIN_WORDS } from '../../core/backup';
 import { saveFile } from '../../core/saveFile';
 import { PathView } from '../../components/PathView';
 import { say, useWords } from '../../core/useAids';
+import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
@@ -29,6 +30,8 @@ export default function Chemin() {
   const [phrase, setPhrase] = useState('');
   const [saved, setSaved] = useState('');
   const entries = useProject((x) => x.entries);
+  const facility = useFacilityState();
+  const proposals = Object.entries(facility.proposals).filter(([id]) => !s.linkedProposals.some((l) => l.proposal === id));
 
   const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n }));
   const copy = nodes.map((n) => (moved && n.id === moved.node ? { ...n, when: moved.when } : n));
@@ -66,6 +69,22 @@ export default function Chemin() {
             </View>
           </View>
         )}
+
+        {proposals.map(([id, text]) => (
+          <View key={id} style={st.inset}>
+            <Text style={st.tileTitle}>Le CHRS propose : {text}.</Text>
+            <Text style={st.small}>Le collectif ne lit jamais ton chemin. C'est toi qui y fais entrer ce qu'il propose.</Text>
+            <Pressable
+              onPress={() => {
+                act('amina', { act: 'node_set', node: `propose-${id}`, lane: 'démarches', kind: 'event', label: text, when: 'hiver', thread: false });
+                act('amina', { act: 'proposal_linked', proposal: id, node: `propose-${id}` });
+                say('Relié à ton chemin.');
+              }}
+              style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
+              <Text style={[st.btnTxt, { color: '#fff' }]}>Je le relie à mon chemin</Text>
+            </Pressable>
+          </View>
+        ))}
 
         <View style={st.chips}>
           <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: '#fff' }]}>{w('otherPaths')}</Text></Pressable>
@@ -122,6 +141,7 @@ const st = StyleSheet.create({
   plan: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tile: { flexGrow: 1, flexBasis: 200, padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 4 },
   tileTitle: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  inset: { padding: 14, borderRadius: S.radius, backgroundColor: C.pe.soft, gap: 6, borderLeftWidth: 5, borderLeftColor: C.pe.value },
   export: { padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 8 },
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   tileItem: { fontFamily: F.body, fontSize: 15, color: C.text },
