@@ -50,6 +50,17 @@ export const WORDS = {
   discard: { fr: 'Écarter (on ne peut pas revenir)', ar: 'إبعاد (لا رجعة فيه)', falc: 'Enlever pour toujours' },
   newIdea: { fr: '＋ Une idée', ar: '＋ فكرة', falc: '＋ Une idée' },
   bornOf: { fr: 'née de', ar: 'نابعة من', falc: 'vient de' },
+  // 04 Priorités
+  prioQuestion: { fr: "Qu'est-ce qui compte le plus ? Je range, puis je situe mes idées.", ar: 'ما الأهمّ عندي؟ أرتّب ثم أضع أفكاري.', falc: 'Ce qui compte le plus pour moi.' },
+  first: { fr: "D'ABORD", ar: 'أوّلاً', falc: "D'ABORD" },
+  then: { fr: 'ENSUITE', ar: 'ثمّ', falc: 'ENSUITE' },
+  also: { fr: 'AUSSI', ar: 'أيضاً', falc: 'AUSSI' },
+  less: { fr: 'MOINS', ar: 'أقلّ', falc: 'MOINS' },
+  notYet: { fr: 'Je ne sais pas encore', ar: 'لا أعرف بعد', falc: 'Je ne sais pas' },
+  shareRank: { fr: 'Deux axes peuvent partager un rang. « Je ne sais pas encore » est permis.', ar: 'محوران يمكن أن يتشاركا نفس المرتبة. « لا أعرف بعد » جواب مقبول.', falc: 'Deux cartes peuvent être ensemble.' },
+  ranks: { fr: '1 · Je range', ar: '1 · أرتّب', falc: '1 · Je range' },
+  lines: { fr: '2 · Je situe mes idées', ar: '2 · أضع أفكاري', falc: '2 · Je place mes idées' },
+  littleMuch: { fr: 'peu ←→ beaucoup', ar: 'قليلاً ←→ كثيراً', falc: 'un peu ←→ beaucoup' },
 } as const;
 
 export type WordKey = keyof typeof WORDS;
