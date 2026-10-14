@@ -10,9 +10,9 @@
 
 import type { Entry } from './acts';
 
-export interface Profile { id: string; firstName: string }
+export interface Profile { id: string; firstName: string; /** date ISO de la dernière copie emportée */ lastBackup?: string }
 
-export type KV = { getItem: (k: string) => string | null; setItem: (k: string, v: string) => void; removeItem: (k: string) => void };
+export type KV = { getItem: (k: string) => string | null; setItem: (k: string, v: string) => void; removeItem: (k: string) => void; /** efface tout ce qui appartient à un profil, clé de chiffrement comprise */ purge?: (id: string) => void };
 
 export const PROFILES_KEY = 'hlux.profiles';
 export const journalKey = (id: string) => `hlux.project.${id}`;
@@ -61,3 +61,23 @@ export function firstEntries(id: string, sentence: string, saidWith: string): En
     },
   }];
 }
+
+/** Le rappel doux : jamais de copie, ou la dernière a plus de 7 jours. */
+export const BACKUP_EVERY_DAYS = 7;
+export function needsBackup(p: Profile | undefined, now: Date): boolean {
+  if (!p) return false;
+  if (!p.lastBackup) return true;
+  return now.getTime() - new Date(p.lastBackup).getTime() > BACKUP_EVERY_DAYS * 24 * 3600 * 1000;
+}
+
+/** Ce que contient un dossier emporté (avant chiffrement). */
+export interface Dossier { person: string; firstName: string; entries: Entry[] }
+
+export function readDossier(json: string): Dossier {
+  const d = JSON.parse(json) as Partial<Dossier>;
+  if (typeof d.person !== 'string' || !Array.isArray(d.entries)) throw new Error("Ce dossier n'a pas la forme attendue.");
+  // Les dossiers d'avant le passage 11 n'avaient pas de prénom : on le reprend de l'identifiant.
+  const firstName = d.firstName ?? d.person.charAt(0).toUpperCase() + d.person.slice(1);
+  return { person: d.person, firstName, entries: d.entries };
+}
+

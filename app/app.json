@@ -30,7 +30,8 @@
       "expo-router",
       "expo-font",
       "expo-localization",
-      "expo-sharing"
+      "expo-sharing",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": false

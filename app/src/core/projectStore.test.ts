@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { journalKey, profileId, type KV } from './profiles';
+import { journalKey, needsBackup, profileId, readDossier, type KV } from './profiles';
 import { makeProjectStore } from './projectStore';
 import { standing } from './project';
 
@@ -48,5 +48,47 @@ describe('Profils et séance', () => {
   it('deux prénoms identiques restent deux profils', () => {
     expect(profileId('Amina', ['amina'])).toBe('amina-2');
     expect(profileId('Aïcha', [])).toBe('aicha');
+  });
+
+  it('départ : pas d’effacement sans copie emportée dans la séance ; puis tout part, clé comprise', () => {
+    const kv = memory();
+    const purged: string[] = [];
+    const s = makeProjectStore({ ...kv, purge: (id) => void purged.push(id) });
+    s.getState().openSession('Sarah');
+    s.getState().open('amina');
+    expect(s.getState().purge()).toBe(false);
+    const d = s.getState().dossier()!;
+    expect(d.firstName).toBe('Amina');
+    s.getState().markBackedUp(new Date('2026-10-14T10:00:00Z'));
+    expect(s.getState().purge()).toBe(true);
+    expect(purged).toEqual(['amina']);
+    expect(kv.m.get(journalKey('amina'))).toBeUndefined();
+    expect(s.getState().profiles).toEqual([]);
+    // relancée, la tablette ne fait pas revenir la démonstration
+    expect(makeProjectStore(kv).getState().profiles).toEqual([]);
+  });
+
+  it('restaurer : un nouveau profil, jamais par-dessus un autre', () => {
+    const kv = memory();
+    const s = makeProjectStore(kv);
+    s.getState().openSession('Sarah');
+    s.getState().open('amina');
+    const d = s.getState().dossier()!;
+    s.getState().close();
+    const id = s.getState().restoreProfile(d);
+    expect(id).toBe('amina-2');
+    expect(s.getState().entries).toEqual(d.entries);
+  });
+
+  it('le rappel doux : jamais de copie, ou plus de 7 jours', () => {
+    const now = new Date('2026-10-14T10:00:00Z');
+    expect(needsBackup({ id: 'a', firstName: 'A' }, now)).toBe(true);
+    expect(needsBackup({ id: 'a', firstName: 'A', lastBackup: '2026-10-10T10:00:00Z' }, now)).toBe(false);
+    expect(needsBackup({ id: 'a', firstName: 'A', lastBackup: '2026-10-01T10:00:00Z' }, now)).toBe(true);
+  });
+
+  it('un dossier ancien, sans prénom, se relit', () => {
+    expect(readDossier(JSON.stringify({ person: 'amina', entries: [] })).firstName).toBe('Amina');
+    expect(() => readDossier('{"x":1}')).toThrow();
   });
 });

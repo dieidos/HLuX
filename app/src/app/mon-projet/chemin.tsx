@@ -7,8 +7,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 
 import { Screen } from '../../components/Chrome';
 import { AideButton } from '../../components/AideButton';
-import { BackupRefusal, exportDossier, MIN_WORDS } from '../../core/backup';
-import { saveFile } from '../../core/saveFile';
+import { DossierCopy } from '../../components/DossierCopy';
 import { PathView } from '../../components/PathView';
 import { say, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
@@ -31,9 +30,6 @@ export default function Chemin() {
   const [plan, setPlan] = useState(false);
   const [story, setStory] = useState('');
   const [planWords, setPlanWords] = useState('');
-  const [phrase, setPhrase] = useState('');
-  const [saved, setSaved] = useState('');
-  const entries = useProject((x) => x.entries);
   const facility = useFacilityState();
   const proposals = Object.entries(facility.proposals).filter(([id]) => !s.linkedProposals.some((l) => l.proposal === id));
 
@@ -102,26 +98,7 @@ export default function Chemin() {
           <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: C.onAccent }]}>{w('myPlan')}</Text></Pressable>
         </View>
 
-        <View style={st.export}>
-          <Text style={st.tileTitle}>🔒 Emporter mon dossier</Text>
-          <Text style={st.small}>Une copie chiffrée, lisible seulement avec ta phrase ({MIN_WORDS} mots ou plus). Une phrase perdue, c’est un dossier perdu : personne ne peut la retrouver.</Text>
-          <TextInput value={phrase} onChangeText={setPhrase} placeholder="Ma phrase de six mots ou plus" secureTextEntry style={st.input} accessibilityLabel="Ma phrase" />
-          <Pressable
-            onPress={async () => {
-              try {
-                const f = exportDossier(JSON.stringify({ person: me.id, entries }), phrase);
-                await saveFile('dossier-amina.hlux.json', JSON.stringify(f));
-                setSaved('Ton dossier chiffré est prêt.');
-                setPhrase('');
-              } catch (e) {
-                setSaved(e instanceof BackupRefusal ? e.message : 'La copie a échoué.');
-              }
-            }}
-            style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: C.onAccent }]}>Emporter</Text>
-          </Pressable>
-          {saved ? <Text style={st.small} accessibilityLiveRegion="polite">{saved}</Text> : null}
-        </View>
+        <DossierCopy />
 
         {plan && (
           <View style={st.plan}>

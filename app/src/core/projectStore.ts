@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 
 import type { Entry, ProjectAct, Provenance } from './acts';
-import { firstEntries, profileId, readJournal, readProfiles, writeJournal, writeProfiles, type KV, type Profile } from './profiles';
+import { firstEntries, journalKey, profileId, readJournal, readProfiles, writeJournal, writeProfiles, type Dossier, type KV, type Profile } from './profiles';
 import { seedAmina } from './seed';
 
 /** L'équipe de l'établissement de démonstration (personnages imaginaires). */
@@ -23,6 +23,16 @@ interface ProjectStore {
   open: (id: string) => void;
   close: () => void;
   createProfile: (firstName: string, sentence: string) => string;
+  /** Le dossier du profil ouvert, prêt à être chiffré et emporté. */
+  dossier: () => Dossier | null;
+  /** Une copie a été emportée : la date est notée (rappel doux). */
+  markBackedUp: (now: Date) => void;
+  /** Restaurer un dossier : toujours un nouveau profil, jamais par-dessus un autre. */
+  restoreProfile: (d: Dossier) => string;
+  /** Départ : le profil ouvert est effacé de la tablette (journal et clé). Il faut une copie emportée dans la séance. */
+  purge: () => boolean;
+  /** Une copie a-t-elle été emportée pendant cette séance ? */
+  backedUpNow: boolean;
   act: (author: string, act: ProjectAct, provenance?: Provenance, confirmedBy?: string) => Entry;
   undo: (author: string, rank: number) => void;
   confirm: (rank: number, by: string) => void;
@@ -32,11 +42,13 @@ interface ProjectStore {
 /** Au premier lancement, la tablette de démonstration porte le profil d'Amina et son fil. */
 function boot(kv: KV): Profile[] {
   let profiles = readProfiles(kv);
-  if (!profiles.length) {
+  // Une seule fois : une tablette vidée par des départs ne voit pas revenir la démonstration.
+  if (!profiles.length && !kv.getItem('hlux.booted')) {
     profiles = [{ id: 'amina', firstName: 'Amina' }];
     writeProfiles(kv, profiles);
     if (!readJournal(kv, 'amina').length) writeJournal(kv, 'amina', seedAmina());
   }
+  kv.setItem('hlux.booted', '1');
   return profiles;
 }
 
@@ -53,13 +65,14 @@ export function makeProjectStore(kv: KV) {
       pro: null,
       person: null,
       entries: [],
-      openSession: (pro) => set({ pro, person: null, entries: [] }),
-      closeSession: () => set({ pro: null, person: null, entries: [] }),
+      backedUpNow: false,
+      openSession: (pro) => set({ pro, person: null, entries: [], backedUpNow: false }),
+      closeSession: () => set({ pro: null, person: null, entries: [], backedUpNow: false }),
       open: (id) => {
         if (!get().pro || !get().profiles.some((p) => p.id === id)) return; // le profil s'ouvre par la séance
-        set({ person: id, entries: readJournal(kv, id) });
+        set({ person: id, entries: readJournal(kv, id), backedUpNow: false });
       },
-      close: () => set({ person: null, entries: [] }),
+      close: () => set({ person: null, entries: [], backedUpNow: false }),
       createProfile: (firstName, sentence) => {
         const pro = get().pro;
         if (!pro || !firstName.trim()) return '';
@@ -70,6 +83,37 @@ export function makeProjectStore(kv: KV) {
         set({ profiles });
         get().open(id);
         return id;
+      },
+      dossier: () => {
+        const p = get().profiles.find((x) => x.id === get().person);
+        return p ? { person: p.id, firstName: p.firstName, entries: get().entries } : null;
+      },
+      markBackedUp: (now) => {
+        const id = get().person;
+        if (!id) return;
+        const profiles = get().profiles.map((p) => (p.id === id ? { ...p, lastBackup: now.toISOString() } : p));
+        writeProfiles(kv, profiles);
+        set({ profiles, backedUpNow: true });
+      },
+      restoreProfile: (d) => {
+        if (!get().pro) return '';
+        const id = profileId(d.firstName, get().profiles.map((p) => p.id));
+        const profiles = [...get().profiles, { id, firstName: d.firstName }];
+        writeProfiles(kv, profiles);
+        writeJournal(kv, id, d.entries);
+        set({ profiles });
+        get().open(id);
+        return id;
+      },
+      purge: () => {
+        const id = get().person;
+        if (!get().pro || !id || !get().backedUpNow) return false;
+        if (kv.purge) kv.purge(id);
+        kv.removeItem(journalKey(id));
+        const profiles = get().profiles.filter((p) => p.id !== id);
+        writeProfiles(kv, profiles);
+        set({ profiles, person: null, entries: [], backedUpNow: false });
+        return true;
       },
       act: (author, act, provenance = 'by_hand', confirmedBy) => {
         const e: Entry = { rank: get().entries.length, author, provenance, act, ...(confirmedBy ? { confirmedBy } : {}) };
