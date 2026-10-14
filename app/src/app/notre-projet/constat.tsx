@@ -14,6 +14,7 @@ import type { Feeling } from '../../core/acts';
 import { QUALIF_WORDS, SOURCE_WORDS, type Qualification, type Source } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
+import { useProject, useTeam } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 const ZONES: [Feeling, string, string][] = [
@@ -22,15 +23,17 @@ const ZONES: [Feeling, string, string][] = [
   ['hard', "C'est difficile chez nous", C.feeling.hard],
 ];
 const LADDER: Qualification[] = ['individual', 'signal', 'repeated', 'confirmed'];
-const PEOPLE = ['Aïcha', 'Bruno', 'Karim', 'Léa'];
 
 export default function Constat() {
+  // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
+  const PEOPLE = useTeam();
+  const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const [title, setTitle] = useState('');
   const [source, setSource] = useState<Source>('team');
   const [reading, setReading] = useState('');
-  const speaker = f.floor ?? f.mandate ?? 'Aïcha';
+  const speaker = f.floor ?? f.mandate ?? opener;
   const session = f.attendance?.session ?? 'séance';
   // Les sujets consentis (écran 07) arrivent sur la table, à placer.
   const fromAgenda = f.agenda.filter((a) => a.source === 'consented_word' && !f.findings[a.item]);

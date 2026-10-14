@@ -11,10 +11,10 @@ import type { Lean } from '../../core/acts';
 import { say } from '../../core/useAids';
 import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
+import { useProject, useTeam } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
 import { C, F, S } from '../../design/theme';
 
-const PEOPLE = ['Aïcha', 'Bruno', 'Karim', 'Léa'];
 const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
 const EXAMPLES: [string, string, string][] = [
   ['Atelier courriers du mardi', 'binôme', 'chaque semaine'],
@@ -23,9 +23,12 @@ const EXAMPLES: [string, string, string][] = [
 ];
 
 export default function Actions() {
+  // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
+  const PEOPLE = useTeam();
+  const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
-  const [who, setWho] = useState('Aïcha');
+  const [who, setWho] = useState(opener);
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [aided, setAided] = useState(false);

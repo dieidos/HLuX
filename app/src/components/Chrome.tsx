@@ -70,12 +70,13 @@ export function AidsBar({ side }: { side: 'pp' | 'pe' }) {
   const { listen, simple, lang, toggle, switchLang } = useAids();
   const me = useMe();
   const pro = useProject((s) => s.pro);
+  const place = useProject((s) => s.setup?.name ?? '');
   return (
     <View style={st.aids}>
       <Aid on={listen} label={w('listen')} font={bold} onPress={() => toggle('listen')} />
       <Aid on={simple} label={w('simpler')} font={bold} onPress={() => toggle('simple')} />
       {side === 'pp' && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
-      <Text style={st.who}>{side === 'pp' ? `${me.name} · ${w('withPro')} ${pro ?? ''}` : 'CHRS Les Lilas'}</Text>
+      <Text style={st.who}>{side === 'pp' ? `${me.name} · ${w('withPro')} ${pro ?? ''}` : place}</Text>
     </View>
   );
 }

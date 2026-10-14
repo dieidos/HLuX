@@ -1,4 +1,6 @@
-// Accueil : la séance locale ouvre la tablette (décision du 2026-10-14).
+// Accueil. Premier lancement : on nomme l'établissement et l'équipe (la tablette démarre vide).
+// Puis la séance locale ouvre la tablette (décision du 2026-10-14).
+// Appui long sur « HLuX » : le mode démonstration, caché, qui entre lui-même ses données.
 // 1. La professionnelle touche son prénom. 2. La personne touche le sien, ou entre avec un prénom et une phrase.
 // 3. « Bonjour Amina », puis Mon projet ou Notre projet. Hors séance, les profils restent fermés.
 import { Link } from 'expo-router';
@@ -12,13 +14,18 @@ import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
 import { pickTextFile } from '../core/openFile';
 import { needsBackup, readDossier } from '../core/profiles';
 import { useWords } from '../core/useAids';
-import { TEAM, useMe, useProject } from '../core/useProject';
+import { enterDemo, useMe, useProject, useTeam } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 
 export default function Home() {
   const w = useWords();
   const me = useMe();
   const pro = useProject((s) => s.pro);
+  const setup = useProject((s) => s.setup);
+  const team = useTeam();
+  const [place, setPlace] = useState('');
+  const [names, setNames] = useState('');
+  const [askDemo, setAskDemo] = useState(false);
   const profiles = useProject((s) => s.profiles);
   const backedUpNow = useProject((s) => s.backedUpNow);
   const { openSession, closeSession, open, close, createProfile, restoreProfile, purge } = useProject.getState();
@@ -52,13 +59,52 @@ export default function Home() {
     }
   };
 
+  // Appui long sur « HLuX » : proposer la démonstration (jamais par accident : il faut confirmer).
+  const logo = (
+    <>
+      <Pressable onLongPress={() => setAskDemo(true)} delayLongPress={800} accessibilityLabel="HLuX" accessibilityHint={w('demoOpen')}>
+        <Wordmark size={28} />
+      </Pressable>
+      {askDemo ? (
+        <View style={st.newBox}>
+          <Text style={st.note}>{w('demoOpen')}</Text>
+          <View style={st.row}>
+            <Pressable accessibilityRole="button" onPress={() => { setAskDemo(false); enterDemo(); }} style={[st.btn, st.primary]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('openIt')}</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" onPress={() => setAskDemo(false)} style={st.btn}>
+              <Text style={st.btnTxt}>{w('cancel')}</Text>
+            </Pressable>
+          </View>
+        </View>
+      ) : null}
+    </>
+  );
+
+  if (!setup) {
+    return (
+      <ScrollView contentContainerStyle={st.page}>
+        {logo}
+        <Text style={st.hello}>{w('setupTitle')}</Text>
+        <View style={st.newBox}>
+          <TextInput value={place} onChangeText={setPlace} placeholder={w('setupPlace')} style={st.input} accessibilityLabel={w('setupPlace')} />
+          <TextInput value={names} onChangeText={setNames} placeholder={w('setupTeam')} multiline style={st.input} accessibilityLabel={w('setupTeam')} />
+          <Pressable accessibilityRole="button" onPress={() => useProject.getState().configure(place, names.split(/[,;\n]/))} style={[st.btn, st.primary]}>
+            <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('begin')}</Text>
+          </Pressable>
+          <Text style={st.note}>{w('setupNote')}</Text>
+        </View>
+      </ScrollView>
+    );
+  }
+
   if (!pro) {
     return (
       <View style={st.page}>
-        <Wordmark size={28} />
+        {logo}
         <Text style={st.hello}>{w('whoOpens')}</Text>
         <View style={st.row}>
-          {TEAM.map((t) => (
+          {team.map((t) => (
             <Pressable key={t} accessibilityRole="button" onPress={() => openSession(t)} style={st.name}>
               <Text style={st.nameTxt}>{t}</Text>
             </Pressable>

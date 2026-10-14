@@ -77,6 +77,16 @@ export const WORDS = {
   wide: { fr: '💬 bande large : à en parler', ar: 'شريط عريض: لنتحدّث', falc: '💬 on en parle' },
   revealTogether: { fr: 'Découvrir les regards ensemble', ar: 'نكتشف النظرات معاً', falc: 'Voir ensemble' },
   silenceOk: { fr: 'Le silence est une réponse acceptable.', ar: 'الصمت جواب مقبول.', falc: 'On peut ne pas répondre.' },
+  // Premier lancement et démonstration (décision du 2026-10-14)
+  setupTitle: { fr: 'Mettre en place la tablette', ar: 'تهيئة الجهاز اللوحي', falc: 'Préparer la tablette' },
+  setupPlace: { fr: "Le nom de l'établissement", ar: 'اسم المؤسسة', falc: 'Le nom du lieu' },
+  setupTeam: { fr: "Les prénoms de l'équipe, séparés par des virgules", ar: 'أسماء الفريق، مفصولة بفواصل', falc: "Les prénoms de l'équipe" },
+  setupNote: { fr: "Rien d'autre n'est demandé : les personnes entreront elles-mêmes, avec un prénom et une phrase. Les données restent sur cette tablette.", ar: 'لا يُطلب شيء آخر: يدخل الأشخاص بأنفسهم، باسم وجملة. تبقى البيانات على هذا الجهاز اللوحي.', falc: 'Les données restent sur la tablette.' },
+  begin: { fr: 'Commencer', ar: 'ابدأ', falc: 'Commencer' },
+  demoBanner: { fr: 'DÉMONSTRATION · personnages imaginaires', ar: 'عرض توضيحي · شخصيات خيالية', falc: 'DÉMONSTRATION · pour essayer' },
+  demoOpen: { fr: 'Ouvrir la démonstration ? Elle entre des données imaginaires, à part des vraies.', ar: 'فتح العرض التوضيحي؟ يُدخل بيانات خيالية، منفصلة عن البيانات الحقيقية.', falc: 'Ouvrir la démonstration ?' },
+  demoLeave: { fr: 'Quitter la démonstration', ar: 'الخروج من العرض التوضيحي', falc: 'Quitter la démonstration' },
+  cancel: { fr: 'Annuler', ar: 'إلغاء', falc: 'Annuler' },
   // Séance locale et profils (passage 10)
   whoOpens: { fr: 'Qui ouvre la séance ?', ar: 'مَن يفتح الجلسة؟', falc: 'Qui commence ?' },
   whoIsHere: { fr: 'Qui est là ?', ar: 'مَن هنا؟', falc: 'Qui est là ?' },

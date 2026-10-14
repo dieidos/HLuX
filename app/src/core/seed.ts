@@ -2,6 +2,7 @@
 // Données fictives de démonstration (Amina, CHRS Les Lilas — personnages imaginaires).
 
 import type { Entry, ProjectAct } from './acts';
+import type { FacilityAct, FEntry } from './facility';
 
 export function seedAmina(): Entry[] {
   return [
@@ -43,4 +44,18 @@ function pathAmina(from: number): Entry[] {
     { act: 'plan_set', plan: { first: ['Atelier courriers · jeudi'], waiting: [['Formation', 'après le rendez-vous CAF']], with_whom: ['Sarah', 'Salma'], open: ['Créer', 'Permis'] } },
   ];
   return acts.map((act, i) => ({ rank: from + i, author: 'amina', provenance: 'by_hand', act }));
+}
+
+/** Le CHRS Les Lilas tel que l'Atlas le montre au début de l'écran 07 (personnages imaginaires). */
+export function seedLilas(): FEntry[] {
+  const acts: FacilityAct[] = [
+    { act: 'attendance', session: 'mardi 12 janvier', present: ['Aïcha', 'Bruno', 'Karim'], absent: ['Léa'], facilitator: 'Aïcha' },
+    { act: 'agenda_item', item: 'local-cvs', title: 'Le local du CVS', source: 'cvs', session: 'mardi 12 janvier' },
+    { act: 'agenda_item', item: 'laverie', title: 'Les horaires de la laverie', source: 'consented_word', session: 'mardi 12 janvier' },
+    { act: 'mandate_set', to: 'Aïcha' },
+    { act: 'finding_placed', finding: 'nuit', title: "L'équipe de nuit prévient", zone: 'fine', source: 'team', author: 'Bruno' },
+    { act: 'finding_placed', finding: 'cvs', title: 'Le CVS se réunit', zone: 'fine', source: 'cvs', author: 'Aïcha' },
+    { act: 'finding_placed', finding: 'laverie', title: 'Horaires de la laverie', zone: 'unsure', source: 'consented_word', author: 'Karim' },
+  ];
+  return acts.map((act, i) => ({ rank: i, author: 'aicha', provenance: 'by_hand', act }));
 }

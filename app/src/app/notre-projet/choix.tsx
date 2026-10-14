@@ -13,6 +13,7 @@ import type { Lean, Rank } from '../../core/acts';
 import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
+import { useProject, useTeam } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
 import { C, F, S } from '../../design/theme';
 
@@ -21,7 +22,6 @@ export const CRITERIA: [Criterion, string][] = [
   ['urgency', '⏱️ Urgence'], ['cooperation', '🤝 Coopération nécessaire'], ['resources', '📦 Ressources disponibles'],
 ];
 const RANKS: [Rank, string][] = [['first', "D'ABORD"], ['then', 'ENSUITE'], ['also', 'AUSSI'], ['less', 'MOINS'], ['not_yet', '?']];
-const VOICES = ['Aïcha', 'Bruno', 'Karim', 'Léa', 'Le CVS'];
 const SAID: Record<Criterion, string> = {
   effect: "l'effet pour les personnes", rights: 'le respect des droits', feasibility: 'la faisabilité',
   urgency: "l'urgence", cooperation: 'la coopération nécessaire', resources: 'les ressources disponibles',
@@ -29,6 +29,10 @@ const SAID: Record<Criterion, string> = {
 const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
 
 export default function Choix() {
+  // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
+  const PEOPLE = useTeam();
+  const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
+  const VOICES = [...PEOPLE, 'Le CVS'];
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const orientations = Object.entries(f.orientations);

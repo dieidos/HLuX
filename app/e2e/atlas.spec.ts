@@ -1,5 +1,5 @@
 // Recette : les 36 notes de l'Atlas V4 (`src/app.js`, `NOTES`), une par test, sur l'aperçu web.
-// Chaque test part d'une tablette neuve (stockage vide → démonstration Amina / CHRS Les Lilas) et suit
+// Chaque test part d'une tablette neuve (vide), ouvre la démonstration (Amina / CHRS Les Lilas) et suit
 // les gestes de l'Atlas. Le titre de chaque test est la note de l'Atlas, mot pour mot.
 import { expect, test, type Page } from '@playwright/test';
 
@@ -8,6 +8,10 @@ import { expect, test, type Page } from '@playwright/test';
 /** Ouvrir la séance (la professionnelle), puis le profil (la personne). */
 async function enter(page: Page, pro = 'Sarah', person: string | null = 'Amina') {
   await page.goto('/');
+  // Une tablette neuve est vide : la démonstration (appui long sur « HLuX ») entre les données de l'Atlas.
+  await page.getByLabel('HLuX', { exact: true }).first().click({ delay: 1200 });
+  await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+  await expect(page.getByText('DÉMONSTRATION · personnages imaginaires')).toBeVisible();
   await page.getByRole('button', { name: pro, exact: true }).click();
   if (person) {
     await page.getByRole('button', { name: person, exact: true }).click();

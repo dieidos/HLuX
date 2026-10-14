@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { journalKey, needsBackup, profileId, readDossier, type KV } from './profiles';
+import { DEMO_SETUP } from './demo';
+import { journalKey, needsBackup, profileId, readDossier, writeJournal, writeProfiles, type KV } from './profiles';
+import { seedAmina } from './seed';
 import type { Circle, Lean } from './acts';
-import { makeProjectStore } from './projectStore';
+import { makeProjectStore, SETUP_KEY } from './projectStore';
 import { standing } from './project';
 
+/** Une tablette déjà mise en place (Les Lilas), avec le profil d'Amina : les données de la démonstration, en vraie vie. */
 const memory = (): KV & { m: Map<string, string> } => {
   const m = new Map<string, string>();
-  return { m, getItem: (k) => m.get(k) ?? null, setItem: (k, v) => void m.set(k, v), removeItem: (k) => void m.delete(k) };
+  const kv = { m, getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k) };
+  kv.setItem(SETUP_KEY, JSON.stringify(DEMO_SETUP));
+  writeProfiles(kv, [{ id: 'amina', firstName: 'Amina' }]);
+  writeJournal(kv, 'amina', seedAmina());
+  return kv;
 };
 
 describe('Profils et séance', () => {

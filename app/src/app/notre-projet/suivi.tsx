@@ -12,11 +12,11 @@ import { PathView } from '../../components/PathView';
 import { provenanceOf, type FacilityAct } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
+import { useProject, useTeam } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 const MONTHS = ['janvier', 'février', 'mars', 'avril'];
 const LANES = ['atelier', 'CAF', 'équipe'];
-const PEOPLE = ['Aïcha', 'Bruno', 'Karim', 'Léa'];
 
 /** Le suivi tel que l'Atlas le montre (écran 12). */
 const ATLAS: FacilityAct[] = [
@@ -38,6 +38,9 @@ const ATLAS: FacilityAct[] = [
 ];
 
 export default function Suivi() {
+  // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
+  const PEOPLE = useTeam();
+  const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const [others, setOthers] = useState(false);

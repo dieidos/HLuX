@@ -5,6 +5,7 @@ import { Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { SourceSans3_400Regular, SourceSans3_700Bold } from '@expo-google-fonts/source-sans-3';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { DemoBanner } from '../components/DemoBanner';
 import { C } from '../design/theme';
 
 export default function Root() {
@@ -19,6 +20,7 @@ export default function Root() {
   if (!ready) return null;
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: C.bg }}>
+      <DemoBanner />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }} />
     </GestureHandlerRootView>
   );

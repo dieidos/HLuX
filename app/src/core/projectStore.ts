@@ -7,12 +7,27 @@ import { create } from 'zustand';
 import type { Entry, ProjectAct, Provenance } from './acts';
 import { firstEntries, journalKey, profileId, readJournal, readProfiles, writeJournal, writeProfiles, type Dossier, type KV, type Profile } from './profiles';
 import { merge } from './qrCopy';
-import { seedAmina } from './seed';
 
-/** L'équipe de l'établissement de démonstration (personnages imaginaires). */
-export const TEAM = ['Sarah', 'Aïcha', 'Bruno', 'Karim', 'Léa'];
+/** L'établissement de la tablette : son nom et les prénoms de l'équipe (en attendant la connexion dieidos). */
+export interface Setup { name: string; team: string[] }
+export const SETUP_KEY = 'hlux.setup';
+
+export function readSetup(kv: KV): Setup | null {
+  try {
+    const s = JSON.parse(kv.getItem(SETUP_KEY) ?? 'null') as Setup | null;
+    return s && s.name && Array.isArray(s.team) && s.team.length ? s : null;
+  } catch {
+    return null;
+  }
+}
 
 interface ProjectStore {
+  /** null tant que l'établissement n'est pas mis en place (premier lancement). */
+  setup: Setup | null;
+  /** Premier lancement : le nom de l'établissement et les prénoms de l'équipe. */
+  configure: (name: string, team: string[]) => boolean;
+  /** Relire le stockage (après un changement d'espace : vraie vie ↔ démonstration). Ferme la séance. */
+  reload: () => void;
   profiles: Profile[];
   /** La professionnelle qui a ouvert la séance ; null : séance fermée. */
   pro: string | null;
@@ -49,21 +64,8 @@ interface ProjectStore {
   act: (author: string, act: ProjectAct, provenance?: Provenance, confirmedBy?: string) => Entry;
   undo: (author: string, rank: number) => void;
   confirm: (rank: number, by: string) => void;
-  reset: () => void;
 }
 
-/** Au premier lancement, la tablette de démonstration porte le profil d'Amina et son fil. */
-function boot(kv: KV): Profile[] {
-  let profiles = readProfiles(kv);
-  // Une seule fois : une tablette vidée par des départs ne voit pas revenir la démonstration.
-  if (!profiles.length && !kv.getItem('hlux.booted')) {
-    profiles = [{ id: 'amina', firstName: 'Amina' }];
-    writeProfiles(kv, profiles);
-    if (!readJournal(kv, 'amina').length) writeJournal(kv, 'amina', seedAmina());
-  }
-  kv.setItem('hlux.booted', '1');
-  return profiles;
-}
 
 export function makeProjectStore(kv: KV) {
   return create<ProjectStore>()((set, get) => {
@@ -74,12 +76,25 @@ export function makeProjectStore(kv: KV) {
       set({ entries });
     };
     return {
-      profiles: boot(kv),
+      setup: readSetup(kv),
+      configure: (name, team) => {
+        const clean = [...new Set(team.map((t) => t.trim()).filter(Boolean))];
+        if (!name.trim() || !clean.length) return false;
+        const setup = { name: name.trim(), team: clean };
+        kv.setItem(SETUP_KEY, JSON.stringify(setup));
+        set({ setup });
+        return true;
+      },
+      reload: () => set({ setup: readSetup(kv), profiles: readProfiles(kv), pro: null, person: null, entries: [], backedUpNow: false }),
+      profiles: readProfiles(kv),
       pro: null,
       person: null,
       entries: [],
       backedUpNow: false,
-      openSession: (pro) => set({ pro, person: null, entries: [], backedUpNow: false }),
+      openSession: (pro) => {
+        if (!get().setup?.team.includes(pro)) return; // seule l'équipe de l'établissement ouvre une séance
+        set({ pro, person: null, entries: [], backedUpNow: false });
+      },
       closeSession: () => set({ pro: null, person: null, entries: [], backedUpNow: false }),
       open: (id) => {
         if (!get().pro || !get().profiles.some((p) => p.id === id)) return; // le profil s'ouvre par la séance
@@ -172,7 +187,6 @@ export function makeProjectStore(kv: KV) {
           { rank: n + 1, author: by, provenance: 'by_hand', undone: rank },
         ]);
       },
-      reset: () => save(get().person === 'amina' ? seedAmina() : []),
     };
   });
 }
