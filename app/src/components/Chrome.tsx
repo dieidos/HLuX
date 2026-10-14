@@ -3,10 +3,14 @@
 
 import { Link, usePathname } from 'expo-router';
 import type { ReactNode } from 'react';
-import { I18nManager, Pressable, StyleSheet, Text, View } from 'react-native';
+import { I18nManager, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { say, useAids, useFamily, useRegister, useWords } from '../core/useAids';
 import { useMe, useProject } from '../core/useProject';
+import { SvgXml } from 'react-native-svg';
+
+import { useLayout } from '../design/layout';
+import { LOGO_XML } from '../design/logo';
 import { C, F, S } from '../design/theme';
 import type { WordKey } from '../i18n/words';
 
@@ -19,14 +23,17 @@ const PE: [WordKey, string][] = [
   ['choice', '/notre-projet/choix'], ['actions', '/notre-projet/actions'], ['follow', '/notre-projet/suivi'],
 ];
 
-/** HLuX, aux couleurs exactes du logo, sans fond ni contour. */
+/** Le logo, puis HLuX aux couleurs exactes du logo, sans fond ni contour. */
 export function Wordmark({ size = 15 }: { size?: number }) {
   return (
-    <Text style={{ fontFamily: F.wordmark, fontSize: size, letterSpacing: 0.8 }} accessibilityLabel="HLuX">
-      <Text style={{ color: C.logo.first }}>HL</Text>
-      <Text style={{ color: C.logo.second }}>u</Text>
-      <Text style={{ color: C.logo.third }}>X</Text>
-    </Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: size / 3 }} accessibilityLabel="HLuX">
+      <SvgXml xml={LOGO_XML} width={size * 1.9} height={size * 1.9} />
+      <Text style={{ fontFamily: F.wordmark, fontSize: size, letterSpacing: 0.8 }}>
+        <Text style={{ color: C.logo.first }}>HL</Text>
+        <Text style={{ color: C.logo.second }}>u</Text>
+        <Text style={{ color: C.logo.third }}>X</Text>
+      </Text>
+    </View>
   );
 }
 
@@ -38,21 +45,23 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const rtl = side === 'pp' && reg === 'ar';
   const body = useFamily();
   const bold = useFamily(true);
+  const { phone } = useLayout();
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]}>
       <View style={st.top}>
         <Link href="/" accessibilityLabel="Accueil" style={st.home}><Wordmark /></Link>
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
-        <View style={st.stepper}>
+        {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
+        <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>
           {steps.map(([k, href]) => {
             const on = path === href;
             return (
-              <Link key={href} href={href as never} style={[st.step, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
+              <Link key={href} href={href as never} accessibilityState={{ selected: on }} style={[st.step, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
                 <Text style={[st.stepTxt, { fontFamily: bold }, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
               </Link>
             );
           })}
-        </View>
+        </ScrollView>
       </View>
       <View style={st.head}>
         <Text style={st.title}>{w(title)}</Text>
@@ -91,17 +100,20 @@ function Aid({ on, label, onPress, font }: { on: boolean; label: string; onPress
 
 const st = StyleSheet.create({
   page: { flex: 1, backgroundColor: C.bg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line },
+  top: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line },
   home: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
   proj: { fontFamily: F.bold, color: C.ink, fontSize: 15 },
   stepper: { flex: 1, flexDirection: 'row', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap' },
-  step: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: S.radiusPill, backgroundColor: C.surface2, minHeight: 32 },
+  step: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: S.radiusPill, backgroundColor: C.surface2, minHeight: S.touch, justifyContent: 'center' },
+  stepScroll: { flexBasis: '100%' },
+  stepperPhone: { flexDirection: 'row', gap: 4 },
+  stepWide: { flexGrow: 1 },
   stepTxt: { fontFamily: F.bold, fontSize: 13, color: C.muted },
   head: { paddingHorizontal: 24, paddingTop: 16, gap: 4 },
   title: { fontFamily: F.display, fontSize: S.title, color: C.ink },
   question: { fontFamily: F.body, fontSize: S.body, color: C.text },
   body: { flex: 1, padding: 24 },
-  aids: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, backgroundColor: C.surface, borderTopWidth: 1, borderColor: C.line },
+  aids: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, padding: 12, backgroundColor: C.surface, borderTopWidth: 1, borderColor: C.line },
   aid: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.surface2, borderWidth: 1, borderColor: C.line },
   aidOn: { backgroundColor: C.violetInk, borderColor: C.violetInk },
   aidTxt: { fontFamily: F.bold, color: C.ink, fontSize: 15 },

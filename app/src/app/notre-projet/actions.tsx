@@ -13,11 +13,13 @@ import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useProject, useTeam } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
+import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
 
 const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
 
 export default function Actions() {
+  const { phone } = useLayout();
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
   const PEOPLE = useTeam();
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
@@ -92,7 +94,7 @@ export default function Actions() {
               <Text style={st.small}>{[s.modality, s.rhythm].filter(Boolean).join(' · ')}</Text>
               {([true, false] as const).map((effect) => (
                 <View key={String(effect)} style={st.lineRow}>
-                  <Text style={[st.small, { width: 210 }]}>REGARDS RÉUNIS · {effect ? 'effet pour les personnes' : "faisabilité pour l'équipe"}</Text>
+                  <Text style={[st.small, { width: phone ? '100%' : 210 }]}>REGARDS RÉUNIS · {effect ? 'effet pour les personnes' : "faisabilité pour l'équipe"}</Text>
                   {line(id, effect)}
                   {LEANS.map((l) => (
                     <Pressable key={l} onPress={() => lean(id, effect, l)} style={st.pick} accessibilityRole="button" accessibilityLabel={`${who}, ${effect ? 'effet' : 'faisabilité'} : ${LEAN_WORDS[l]}`}>
@@ -149,7 +151,7 @@ const st = StyleSheet.create({
   btnTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   sol: { padding: 12, borderRadius: 14, backgroundColor: C.surface2, gap: 6, borderTopWidth: 4, borderTopColor: C.pe.value },
   solTitle: { fontFamily: F.bold, fontSize: 16, color: C.ink },
-  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+  lineRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   track: { flex: 1, minWidth: 200, height: 40, borderRadius: 10, backgroundColor: C.surface },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
   mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },

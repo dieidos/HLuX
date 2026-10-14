@@ -17,6 +17,7 @@ import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useTeam } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
+import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
 
 export const CRITERIA: [Criterion, string][] = [
@@ -31,6 +32,7 @@ const SAID: Record<Criterion, string> = {
 const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deux', much: 'beaucoup' };
 
 export default function Choix() {
+  const { phone } = useLayout();
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
   const PEOPLE = useTeam();
   const VOICES = [...PEOPLE, 'Le CVS'];
@@ -151,7 +153,7 @@ export default function Choix() {
                     <Text style={st.h}>{placer}, en privé</Text>
                     {CRITERIA.map(([c, label]) => (
                       <View key={c} style={st.row}>
-                        <Text style={[st.crit, { width: 260 }]}>{label}</Text>
+                        <Text style={[st.crit, { width: phone ? '100%' : 260 }]}>{label}</Text>
                         {LEANS.map((l) => (
                           <Pressable key={l} onPress={() => setMine((m) => ({ ...m, [c]: l }))} style={[st.pick, mine[c] === l && st.pickOn]} accessibilityRole="radio" accessibilityState={{ checked: mine[c] === l }}>
                             <Text style={st.btnTxt}>{LEAN_WORDS[l]}</Text>
@@ -178,7 +180,7 @@ export default function Choix() {
                   const b = band(marks.map((m) => m.lean))!;
                   return (
                     <View key={c} style={st.lineRow}>
-                      <Text style={[st.crit, { width: 240 }]}>{label}</Text>
+                      <Text style={[st.crit, { width: phone ? '100%' : 240 }]}>{label}</Text>
                       <View style={st.track}>
                         <View style={[st.band, { left: `${(LEANS.indexOf(b.from) * 100) / 3}%`, width: `${((LEANS.indexOf(b.to) - LEANS.indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? C.band.near : C.band.far }]} />
                         {marks.map((m, i) => (
@@ -243,7 +245,7 @@ const st = StyleSheet.create({
   private: { padding: 12, borderRadius: 14, backgroundColor: C.violetSoft, gap: 8, borderWidth: 2, borderColor: C.violet },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
   pickOn: { borderColor: C.violet, backgroundColor: C.lavender },
-  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  lineRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10 },
   track: { flex: 1, height: 44, borderRadius: 10, backgroundColor: C.surface2 },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
   mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
