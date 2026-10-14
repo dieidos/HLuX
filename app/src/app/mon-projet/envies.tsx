@@ -25,6 +25,8 @@ export default function Envies() {
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState('');
   const [from, setFrom] = useState<string | null>(null);
+  const [inSession, setInSession] = useState(false);
+  const pro = useProject((x) => x.pro);
 
   const place = (idea: string, spot: Spot, words: string) => {
     act(me.id, { act: 'idea_placed', idea, spot });
@@ -33,7 +35,8 @@ export default function Envies() {
   };
   const create = () => {
     if (!title.trim()) return;
-    act(me.id, { act: 'idea_created', idea: `idee-${Object.keys(s.ideas).length + 1}`, title: title.trim(), from_card: from, in_session: false });
+    act(me.id, { act: 'idea_created', idea: `idee-${Object.keys(s.ideas).length + 1}`, title: title.trim(), from_card: from, in_session: inSession });
+    setInSession(false);
     setAdding(false); setTitle(''); setFrom(null);
   };
   const at = (spot: Spot) =>
@@ -47,6 +50,7 @@ export default function Envies() {
         <View style={st.idea}>
           <Text style={st.ideaTxt}>{i.title}</Text>
           {card ? <Text style={st.born}>{w('bornOf')} {card.title}</Text> : null}
+          {i.inSession ? <Text style={st.born}>{t('née en séance', 'وُلدت في الجلسة')}</Text> : null}
         </View>
       </Draggable>
     );
@@ -86,6 +90,11 @@ export default function Envies() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
+              {pro ? (
+                <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: inSession }} onPress={() => setInSession(!inSession)} style={[st.pick, inSession && st.pickOn]}>
+                  <Text style={st.btnTxt}>{t(`Née en séance, avec ${pro}`, `وُلدت في الجلسة، مع ${pro}`)}</Text>
+                </Pressable>
+              ) : null}
               <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Créer', 'إنشاء')}</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>{t('Annuler', 'إلغاء')}</Text></Pressable>
             </View>

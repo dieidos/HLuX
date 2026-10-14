@@ -38,6 +38,7 @@ export default function Constat() {
   const [reading, setReading] = useState('');
   const speaker = f.floor ?? (f.mandate || opener);
   const [mandating, setMandating] = useState(false);
+  const [dictatedTitle, setDictatedTitle] = useState(false);
   const [live, setLive] = useState('');
   const tell = (t: string) => {
     say(t);
@@ -77,7 +78,8 @@ export default function Constat() {
   const add = () => {
     if (!title.trim()) return;
     // Une parole consentie n'est signée par personne d'autre que sa source (A11).
-    act(speaker, { act: 'finding_placed', finding: freshId('c', Object.keys(f.findings)), title: title.trim(), zone: 'unsure', source, author: source === 'consented_word' ? '' : speaker });
+    act(speaker, { act: 'finding_placed', finding: freshId('c', Object.keys(f.findings)), title: title.trim(), zone: 'unsure', source, author: source === 'consented_word' ? '' : speaker }, dictatedTitle ? 'dictated' : 'by_hand');
+    setDictatedTitle(false);
     tell(`${speaker} pose une carte : ${title.trim()}.`);
     setTitle('');
   };
@@ -144,7 +146,7 @@ export default function Constat() {
         </DragArea>
         <View style={[st.row, st.addRow]}>
           <TextInput value={title} onChangeText={setTitle} placeholder={`${speaker} pose une carte…`} style={st.input} accessibilityLabel="Nouvelle carte du constat" />
-          <DictateButton label="🎙" onText={setTitle} />
+          <DictateButton label="🎙" onText={(x) => { setTitle(x); setDictatedTitle(true); }} />
           {(['team', 'cvs', 'consented_word'] as Source[]).map((s) => (
             <Pressable accessibilityRole="button" key={s} onPress={() => setSource(s)} style={[st.btn, source === s && st.on]}><Text style={[st.btnTxt, source === s && { color: C.onAccent }]}>{SOURCE_WORDS[s]}</Text></Pressable>
           ))}

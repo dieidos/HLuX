@@ -3,6 +3,7 @@
 // Appui long sur « HLuX » : le mode démonstration, caché, qui entre lui-même ses données.
 // 1. La professionnelle touche son prénom. 2. La personne touche le sien, ou entre avec un prénom et une phrase.
 // 3. « Bonjour Amina », puis Mon projet ou Notre projet. Hors séance, les profils restent fermés.
+import { CompareVersions } from '../components/CompareVersions';
 import { refusalAr } from '../i18n/refusals';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -172,7 +173,7 @@ export default function Home() {
         <Wordmark size={28} />
         <Text style={st.hello}>{w('whoIsHere')}</Text>
         <View style={st.row}>
-          {profiles.map((p) => (
+          {profiles.filter((p) => !p.copyOf).map((p) => (
             <Pressable key={p.id} accessibilityRole="button" onPress={() => open(p.id)} style={st.name}>
               <Text style={st.nameTxt}>{p.firstName}</Text>
             </Pressable>
@@ -225,6 +226,7 @@ export default function Home() {
     <ScrollView contentContainerStyle={[st.page, { direction: arabicHome ? 'rtl' : 'ltr' }]} {...(arabicHome ? ({ lang: 'ar' } as object) : {})}>
       <Wordmark size={28} />
       <Text style={st.hello}>{w('hello')} {me.name} 👋</Text>
+      <CompareVersions />
       {needsBackup(profile, new Date()) && !leaving ? (
         <View style={st.newBox}>
           <Text style={st.reminder}>{w('backupReminder')}</Text>

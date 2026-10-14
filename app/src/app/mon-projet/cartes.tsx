@@ -1,6 +1,7 @@
 // 01 Cartes — « Quelle Carte reprendre ? Ou j'en ajoute une. »
 // Cartes existantes ; Nouvelle Carte (je parle / j'écris / je choisis une image) ; Carte en grand.
 
+import { freshId } from '../../core/ids';
 import { momentAr } from '../../i18n/moments';
 import { usePathname } from 'expo-router';
 import { refusalAr } from '../../i18n/refusals';
@@ -31,7 +32,8 @@ const ORIGIN = {
 
 /** Les étapes du fil de la Carte, dites en arabe. */
 const STEP_AR: Record<string, string> = {
-  Dite: 'قيلت', Ressentie: 'أُحسّت', 'Une envie en est née': 'وُلدت منها رغبة', 'Apportée au collectif': 'قُدّمت للمجموعة',
+  Dite: 'قيلت', Écrite: 'كُتبت', 'Choisie en image': 'اختيرت بصورة', Ressentie: 'أُحسّت',
+  'Reposée dans la réserve': 'أُعيدت إلى علبة البطاقات', 'Pas maintenant': 'ليس الآن', 'Une envie en est née': 'وُلدت منها رغبة', 'Apportée au collectif': 'قُدّمت للمجموعة',
   'Un engagement du collectif': 'التزام من المجموعة', 'Reliée à mon chemin': 'رُبطت بطريقي',
 };
 
@@ -91,11 +93,11 @@ export default function Cartes() {
 
   const create = () => {
     if (!text.trim() && !picto) return;
-    const id = `carte-${Object.keys(s.cards).length + 1}`;
+    const id = freshId('carte', Object.keys(s.cards));
     act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
       picto, verbatim: text.trim(), lang: arabic ? 'ar' : 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: dayInWords(),
-    });
+    }, spoken ? 'dictated' : 'by_hand');
     tell(tNow('Ta Carte est créée.', 'تمّ إنشاء بطاقتكِ.'), pathname);
     setAdding(false); setText(''); setPicto(null); setSpoken(false);
   };

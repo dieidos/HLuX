@@ -72,7 +72,6 @@ export const WORDS = {
   invite: { fr: '＋ Inviter un proche', ar: '＋ دعوة شخص قريب', falc: '＋ Inviter' },
   myView: { fr: 'Mon regard', ar: 'نظرتي', falc: 'Mon regard' },
   together: { fr: 'Nos regards réunis', ar: 'نظراتنا معاً', falc: 'Ensemble' },
-  sarahOrder: { fr: "Avec l'ordre de Sarah", ar: 'بترتيب سارة', falc: "L'ordre de Sarah" },
   narrow: { fr: '😊 bande étroite : on se rejoint', ar: 'شريط ضيّق: نلتقي', falc: '😊 on pense pareil' },
   wide: { fr: '💬 bande large : à en parler', ar: 'شريط عريض: لنتحدّث', falc: '💬 on en parle' },
   revealTogether: { fr: 'Découvrir les regards ensemble', ar: 'نكتشف النظرات معاً', falc: 'Voir ensemble' },

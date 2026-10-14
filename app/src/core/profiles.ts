@@ -18,6 +18,8 @@ export interface Profile {
   lastBackup?: string;
   /** la langue et le registre de la personne : retrouvés à chaque ouverture de son profil */
   lang?: 'fr' | 'ar';
+  /** L'autre version de ce dossier (copie QR divergente), à comparer côte à côte. */
+  copyOf?: string;
   falc?: boolean;
 }
 

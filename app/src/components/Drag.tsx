@@ -84,7 +84,7 @@ export function Zone({ id, onDrop, style, children, label, accepts }: { id: stri
   // Re-mesurer au moment du prendre : la mise en page a pu bouger depuis.
   useEffect(() => { if (lit) measure(); }, [lit, measure]);
   return (
-    <View ref={ref} onLayout={measure} accessibilityLabel={label} style={[st.zone, style, lit && st.zoneLit, d.hover === id && st.zoneHover]}>
+    <View ref={ref} onLayout={measure} role="group" accessibilityLabel={label} style={[st.zone, style, lit && st.zoneLit, d.hover === id && st.zoneHover]}>
       {children}
       {lit && (
         <Pressable onPress={() => d.placeHeld(id)} accessibilityRole="button" accessibilityLabel={t(`Poser ici : ${label}`, `ضعيها هنا: ${label}`)} style={st.here}>

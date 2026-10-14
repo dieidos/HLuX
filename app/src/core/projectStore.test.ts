@@ -133,6 +133,15 @@ describe('Profils et séance', () => {
     phone.getState().act('amina', { act: 'card_felt', card: 'papiers', feeling: 'fine', when: 'hier' });
     tablet.getState().act('amina', { act: 'card_felt', card: 'papiers', feeling: 'hard', when: 'hier' });
     expect(phone.getState().receiveCopy(tablet.getState().dossier()!)).toEqual({ id: 'amina-2', diverged: true });
+    // L'autre version est marquée comme telle ; son dossier à elle reste ouvert, intact.
+    expect(phone.getState().profiles.find((p) => p.id === 'amina-2')).toMatchObject({ copyOf: 'amina' });
+    expect(phone.getState().person).toBe('amina');
+    expect(phone.getState().otherVersion('amina-2').at(-1)?.act).toMatchObject({ feeling: 'hard' });
+    // Seule une « autre version » se retire ainsi, jamais le dossier lui-même.
+    phone.getState().dropVersion('amina');
+    expect(phone.getState().profiles.map((p) => p.id)).toContain('amina');
+    phone.getState().dropVersion('amina-2');
+    expect(phone.getState().profiles.map((p) => p.id)).toEqual(['amina']);
   });
 
   it('la langue et « Plus simple » restent dans le profil de la personne', () => {

@@ -59,6 +59,10 @@ interface ProjectStore {
    * Si les deux journaux ont divergé, la copie arrive à côté (un second profil) : c'est la personne qui compare.
    */
   receiveCopy: (d: Dossier) => { id: string; diverged: boolean };
+  /** Le journal d'une autre version (comparaison côte à côte). */
+  otherVersion: (id: string) => Entry[];
+  /** Retirer l'autre version, une fois que la personne a gardé ce qu'elle voulait. */
+  dropVersion: (id: string) => void;
   /** Restaurer un dossier : toujours un nouveau profil, jamais par-dessus un autre. */
   restoreProfile: (d: Dossier) => string;
   /** Départ : le profil ouvert est effacé de la tablette (journal et clé). Il faut une copie emportée dans la séance. */
@@ -155,10 +159,29 @@ export function makeProjectStore(kv: KV) {
         const here = get().profiles.find((p) => p.id === d.person);
         if (!here) return { id: get().restoreProfile(d), diverged: false };
         const { entries, diverged } = merge(readJournal(kv, here.id), d.entries);
-        if (diverged) return { id: get().restoreProfile(d), diverged: true };
+        if (diverged) {
+          // L'autre version arrive à côté, marquée comme telle ; la personne compare et choisit.
+          const id = profileId(d.firstName, get().profiles.map((p) => p.id));
+          const profiles = [...get().profiles, { id, firstName: d.firstName, copyOf: here.id }];
+          writeProfiles(kv, profiles);
+          writeJournal(kv, id, d.entries);
+          set({ profiles });
+          get().open(here.id);
+          return { id, diverged: true };
+        }
         writeJournal(kv, here.id, entries);
         get().open(here.id);
         return { id: here.id, diverged: false };
+      },
+      otherVersion: (id) => readJournal(kv, id),
+      dropVersion: (id) => {
+        const p = get().profiles.find((x) => x.id === id);
+        if (!p?.copyOf) return; // on ne retire ici qu'une « autre version », jamais un dossier
+        if (kv.purge) kv.purge(id);
+        kv.removeItem(journalKey(id));
+        const profiles = get().profiles.filter((x) => x.id !== id);
+        writeProfiles(kv, profiles);
+        set({ profiles });
       },
       restoreProfile: (d) => {
         if (!get().pro && !get().personal()) return '';
