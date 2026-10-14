@@ -51,7 +51,9 @@ export default function Suivi() {
     }
   };
   const nodes = Object.entries(f.nodes).map(([id, n]) => ({ id, ...n }));
-  const months = [...new Set([...nextMonths(), ...nodes.map((n) => n.when)])];
+  const now = new Date().getMonth();
+  const rank = (m: string) => (MONTH_NAMES.indexOf(m) - now + 12) % 12;
+  const months = [...new Set([...nextMonths(), ...nodes.map((n) => n.when)])].sort((a, b) => rank(a) - rank(b));
   const lanes = [...new Set([...LANES, ...nodes.map((n) => n.lane)])];
   const commitments = Object.entries(f.commitments);
   const place = useProject((x) => x.setup?.name ?? '');

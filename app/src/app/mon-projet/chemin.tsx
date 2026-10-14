@@ -140,6 +140,17 @@ export default function Chemin() {
           <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: C.onAccent }]}>{w('myPlan')}</Text></Pressable>
         </View>
 
+        {Object.values(s.whatIfs).some((x) => x.kept) && (
+          <View style={{ gap: 6 }}>
+            <Text style={st.tileTitle}>{t('💭 Les idées gardées', '💭 الأفكار المحفوظة', '💭 Mes idées')}</Text>
+            {Object.entries(s.whatIfs).filter(([, x]) => x.kept).map(([id, x]) => (
+              <View key={id} style={st.tile}>
+                <Text style={st.tileItem}>{x.question || t('Et si… ?', 'ماذا لو…؟')}</Text>
+                {x.story ? <Text style={st.small}>{x.story}</Text> : null}
+              </View>
+            ))}
+          </View>
+        )}
         <DossierCopy />
 
         {plan && (

@@ -18,7 +18,7 @@ test('une tablette neuve est vide : on la met en place, puis une personne entre 
   await page.getByRole('link', { name: /Mon projet/ }).click();
   // Le moment porte sa date, et dit comment la Carte est née (ici, écrite).
   await expect(page.getByText(/\S+ \d+ \S+ · écrite avec Inès/)).toBeVisible();
-  await expect(page.getByText('Nour · avec Inès')).toBeVisible();
+  await expect(page.getByText('Nour · avec Inès').filter({ visible: true })).toBeVisible();
 });
 
 test('la démonstration se tient à part, et la vraie vie reprend telle quelle en la quittant', async ({ page }) => {

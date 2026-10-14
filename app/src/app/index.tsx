@@ -8,7 +8,7 @@ import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Wordmark } from '../components/Chrome';
+import { AidsBar, Wordmark } from '../components/Chrome';
 import { DossierCopy } from '../components/DossierCopy';
 import { QrReceive, QrSend } from '../components/QrCopy';
 import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
@@ -219,6 +219,9 @@ export default function Home() {
           </Pressable>
         </View>
       ) : null}
+      <View style={{ alignSelf: 'stretch' }}>
+        <AidsBar side="pp" />
+      </View>
     </ScrollView>
   );
 }
