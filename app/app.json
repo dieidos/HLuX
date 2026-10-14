@@ -31,7 +31,21 @@
       "expo-font",
       "expo-localization",
       "expo-sharing",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "La caméra lit les codes QR qui copient ton dossier d'un appareil à l'autre. Aucune image n'est gardée.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Le micro sert à dicter une phrase. La voix est reconnue sur l'appareil et n'est jamais enregistrée.",
+          "speechRecognitionPermission": "La reconnaissance de la parole se fait sur l'appareil, pour écrire ce que tu dis. Rien n'est gardé ni envoyé."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

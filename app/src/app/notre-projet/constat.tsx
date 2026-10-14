@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AideButton } from '../../components/AideButton';
+import { DictateButton } from '../../components/DictateButton';
 import { Screen } from '../../components/Chrome';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
@@ -99,6 +100,7 @@ export default function Constat() {
         </DragArea>
         <View style={[st.row, st.addRow]}>
           <TextInput value={title} onChangeText={setTitle} placeholder={`${speaker} pose une carte…`} style={st.input} accessibilityLabel="Nouvelle carte du constat" />
+          <DictateButton label="🎙" onText={setTitle} />
           {(['team', 'cvs', 'consented_word'] as Source[]).map((s) => (
             <Pressable accessibilityRole="button" key={s} onPress={() => setSource(s)} style={[st.btn, source === s && st.on]}><Text style={[st.btnTxt, source === s && { color: C.onAccent }]}>{SOURCE_WORDS[s]}</Text></Pressable>
           ))}

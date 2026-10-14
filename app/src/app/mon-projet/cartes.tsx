@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { CardView } from '../../components/CardView';
+import { DictateButton } from '../../components/DictateButton';
 import { Screen } from '../../components/Chrome';
 import { Picto } from '../../components/Picto';
 import { AideRefusal, askAide } from '../../core/aides';
@@ -29,6 +30,7 @@ export default function Cartes() {
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState('');
   const [picto, setPicto] = useState<PictoKey | null>(null);
+  const [spoken, setSpoken] = useState(false);
   const big = open ? s.cards[open] : null;
 
   // Une aide IA : sur geste, le résultat attend la validation d'Amina (journal : « hypothesis »).
@@ -51,10 +53,10 @@ export default function Cartes() {
     const id = `carte-${Object.keys(s.cards).length + 1}`;
     act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
-      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : 'written', said_with: 'Sarah', when: "aujourd'hui",
+      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: 'Sarah', when: "aujourd'hui",
     });
     say('Ta Carte est créée.');
-    setAdding(false); setText(''); setPicto(null);
+    setAdding(false); setText(''); setPicto(null); setSpoken(false);
   };
 
   return (
@@ -113,6 +115,7 @@ export default function Cartes() {
           <View style={st.bigCard}>
             <Text style={st.bigTitle}>{w('newCard')}</Text>
             <TextInput value={text} onChangeText={setText} placeholder="J'écris ce que je veux dire…" style={st.input} multiline accessibilityLabel="J'écris" />
+            <DictateButton onText={(t) => { setText(t); setSpoken(true); }} />
             <Text style={st.muted}>…ou je choisis une image</Text>
             <View style={st.pictos}>
               {(Object.keys(PICTOS) as PictoKey[]).map((k) => (

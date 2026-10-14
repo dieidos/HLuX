@@ -7,6 +7,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 
 import { Wordmark } from '../components/Chrome';
 import { DossierCopy } from '../components/DossierCopy';
+import { QrReceive, QrSend } from '../components/QrCopy';
 import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
 import { pickTextFile } from '../core/openFile';
 import { needsBackup, readDossier } from '../core/profiles';
@@ -27,6 +28,7 @@ export default function Home() {
   const [restorePhrase, setRestorePhrase] = useState('');
   const [restoreMsg, setRestoreMsg] = useState('');
   const [leaving, setLeaving] = useState(false);
+  const [qr, setQr] = useState<'send' | 'receive' | null>(null);
   const profile = profiles.find((p) => p.id === me.id);
 
   const choose = async () => {
@@ -95,6 +97,10 @@ export default function Home() {
             <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('enter')}</Text>
           </Pressable>
         </View>
+        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn} accessibilityState={{ expanded: qr === 'receive' }}>
+          <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
+        </Pressable>
+        {qr === 'receive' ? <QrReceive onDone={(m) => { setQr(null); setRestoreMsg(m); }} /> : null}
         <View style={st.newBox}>
           <Text style={st.doorTxt}>{w('restore')}</Text>
           <Pressable accessibilityRole="button" onPress={choose} style={st.btn}>
@@ -143,10 +149,14 @@ export default function Home() {
         <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
           <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
         </Pressable>
+        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'send' ? null : 'send')} style={st.btn} accessibilityState={{ expanded: qr === 'send' }}>
+          <Text style={st.btnTxt}>{w('copyToDevice')}</Text>
+        </Pressable>
         <Pressable accessibilityRole="button" onPress={() => setLeaving(!leaving)} style={st.btn} accessibilityState={{ expanded: leaving }}>
           <Text style={st.btnTxt}>🧳 {w('leaving')}</Text>
         </Pressable>
       </View>
+      {qr === 'send' ? <QrSend /> : null}
       {leaving ? (
         <View style={st.newBox}>
           <Text style={st.note}>{w('eraseNote')}</Text>

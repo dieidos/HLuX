@@ -10,16 +10,17 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: 'http://localhost:8090',
+    baseURL: 'http://localhost:8097',
     // Une tablette en paysage : la cible première du CDC.
     viewport: { width: 1180, height: 820 },
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'tablette', use: { ...devices['Desktop Chrome'], viewport: { width: 1180, height: 820 } } }],
   webServer: {
-    command: 'npx expo export --platform web --output-dir dist-e2e && npx serve -s dist-e2e -l 8090 --no-clipboard',
-    url: 'http://localhost:8090',
+    command: 'npx expo export --platform web --output-dir dist-e2e && npx serve -s dist-e2e -l 8097 --no-clipboard',
+    url: 'http://localhost:8097',
     timeout: 240_000,
-    reuseExistingServer: !process.env.CI,
+    // Jamais réutiliser : un autre service local pourrait tenir le port (8090 l'était, par dieidos).
+    reuseExistingServer: false,
   },
 });

@@ -6,6 +6,7 @@ import { create } from 'zustand';
 
 import type { Entry, ProjectAct, Provenance } from './acts';
 import { firstEntries, journalKey, profileId, readJournal, readProfiles, writeJournal, writeProfiles, type Dossier, type KV, type Profile } from './profiles';
+import { merge } from './qrCopy';
 import { seedAmina } from './seed';
 
 /** L'équipe de l'établissement de démonstration (personnages imaginaires). */
@@ -27,6 +28,11 @@ interface ProjectStore {
   dossier: () => Dossier | null;
   /** Une copie a été emportée : la date est notée (rappel doux). */
   markBackedUp: (now: Date) => void;
+  /**
+   * Recevoir une copie par QR (même personne, autre appareil) : fusion en ajout seul.
+   * Si les deux journaux ont divergé, la copie arrive à côté (un second profil) : c'est la personne qui compare.
+   */
+  receiveCopy: (d: Dossier) => { id: string; diverged: boolean };
   /** Restaurer un dossier : toujours un nouveau profil, jamais par-dessus un autre. */
   restoreProfile: (d: Dossier) => string;
   /** Départ : le profil ouvert est effacé de la tablette (journal et clé). Il faut une copie emportée dans la séance. */
@@ -101,6 +107,16 @@ export function makeProjectStore(kv: KV) {
         const profiles = get().profiles.map((p) => (p.id === id ? { ...p, lastBackup: now.toISOString() } : p));
         writeProfiles(kv, profiles);
         set({ profiles, backedUpNow: true });
+      },
+      receiveCopy: (d) => {
+        if (!get().pro) return { id: '', diverged: false };
+        const here = get().profiles.find((p) => p.id === d.person);
+        if (!here) return { id: get().restoreProfile(d), diverged: false };
+        const { entries, diverged } = merge(readJournal(kv, here.id), d.entries);
+        if (diverged) return { id: get().restoreProfile(d), diverged: true };
+        writeJournal(kv, here.id, entries);
+        get().open(here.id);
+        return { id: here.id, diverged: false };
       },
       restoreProfile: (d) => {
         if (!get().pro) return '';

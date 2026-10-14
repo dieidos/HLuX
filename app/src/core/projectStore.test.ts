@@ -110,5 +110,22 @@ describe('Profils et séance', () => {
     expect(st.invitations['inv-1'].answered).toBe(true);
     expect(g.getState().guestRead('inv-1')!.entries.filter((e) => e.act?.act === 'invitation_answered')).toHaveLength(1);
   });
+
+  it('copie par QR : la suite du même journal se fusionne ; une divergence arrive à côté', () => {
+    const tablet = makeProjectStore(memory());
+    tablet.getState().openSession('Sarah');
+    tablet.getState().open('amina');
+    tablet.getState().act('amina', { act: 'views_revealed' });
+    const copy = tablet.getState().dossier()!;
+
+    const phone = makeProjectStore(memory());
+    phone.getState().openSession('Sarah');
+    expect(phone.getState().receiveCopy(copy)).toEqual({ id: 'amina', diverged: false });
+    expect(phone.getState().entries).toEqual(copy.entries);
+
+    phone.getState().act('amina', { act: 'card_felt', card: 'papiers', feeling: 'fine', when: 'hier' });
+    tablet.getState().act('amina', { act: 'card_felt', card: 'papiers', feeling: 'hard', when: 'hier' });
+    expect(phone.getState().receiveCopy(tablet.getState().dossier()!)).toEqual({ id: 'amina-2', diverged: true });
+  });
 });
 

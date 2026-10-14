@@ -95,6 +95,9 @@ export const WORDS = {
   restore: { fr: 'Retrouver un dossier', ar: 'استعادة ملف', falc: 'Reprendre un dossier' },
   chooseFile: { fr: 'Choisir le fichier', ar: 'اختيار الملف', falc: 'Le fichier' },
   openIt: { fr: 'Ouvrir', ar: 'فتح', falc: 'Ouvrir' },
+  // Copie par QR (CDC, données locales)
+  copyToDevice: { fr: '📲 Copier vers un autre appareil', ar: '📲 نسخ إلى جهاز آخر', falc: '📲 Copier sur mon téléphone' },
+  receiveCopy: { fr: '📷 Recevoir une copie', ar: '📷 استلام نسخة', falc: '📷 Recevoir une copie' },
   // 06 Chemin
   pathQuestion: { fr: "Où je vais, et quand ? Les autres chemins s'ouvrent si je le demande.", ar: 'إلى أين أذهب، ومتى؟ الطرق الأخرى تُفتح إذا طلبتُ.', falc: 'Mon chemin.' },
   otherPaths: { fr: '🌈 Autres chemins', ar: '🌈 طرق أخرى', falc: '🌈 Autres chemins' },

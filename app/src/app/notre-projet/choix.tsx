@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
+import { DictateButton } from '../../components/DictateButton';
 
 import { Screen } from '../../components/Chrome';
 import type { Lean, Rank } from '../../core/acts';
@@ -167,6 +168,7 @@ export default function Choix() {
                 ) : (
                   <>
                     <TextInput value={dictated} onChangeText={setDictated} placeholder="Ce que le groupe dit…" multiline style={st.input} accessibilityLabel="Décision dictée" />
+                    <DictateButton label="🎙 Le groupe dicte" onText={setDictated} />
                     <TextInput value={words} onChangeText={setWords} placeholder="La phrase validée (reformulée)…" multiline style={st.input} accessibilityLabel="Décision reformulée" />
                     <AideButton kind="phrase" label="Reformuler la phrase dictée" text={dictated} who="Le groupe" onProposal={(p) => { setWords(p); setAided(true); }} />
                     <Pressable accessibilityRole="button" onPress={() => {
