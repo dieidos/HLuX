@@ -40,7 +40,7 @@ export default function Sujets() {
         {card && (
           <View style={st.sas}>
             <View style={[st.version, { borderTopColor: C.pp.value, backgroundColor: brought ? C.pe.soft : C.pp.soft }]}>
-              <Text style={st.kicker}>MA VERSION — AMINA</Text>
+              <Text style={st.kicker}>MA VERSION — {me.name.toUpperCase()}</Text>
               <Text style={st.quote}>« {card.verbatim} »</Text>
             </View>
             <Text style={st.arrow}>→</Text>

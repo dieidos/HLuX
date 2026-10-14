@@ -67,3 +67,31 @@ jobs:
           npx tsc --noEmit
           npx eslint src
           npx vitest run
+
+  e2e:
+    name: Recette (36 notes de l'Atlas, Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Dépendances et navigateur
+        working-directory: app
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Les 36 scénarios sur l'aperçu web
+        working-directory: app
+        env:
+          CI: 'true'
+        run: npx playwright test
+      - name: Rapport en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: app/playwright-report
+          retention-days: 7
