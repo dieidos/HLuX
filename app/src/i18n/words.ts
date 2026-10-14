@@ -77,6 +77,18 @@ export const WORDS = {
   wide: { fr: '💬 bande large : à en parler', ar: 'شريط عريض: لنتحدّث', falc: '💬 on en parle' },
   revealTogether: { fr: 'Découvrir les regards ensemble', ar: 'نكتشف النظرات معاً', falc: 'Voir ensemble' },
   silenceOk: { fr: 'Le silence est une réponse acceptable.', ar: 'الصمت جواب مقبول.', falc: 'On peut ne pas répondre.' },
+  // 06 Chemin
+  pathQuestion: { fr: "Où je vais, et quand ? Les autres chemins s'ouvrent si je le demande.", ar: 'إلى أين أذهب، ومتى؟ الطرق الأخرى تُفتح إذا طلبتُ.', falc: 'Mon chemin.' },
+  otherPaths: { fr: '🌈 Autres chemins', ar: '🌈 طرق أخرى', falc: '🌈 Autres chemins' },
+  whatIf: { fr: '💭 Et si… ?', ar: '💭 ماذا لو…؟', falc: '💭 Et si… ?' },
+  myPlan: { fr: '📘 Mon plan', ar: '📘 خطّتي', falc: '📘 Mon plan' },
+  copyNote: { fr: 'COPIE — ton vrai chemin ne change pas', ar: 'نسخة — طريقكِ الحقيقي لا يتغيّر', falc: 'Copie : ton chemin ne change pas' },
+  keepIdea: { fr: "Je garde l'idée", ar: 'أحتفظ بالفكرة', falc: "Je garde l'idée" },
+  closeIt: { fr: 'Je referme', ar: 'أغلق', falc: 'Je ferme' },
+  planFirst: { fr: "🥇 D'abord", ar: '🥇 أوّلاً', falc: "🥇 D'abord" },
+  planWaiting: { fr: '⏳ Ça attend', ar: '⏳ ينتظر', falc: '⏳ Ça attend' },
+  planWith: { fr: '👥 Avec qui', ar: '👥 مع مَن', falc: '👥 Avec qui' },
+  planOpen: { fr: '🌱 Reste ouvert', ar: '🌱 يبقى مفتوحاً', falc: '🌱 Reste ouvert' },
 } as const;
 
 export type WordKey = keyof typeof WORDS;
