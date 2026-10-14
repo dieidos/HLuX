@@ -23,3 +23,18 @@ export function band(marks: Lean[]): { from: Lean; to: Lean; narrow: boolean } |
   const hi = Math.max(...idx);
   return { from: LEANS[lo], to: LEANS[hi], narrow: hi - lo <= 1 };
 }
+
+/** Le geste sur une ligne : combien de places un glissé fait franchir (une par `step` pixels, arrondi). */
+export const placesFor = (dx: number, step: number): number => (Math.abs(dx) < step / 2 ? 0 : Math.round(dx / step));
+
+/** Déplacer une idée de `n` places sur une ligne (bornée aux extrémités). Rend le nouvel ordre et l'idée franchie en dernier. */
+export function shifted(order: string[], id: string, n: number): { order: string[]; passed: string | null } {
+  const i = order.indexOf(id);
+  if (i < 0 || !n) return { order, passed: null };
+  const j = Math.min(order.length - 1, Math.max(0, i + n));
+  if (j === i) return { order, passed: null };
+  const next = order.filter((x) => x !== id);
+  next.splice(j, 0, id);
+  return { order: next, passed: order[j] };
+}
+

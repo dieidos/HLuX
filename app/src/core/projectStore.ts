@@ -33,6 +33,13 @@ interface ProjectStore {
   purge: () => boolean;
   /** Une copie a-t-elle été emportée pendant cette séance ? */
   backedUpNow: boolean;
+  /**
+   * La page invité, sans séance ni compte : elle ne voit **que** l'invitation et l'idée visée.
+   * ⛳ Lot 5 : ces deux gestes passent par le relais dieidos (`/api/ephemeral/invitations`) ; d'ici là,
+   * l'aperçu local relit le journal qui porte l'invitation.
+   */
+  guestRead: (invitation: string) => { firstName: string; entries: Entry[] } | null;
+  guestAnswer: (invitation: string, act: ProjectAct, guest: string) => void;
   act: (author: string, act: ProjectAct, provenance?: Provenance, confirmedBy?: string) => Entry;
   undo: (author: string, rank: number) => void;
   confirm: (rank: number, by: string) => void;
@@ -114,6 +121,21 @@ export function makeProjectStore(kv: KV) {
         writeProfiles(kv, profiles);
         set({ profiles, person: null, entries: [], backedUpNow: false });
         return true;
+      },
+      guestRead: (invitation) => {
+        for (const p of get().profiles) {
+          const entries = readJournal(kv, p.id);
+          if (entries.some((e) => e.act?.act === 'invitation_sent' && e.act.invitation === invitation)) return { firstName: p.firstName, entries };
+        }
+        return null;
+      },
+      guestAnswer: (invitation, act, guest) => {
+        const p = get().profiles.find((x) => readJournal(kv, x.id).some((e) => e.act?.act === 'invitation_sent' && e.act.invitation === invitation));
+        if (!p || act.act !== 'invitation_answered' || act.invitation !== invitation) return; // une seule invitation, une seule réponse
+        const entries = readJournal(kv, p.id);
+        if (entries.some((e) => e.act?.act === 'invitation_answered' && e.act.invitation === invitation)) return;
+        writeJournal(kv, p.id, [...entries, { rank: entries.length, author: guest, provenance: 'by_hand', act }]);
+        if (get().person === p.id) set({ entries: readJournal(kv, p.id) });
       },
       act: (author, act, provenance = 'by_hand', confirmedBy) => {
         const e: Entry = { rank: get().entries.length, author, provenance, act, ...(confirmedBy ? { confirmedBy } : {}) };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { band, leanOf } from './views';
+import { band, leanOf, placesFor, shifted } from './views';
 
 describe('Regards réunis', () => {
   it("situe une idée sur la ligne d'Amina, en mots", () => {
@@ -17,3 +17,17 @@ describe('Regards réunis', () => {
     expect(band([])).toBeNull();
   });
 });
+
+describe('Le geste sur une ligne', () => {
+  it('un petit glissé ne déplace rien ; un grand franchit plusieurs places', () => {
+    expect(placesFor(30, 110)).toBe(0);
+    expect(placesFor(120, 110)).toBe(1);
+    expect(placesFor(-250, 110)).toBe(-2);
+  });
+  it("l'idée glisse, bornée aux bouts, et l'on sait qui elle a franchi", () => {
+    expect(shifted(['a', 'b', 'c'], 'a', 2)).toEqual({ order: ['b', 'c', 'a'], passed: 'c' });
+    expect(shifted(['a', 'b', 'c'], 'c', -9)).toEqual({ order: ['c', 'a', 'b'], passed: 'a' });
+    expect(shifted(['a', 'b', 'c'], 'a', -1).passed).toBeNull();
+  });
+});
+

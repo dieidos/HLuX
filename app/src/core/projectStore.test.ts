@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { journalKey, needsBackup, profileId, readDossier, type KV } from './profiles';
+import type { Circle, Lean } from './acts';
 import { makeProjectStore } from './projectStore';
 import { standing } from './project';
 
@@ -91,4 +92,23 @@ describe('Profils et séance', () => {
     expect(readDossier(JSON.stringify({ person: 'amina', entries: [] })).firstName).toBe('Amina');
     expect(() => readDossier('{"x":1}')).toThrow();
   });
+
+  it("l'invité, sans séance : il ne lit que son invitation, et ne répond qu'une fois", () => {
+    const kv = memory();
+    const s = makeProjectStore(kv);
+    s.getState().openSession('Sarah');
+    s.getState().open('amina');
+    s.getState().act('amina', { act: 'invitation_sent', invitation: 'inv-1', guest: 'Salma', relation: 'sœur', idea: 'formation', axes: ['love'], lang: 'ar', expires: 'dans 3 jours' });
+    s.getState().closeSession();
+    const g = makeProjectStore(kv);
+    expect(g.getState().guestRead('inconnue')).toBeNull();
+    expect(g.getState().guestRead('inv-1')!.firstName).toBe('Amina');
+    const answer = { act: 'invitation_answered' as const, invitation: 'inv-1', leans: [['love', 'much']] as [Circle, Lean][], word: null };
+    g.getState().guestAnswer('inv-1', answer, 'Salma');
+    g.getState().guestAnswer('inv-1', answer, 'Salma');
+    const st = standing(g.getState().guestRead('inv-1')!.entries);
+    expect(st.invitations['inv-1'].answered).toBe(true);
+    expect(g.getState().guestRead('inv-1')!.entries.filter((e) => e.act?.act === 'invitation_answered')).toHaveLength(1);
+  });
 });
+

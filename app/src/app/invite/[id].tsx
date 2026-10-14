@@ -1,14 +1,17 @@
 // La page invité des Regards : lien temporaire, sans compte, dans la langue de l'invité (arabe RTL).
 // L'invité voit une seule idée et fait le même geste : un penchant par axe, peu ←→ beaucoup.
+// Elle ne demande ni séance ni compte, et ne voit que l'invitation et l'idée visée.
 // ⛳ Lot 5 : cette page sera servie par dieidos et répondra via le relais (jeton éphémère).
-//    D'ici là, elle lit et écrit l'invitation sur l'appareil, pour la démonstration.
+//    D'ici là, elle lit et écrit l'invitation sur l'appareil, pour la démonstration (`guestRead`, `guestAnswer`).
 
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { LeanSlider } from '../../components/Slide';
 import type { Circle, Lean } from '../../core/acts';
-import { useProject, useProjectState } from '../../core/useProject';
+import { standing } from '../../core/project';
+import { useProject } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 const AXES: [Circle, { fr: string; ar: string }][] = [
@@ -23,9 +26,11 @@ const LEANS: [Lean, { fr: string; ar: string }][] = [
 
 export default function Invite() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const s = useProjectState();
-  const act = useProject((x) => x.act);
+  const { guestRead, guestAnswer } = useProject.getState();
+  const [seen, setSeen] = useState(() => guestRead(id));
+  const s = standing(seen?.entries ?? []);
   const inv = s.invitations[id];
+  const name = seen?.firstName ?? '';
   const [leans, setLeans] = useState<Partial<Record<Circle, Lean>>>({});
   const [word, setWord] = useState('');
   if (!inv) return <View style={st.page}><Text style={st.title}>Ce lien s’est reposé.</Text><Text style={st.small}>Les liens d’invitation vivent peu de temps, pour protéger la personne qui invite.</Text></View>;
@@ -37,23 +42,20 @@ export default function Invite() {
   return (
     <View style={[st.page, { direction: ar ? 'rtl' : 'ltr' }]}>
       <Text style={st.small}>{ar ? 'رابط مؤقّت · دون حساب' : 'lien temporaire · sans compte'}</Text>
-      <Text style={st.title}>{ar ? 'أمينة تطلب رأيكِ' : 'Amina vous demande un regard'}</Text>
+      <Text style={st.title}>{ar ? `${name} تطلب رأيكِ` : `${name} vous demande un regard`}</Text>
       <Text style={st.idea}>« {idea?.title} »</Text>
-      {AXES.map(([axis, label]) => (
+      {AXES.filter(([axis]) => inv.axes.includes(axis)).map(([axis, label]) => (
         <View key={axis} style={st.line}>
           <Text style={st.axis}>{t(label)}</Text>
-          <View style={st.row}>
-            {LEANS.map(([l, lw]) => (
-              <Pressable key={l} onPress={() => setLeans((prev) => ({ ...prev, [axis]: l }))} style={[st.pick, leans[axis] === l && st.pickOn]} accessibilityRole="radio" accessibilityState={{ checked: leans[axis] === l }}>
-                <Text style={st.pickTxt}>{t(lw)}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <LeanSlider options={LEANS.map(([l, lw]) => [l, t(lw)] as [Lean, string])} value={leans[axis]} onChange={(l) => setLeans((prev) => ({ ...prev, [axis]: l }))} rtl={ar} />
         </View>
       ))}
       <TextInput value={word} onChangeText={setWord} placeholder={ar ? 'كلمة حرّة (اختياري)' : 'Un mot libre (facultatif)'} style={st.input} />
       <Pressable
-        onPress={() => act(inv.guest, { act: 'invitation_answered', invitation: id, leans: Object.entries(leans) as [Circle, Lean][], word: word.trim() || null })}
+        onPress={() => {
+          guestAnswer(id, { act: 'invitation_answered', invitation: id, leans: Object.entries(leans) as [Circle, Lean][], word: word.trim() || null }, inv.guest);
+          setSeen(guestRead(id));
+        }}
         style={[st.pick, st.send]} accessibilityRole="button">
         <Text style={[st.pickTxt, { color: C.onAccent }]}>{ar ? 'أرسل رأيي' : 'Envoyer mon avis'}</Text>
       </Pressable>
