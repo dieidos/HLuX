@@ -6,10 +6,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CardView } from '../../components/CardView';
 import { Screen } from '../../components/Chrome';
+import { DictateButton } from '../../components/DictateButton';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
 import { FEELING_WORDS } from '../../core/project';
-import { say, useWords } from '../../core/useAids';
+import { say, useAids, useWords } from '../../core/useAids';
+import { parsePlacement } from '../../core/voicePlace';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
@@ -23,6 +25,7 @@ const ZONES: [Feeling, WordKey, string][] = [
 export default function Ressenti() {
   const me = useMe();
   const w = useWords();
+  const lang = useAids().lang === 'ar' ? 'ar' : 'fr';
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const undo = useProject((x) => x.undo);
@@ -36,6 +39,16 @@ export default function Ressenti() {
   };
 
   const tray = Object.entries(s.cards).filter(([, c]) => !c.feeling);
+  // Dire au lieu de glisser : « Papiers, c'est difficile ». Même geste, même phrase redite, même « Annuler ».
+  const [heard, setHeard] = useState('');
+  const spoken = (text: string, final: boolean) => {
+    if (!final) return;
+    const p = parsePlacement(text, Object.entries(s.cards).map(([id, c]) => ({ id, title: c.title })));
+    if (p) {
+      setHeard('');
+      place(p.card, p.feeling);
+    } else setHeard(`« ${text} » : je n’ai pas reconnu la Carte et l’endroit. Tu peux toucher la carte.`);
+  };
   return (
     <Screen side="pp" title="feeling" question={w('howFeel')}>
       <DragArea>
@@ -58,6 +71,10 @@ export default function Ressenti() {
           ))}
         </View>
       </DragArea>
+      <View style={st.voice}>
+        <DictateButton label="🎙 Je le dis" lang={lang} onText={spoken} />
+        {heard ? <Text style={st.muted} accessibilityLiveRegion="polite">{heard}</Text> : null}
+      </View>
       {said && (
         <View style={st.said} accessibilityLiveRegion="polite">
           <Text style={st.saidTxt}>{said.text}</Text>
@@ -77,6 +94,7 @@ const st = StyleSheet.create({
   stack: { gap: 8 },
   tray: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16, padding: 12, borderRadius: S.radius, backgroundColor: C.surface2, minHeight: 72 },
   muted: { fontFamily: F.body, color: C.muted },
+  voice: { marginTop: 12, gap: 6 },
   said: { position: 'absolute', bottom: 16, alignSelf: 'center', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, paddingHorizontal: 18, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
   saidTxt: { fontFamily: F.bold, fontSize: 16, color: C.ink },
   undo: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.surface2 },

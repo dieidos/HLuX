@@ -8,13 +8,13 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { canDictateOnDevice, LOCALE } from '../core/dictation';
 import { C, F, S } from '../design/theme';
 
-export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: { lang?: 'fr' | 'ar'; label?: string; onText: (text: string) => void }) {
+export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: { lang?: 'fr' | 'ar'; label?: string; onText: (text: string, final: boolean) => void }) {
   const [listening, setListening] = useState(false);
   const [msg, setMsg] = useState('');
 
   useSpeechRecognitionEvent('result', (e) => {
     const text = e.results[0]?.transcript ?? '';
-    if (text) onText(text);
+    if (text) onText(text, e.isFinal);
   });
   useSpeechRecognitionEvent('end', () => setListening(false));
   useSpeechRecognitionEvent('error', () => {
