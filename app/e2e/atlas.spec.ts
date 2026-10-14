@@ -21,12 +21,20 @@ async function enter(page: Page, pro = 'Sarah', person: string | null = 'Amina')
 const link = (page: Page, name: RegExp | string) => page.getByRole('link', { name }).filter({ visible: true }).first();
 const mine = async (page: Page, screen: RegExp) => {
   // Toucher la personne ouvre directement 01 ; depuis Notre projet, le bandeau ramène à Mon projet.
-  const back = page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true });
-  if (await back.count()) await back.first().click();
+  if (page.url().includes('/notre-projet')) {
+    await page.getByRole('button', { name: /👋/ }).filter({ visible: true }).first().click();
+    await link(page, /Mon projet/).click();
+  }
   if (!/Cartes/.test(screen.source)) await link(page, screen).click();
 };
-const ours = async (page: Page, screen: RegExp) => {
+/** Notre projet : depuis « Qui est là ? », ou depuis le menu de la personne (son prénom, dans le bandeau). */
+const toOurs = async (page: Page) => {
+  const direct = page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true });
+  if (!(await direct.count())) await page.getByRole('button', { name: /👋/ }).filter({ visible: true }).first().click();
   await link(page, /Notre projet/).click();
+};
+const ours = async (page: Page, screen: RegExp) => {
+  await toOurs(page);
   await link(page, screen).click();
 };
 /** Prendre, puis poser : le geste de l'Atlas, dans sa version accessible (toucher, puis « Poser ici »). */
@@ -110,7 +118,7 @@ test.describe('03 Envies', () => {
     await mine(page, /Envies/);
     await tap(page, '＋ Une idée');
     await fill(page, 'Mon idée', 'Comprendre mes courriers seule');
-    await tap(page, 'Papiers');
+    // Papiers fait le fil : la nouvelle envie naît d'elle sans qu'on ait à la rechoisir.
     await tap(page, 'Créer');
     await expect(page.getByText('née de Papiers')).toBeVisible();
   });
@@ -295,7 +303,7 @@ test.describe('07 Sujets', () => {
 test.describe('08 Constat', () => {
   test('Aïcha a la parole ; la tablette circule.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
-    await link(page, /Notre projet/).click();
+    await toOurs(page);
     await expect(page.getByText('🎙️ La parole est à Aïcha')).toBeVisible();
     await tap(page, '→ Bruno');
     await expect(page.getByText('🎙️ La parole est à Bruno')).toBeVisible();
@@ -303,7 +311,7 @@ test.describe('08 Constat', () => {
 
   test("Bruno pose une carte de l'équipe.", async ({ page }) => {
     await enter(page, 'Aïcha', null);
-    await link(page, /Notre projet/).click();
+    await toOurs(page);
     await tap(page, '→ Bruno');
     await fill(page, 'Nouvelle carte du constat', 'Les courriers restent fermés');
     await tap(page, '👥 équipe');
@@ -314,7 +322,7 @@ test.describe('08 Constat', () => {
 
   test("L'équipe et Amina le disent : la difficulté se répète.", async ({ page }) => {
     await enter(page, 'Aïcha', null);
-    await link(page, /Notre projet/).click();
+    await toOurs(page);
     const q = page.getByRole('button', { name: /Qualification de « Horaires de la laverie »/ });
     await q.click();
     await expect(q).toContainText('signal à vérifier');
@@ -328,7 +336,7 @@ test.describe('08 Constat', () => {
 
 async function capReady(page: Page) {
   await enter(page, 'Aïcha', null);
-  await link(page, /Notre projet/).click();
+  await toOurs(page);
   const q = page.getByRole('button', { name: /Qualification de « Horaires de la laverie »/ });
   await q.click();
   await q.click();

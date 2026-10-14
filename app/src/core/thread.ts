@@ -35,3 +35,36 @@ export function cardThread(card: Id, p: ProjectState, f: FacilityState | null): 
   for (const l of p.linkedProposals) if (fromHere.has(l.proposal) && f) out.push({ step: 'Reliée à mon chemin', detail: f.proposals[l.proposal] ?? l.proposal });
   return out;
 }
+
+/**
+ * Les écrans où la Carte est passée (le fil de l'Atlas : chaque étape traversée s'allume dans le bandeau).
+ * Rien n'est deviné : chaque passage est un geste du journal qui porte la Carte, ou ce qui en est né.
+ */
+export function threadPassed(card: Id, p: ProjectState, f: FacilityState | null): string[] {
+  const c = p.cards[card];
+  if (!c) return [];
+  const out = ['/mon-projet/cartes'];
+  if (c.feeling || c.moments.length > 1) out.push('/mon-projet/ressenti');
+  const ideas = Object.entries(p.ideas).filter(([, i]) => i.fromCard === card).map(([id]) => id);
+  if (ideas.length) out.push('/mon-projet/envies');
+  if (Object.values(p.lines).some((l) => l.some((x) => ideas.includes(x)))) out.push('/mon-projet/priorites');
+  if (Object.values(p.invitations).some((i) => ideas.includes(i.idea))) out.push('/mon-projet/regards');
+  if (Object.values(p.nodes).some((n) => n.card === card)) out.push('/mon-projet/chemin');
+  const said = new Set(Object.values(p.subjects).filter((x) => x.card === card).map((x) => x.forCollective));
+  if (said.size) out.push('/notre-projet/sujets');
+  if (f) {
+    if (Object.values(f.findings).some((x) => said.has(x.title)) || f.agenda.some((a) => said.has(a.title))) out.push('/notre-projet/constat');
+    if (Object.values(f.commitments).some((e) => e.thread.some((t) => said.has(t)))) out.push('/notre-projet/actions', '/notre-projet/suivi');
+  }
+  return out;
+}
+
+/** La Carte qui fait le fil : celle que la personne a reprise, sinon la dernière qu'elle a touchée. */
+export function currentThread(chosen: Id | null, p: ProjectState, entries: { act?: { act: string; card?: Id | null; from_card?: Id | null } }[]): Id | null {
+  if (chosen && p.cards[chosen]) return chosen;
+  for (const e of [...entries].reverse()) {
+    const id = e.act?.card ?? e.act?.from_card;
+    if (id && p.cards[id]) return id;
+  }
+  return Object.keys(p.cards)[0] ?? null;
+}

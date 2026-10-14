@@ -2,13 +2,13 @@
 // « Et si… ? » joue sur une COPIE (cadre en pointillé) : le vrai chemin ne bouge pas ; deux sorties
 // explicites. Puis le plan, en quatre cases, dans ses mots.
 
+import { DossierCopy } from '../../components/DossierCopy';
 import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
 import { AideButton } from '../../components/AideButton';
-import { DossierCopy } from '../../components/DossierCopy';
 import { PathEditor } from '../../components/PathEditor';
 import { PathView } from '../../components/PathView';
 import { PlanEditor } from '../../components/PlanEditor';
@@ -157,7 +157,6 @@ export default function Chemin() {
             ))}
           </View>
         )}
-        <DossierCopy />
 
         {plan && (
           <View style={st.plan}>
@@ -176,6 +175,7 @@ export default function Chemin() {
                 </Pressable>
               ) : null}
             </View>
+            <DossierCopy />
           </View>
         )}
       </ScrollView>

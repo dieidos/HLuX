@@ -1,12 +1,15 @@
 // Ce qui entoure chaque écran, comme dans l'Atlas : barre du haut (logo + HLuX, projet, fil des
 // six étapes) et barre d'aides (Écouter · Plus simple · Langue).
 
-import { Link, usePathname } from 'expo-router';
-import type { ReactNode } from 'react';
-import { I18nManager, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Link, router, usePathname } from 'expo-router';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Animated, I18nManager, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {say, useAids, useFamily, useLive, useRegister, useWords } from '../core/useAids';
 import { PersonMenu } from './PersonMenu';
+import { Picto } from './Picto';
+import { useThreadCard } from '../core/useThread';
+import { useReducedMotion } from '../design/motion';
 import { useMe, useProject } from '../core/useProject';
 import { SvgXml } from 'react-native-svg';
 
@@ -52,26 +55,26 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const live = useLive();
   const me = useMe();
   const personal = useProject((s) => s.setup?.kind === 'personal');
+  const thread = useThreadCard();
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
         {me.id ? <View style={st.home}><Wordmark /></View> : <Link href="/" accessibilityLabel={reg === 'ar' && facing ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>}
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
-        {/* L'autre projet, à un geste (sur la tablette ; « Notre projet » n'existe pas sur son téléphone). */}
-        {side === 'pp' && !personal ? (
-          <Link href="/notre-projet/sujets" style={[st.other, { borderColor: C.pe.value }]}><Text style={st.otherTxt}>🏛️ {w('ourProject')}</Text></Link>
-        ) : null}
-        {side === 'pe' && me.id ? (
-          <Link href="/mon-projet/cartes" style={[st.other, { borderColor: C.pp.value }]}><Text style={st.otherTxt}>👤 {w('myProject')}</Text></Link>
-        ) : null}
+        <ThreadPill />
         <PersonMenu />
         {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
         <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>
           {steps.map(([k, href]) => {
             const on = path === href;
+            // Le fil : chaque étape que la Carte a traversée porte sa petite image (l'Atlas les allume).
+            const lit = me.id && thread.passed.includes(href);
             return (
-              <Link key={href} href={href as never} accessibilityState={{ selected: on }} style={[st.step, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
-                <Text style={[st.stepTxt, { fontFamily: bold }, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
+              <Link key={href} href={href as never} accessibilityState={{ selected: on }} accessibilityHint={lit ? `${thread.title} est passée par ici` : undefined} style={[st.step, lit && st.stepLit, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
+                <View style={st.stepRow}>
+                  {lit && thread.picto ? <Picto name={thread.picto} size={16} label={false} /> : lit ? <Text style={st.stepTxt}>●</Text> : null}
+                  <Text style={[st.stepTxt, { fontFamily: bold }, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
+                </View>
               </Link>
             );
           })}
@@ -85,12 +88,42 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
         ) : null}
       </View>
       <View style={st.body}>{children}</View>
-      <AidsBar side={side} facing={facing} />
+      <AidsBar side={side} facing={facing} next={nextOf(path, personal)} />
     </View>
   );
 }
 
-export function AidsBar({ side, facing = side === 'pp' }: { side: 'pp' | 'pe'; facing?: boolean }) {
+/** L'écran suivant dans les douze (06 mène à 07 sur la tablette ; « Notre projet » n'existe pas sur son téléphone). */
+function nextOf(path: string, personal: boolean): [WordKey, string] | null {
+  const all = personal ? PP : [...PP, ...PE];
+  const i = all.findIndex(([, href]) => href === path);
+  return i >= 0 && i < all.length - 1 ? all[i + 1] : null;
+}
+
+/** La Carte du fil, dans le bandeau : on la voit passer d'un écran à l'autre. */
+function ThreadPill() {
+  const thread = useThreadCard();
+  const me = useMe();
+  const path = usePathname();
+  const still = useReducedMotion();
+  const [pop] = useState(() => new Animated.Value(1));
+  const here = thread.passed.includes(path);
+  useEffect(() => {
+    // En arrivant sur un écran qu'elle a traversé, la Carte se signale (sans mouvement si on l'a demandé).
+    if (still || !here) return;
+    pop.setValue(0.8);
+    Animated.spring(pop, { toValue: 1, friction: 4, useNativeDriver: true }).start();
+  }, [path, here, still, pop]);
+  if (!me.id || !thread.id) return null;
+  return (
+    <Animated.View style={[st.pill, here && st.pillHere, { transform: [{ scale: pop }] }]} accessibilityLabel={`Le fil : ${thread.title}`}>
+      {thread.picto ? <Picto name={thread.picto} size={22} label={false} /> : <Text>🃏</Text>}
+      <Text style={st.pillTxt} numberOfLines={1}>{thread.title}</Text>
+    </Animated.View>
+  );
+}
+
+export function AidsBar({ side, facing = side === 'pp', next = null }: { side: 'pp' | 'pe'; facing?: boolean; next?: [WordKey, string] | null }) {
   const w = useWords();
   const bold = useFamily(true);
   const { listen, simple, lang, toggle, switchLang } = useAids();
@@ -104,6 +137,11 @@ export function AidsBar({ side, facing = side === 'pp' }: { side: 'pp' | 'pe'; f
       <Aid on={simple} label={w('simpler')} font={bold} onPress={() => toggle('simple')} />
       {facing && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
       <Text style={st.who}>{side === 'pp' ? (pro && !personal ? `${me.name} · ${w('withPro')} ${pro}` : me.name) : place}</Text>
+      {next ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={`${w('next')} : ${w(next[0])}`} onPress={() => router.push(next[1] as never)} style={st.next}>
+          <Text style={[st.nextTxt, { fontFamily: bold }]}>{w(next[0])} ▸</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -129,6 +167,13 @@ const st = StyleSheet.create({
   stepperPhone: { flexDirection: 'row', gap: 4 },
   stepWide: { flexGrow: 1 },
   stepTxt: { fontFamily: F.bold, fontSize: 13, color: C.muted },
+  stepRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  stepLit: { borderWidth: 2, borderColor: C.pp.value },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: 220, minHeight: S.touch, paddingHorizontal: 10, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 2, borderStyle: 'dashed', borderColor: C.line },
+  pillHere: { borderStyle: 'solid', borderColor: C.pp.value },
+  pillTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink, flexShrink: 1 },
+  next: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 16, borderRadius: S.radiusPill, backgroundColor: C.violetInk },
+  nextTxt: { fontSize: 15, color: C.onAccent },
   head: { paddingHorizontal: 24, paddingTop: 16, gap: 4 },
   title: { fontFamily: F.display, fontSize: S.title, color: C.ink },
   live: { alignSelf: 'flex-start', marginTop: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: S.radiusPill, backgroundColor: C.violetSoft, color: C.ink, fontSize: 15 },

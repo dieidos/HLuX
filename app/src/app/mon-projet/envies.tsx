@@ -2,9 +2,11 @@
 // Une idée naît d'une Carte et en garde le lien ; elle se déplace quand on veut ;
 // l'écarter par le bord est le seul geste irréversible, et l'écran le dit.
 
+import { Picto } from '../../components/Picto';
+import { useThreadCard } from '../../core/useThread';
 import { usePathname } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
@@ -27,6 +29,8 @@ export default function Envies() {
   const [from, setFrom] = useState<string | null>(null);
   const [inSession, setInSession] = useState(false);
   const pro = useProject((x) => x.pro);
+  // La Carte du fil : une nouvelle envie naît d'elle, sauf si la personne en choisit une autre.
+  const thread = useThreadCard();
 
   const place = (idea: string, spot: Spot, words: string) => {
     act(me.id, { act: 'idea_placed', idea, spot });
@@ -47,10 +51,13 @@ export default function Envies() {
     const card = i.fromCard ? s.cards[i.fromCard] : null;
     return (
       <Draggable key={id} id={id} label={i.title}>
-        <View style={st.idea}>
+        <View style={[st.idea, card && st.ideaPic]}>
+          {card?.picto ? <Picto name={card.picto} size={28} label={false} /> : null}
+          <View style={{ flexShrink: 1 }}>
           <Text style={st.ideaTxt}>{i.title}</Text>
           {card ? <Text style={st.born}>{w('bornOf')} {card.title}</Text> : null}
           {i.inSession ? <Text style={st.born}>{t('née en séance', 'وُلدت في الجلسة')}</Text> : null}
+          </View>
         </View>
       </Draggable>
     );
@@ -59,6 +66,7 @@ export default function Envies() {
   return (
     <Screen side="pp" title="wishes" question={w('wishQuestion')}>
       <DragArea>
+        <ScrollView contentContainerStyle={{ gap: 0 }}>
         <Ikigai
           label={(k) => w(k as WordKey)}
           at={(spot) => at(spot).map(([id]) => chip(id))}
@@ -72,8 +80,9 @@ export default function Envies() {
           <Zone id="discard" label={w('discard')} onDrop={(id) => place(id, { at: 'discarded' }, t('écartée, pour toujours', 'أُبعدت نهائياً', 'enlevée pour toujours'))} style={st.discard}>
             <Text style={st.small}>🗑️ {w('discard')}</Text>
           </Zone>
-          <Pressable onPress={() => setAdding(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('newIdea')}</Text></Pressable>
+          <Pressable onPress={() => { setFrom(thread.id); setAdding(true); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('newIdea')}</Text></Pressable>
         </View>
+        </ScrollView>
       </DragArea>
 
       {adding && (
@@ -110,6 +119,7 @@ const st = StyleSheet.create({
   tray: { flex: 1, minWidth: 260, backgroundColor: C.surface2 },
   discard: { width: 220, justifyContent: 'center', borderColor: C.discard },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  ideaPic: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   idea: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderTopColor: C.violet },
   ideaTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   born: { fontFamily: F.body, fontSize: 12, color: C.muted },

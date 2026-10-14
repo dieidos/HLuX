@@ -2,6 +2,11 @@
 // On ouvre la démonstration sur un écran de 375 px, puis chaque écran : aucun élément ne dépasse la
 // largeur, sauf à l'intérieur d'une zone faite pour défiler à l'horizontale (le fil des étapes).
 import { expect, test, type Page } from '@playwright/test';
+const toOurs = async (page: Page) => {
+  const direct = page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true });
+  if (!(await direct.count())) await page.getByRole('button', { name: /👋/ }).filter({ visible: true }).first().click();
+  await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).first().click();
+};
 
 test.use({ viewport: { width: 375, height: 812 } });
 
@@ -34,7 +39,7 @@ test('sur un téléphone, aucun écran ne déborde sur le côté', async ({ page
   const faults: Record<string, string[]> = {};
   for (const screen of [/Cartes/, /Ressenti/, /Envies/, /Priorités/, /Regards/, /Chemin/, /Sujets/, /Constat/, /Cap/, /Choix/, /Actions/, /Suivi/]) {
     if (/Sujets/.test(screen.source)) {
-        await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
+        await toOurs(page);
     } else {
       await page.getByRole('link', { name: screen }).filter({ visible: true }).first().click();
     }

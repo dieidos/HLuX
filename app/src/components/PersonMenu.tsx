@@ -1,7 +1,7 @@
 // Le menu de la personne, dans le bandeau de chaque écran (décision du 2026-10-14 : moins d'écrans
 // intermédiaires). Il remplace l'ancien accueil « Bonjour Amina » : on l'accueille par son prénom ici,
 // et ce qui servait rarement (copie, départ, changer de personne, fermer la séance) s'ouvre à la demande.
-import { router } from 'expo-router';
+import { Link, router, usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
@@ -27,6 +27,7 @@ export function PersonMenu() {
   const [leaving, setLeaving] = useState(false);
   const [confirmErase, setConfirmErase] = useState(false);
   const [msg, setMsg] = useState('');
+  const path = usePathname();
   const { height, width } = useWindowDimensions();
   if (!me.id) return null;
   const profile = profiles.find((p) => p.id === me.id);
@@ -44,6 +45,12 @@ export function PersonMenu() {
       {open ? (
         <View style={[st.panel, { maxHeight: height * 0.75, width: Math.min(400, width - 32) }]}>
           <ScrollView contentContainerStyle={{ gap: 10 }}>
+            {/* L'autre projet, à un geste (sur la tablette ; « Notre projet » n'existe pas sur son téléphone). */}
+            {path.startsWith('/notre-projet') ? (
+              <Link href="/mon-projet/cartes" onPress={() => setOpen(false)} style={[st.item, { borderColor: C.pp.value, borderWidth: 2 }]}><Text style={st.itemTxt}>👤 {w('myProject')}</Text></Link>
+            ) : !personal ? (
+              <Link href="/notre-projet/sujets" onPress={() => setOpen(false)} style={[st.item, { borderColor: C.pe.value, borderWidth: 2 }]}><Text style={st.itemTxt}>🏛️ {w('ourProject')}</Text></Link>
+            ) : null}
             <CompareVersions />
             {needsBackup(profile, new Date()) && !leaving ? (
               <View style={st.box}>

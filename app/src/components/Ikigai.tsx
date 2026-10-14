@@ -33,8 +33,9 @@ export function Ikigai({ label, at, onDrop, legend }: {
   onDrop: (item: string, spot: Spot, words: string) => void;
   legend?: boolean;
 }) {
-  const { width } = useLayout();
-  const size = Math.min(IKIGAI_SIZE, width - 40);
+  const { width, height } = useLayout();
+  // Le cercle tient dans l'écran, avec le plateau en dessous (sans le pousser hors de vue).
+  const size = Math.min(IKIGAI_SIZE, width - 40, Math.max(260, height - 400));
   const { R, circles, crossings, box } = geometry(size);
   return (
     <View style={st.row}>

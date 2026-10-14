@@ -1,6 +1,11 @@
 // La séance (07) : « Pas maintenant » reste dans le parcours de la Carte ; les personnes présentes, par leur
 // prénom du jour, deviennent participantes (08-12) ; le départ se confirme et se dit définitif.
 import { expect, test, type Page } from '@playwright/test';
+const toOurs = async (page: Page) => {
+  const direct = page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true });
+  if (!(await direct.count())) await page.getByRole('button', { name: /👋/ }).filter({ visible: true }).first().click();
+  await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).first().click();
+};
 
 async function demo(page: Page, pro = 'Sarah', person: string | null = 'Amina') {
   await page.goto('/');
@@ -13,9 +18,10 @@ const vis = (page: Page, name: string | RegExp) => page.getByRole('button', { na
 
 test('« Pas maintenant » : rien ne passe, et la Carte le garde', async ({ page }) => {
   await demo(page);
-  await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
+  await toOurs(page);
   await vis(page, 'Pas maintenant').click();
   await expect(page.getByText('Rien ne passe. Tu pourras le proposer plus tard, si tu veux.')).toBeVisible();
+  await page.getByRole('button', { name: /👋/ }).filter({ visible: true }).first().click();
   await page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true }).click();
   await vis(page, 'Papiers').click();
   await expect(page.getByLabel('Le fil de la Carte')).toContainText('pas maintenant');
@@ -23,7 +29,7 @@ test('« Pas maintenant » : rien ne passe, et la Carte le garde', async ({ page
 
 test('une nouvelle séance : les personnes présentes, par leur prénom, participent', async ({ page }) => {
   await demo(page);
-  await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
+  await toOurs(page);
   await vis(page, '＋ Nouvelle séance').click();
   await page.getByLabel('Date de la séance').fill('jeudi 15 octobre');
   await page.getByLabel('Personnes accompagnées présentes').fill('Nour, Malik');

@@ -1,6 +1,7 @@
 // 01 Cartes — « Quelle Carte reprendre ? Ou j'en ajoute une. »
 // Cartes existantes ; Nouvelle Carte (je parle / j'écris / je choisis une image) ; Carte en grand.
 
+import { useThread } from '../../core/useThread';
 import { freshId } from '../../core/ids';
 import { momentAr } from '../../i18n/moments';
 import { usePathname } from 'expo-router';
@@ -106,7 +107,7 @@ export default function Cartes() {
     <Screen side="pp" title="cards" question={w('whichCard')}>
       <ScrollView contentContainerStyle={st.grid}>
         {Object.entries(s.cards).map(([id, c]) => (
-          <Pressable accessibilityRole="button" key={id} onPress={() => { setOpen(id); say(c.verbatim || c.title); }} accessibilityLabel={c.title}>
+          <Pressable accessibilityRole="button" key={id} onPress={() => { setOpen(id); useThread.getState().take(id); say(c.verbatim || c.title); }} accessibilityLabel={c.title}>
             <CardView card={c} brought={brought.has(id)} />
           </Pressable>
         ))}
