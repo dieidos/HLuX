@@ -12,7 +12,6 @@ const vis = (page: Page, name: string) => page.getByRole('button', { name, exact
 
 test('02 : posée deux fois, la Carte revient dans la réserve en un geste, et son parcours le garde', async ({ page }) => {
   await demo(page);
-  await page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true }).click();
   await page.getByRole('link', { name: /Ressenti/ }).filter({ visible: true }).click();
   await vis(page, 'Papiers').click();
   await vis(page, "Poser ici : 😟 C'est difficile").click();
@@ -28,7 +27,6 @@ test('02 : posée deux fois, la Carte revient dans la réserve en un geste, et s
 
 test('04 : un axe rangé revient parmi ceux à ranger', async ({ page }) => {
   await demo(page);
-  await page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true }).click();
   await page.getByRole('link', { name: /Priorités/ }).filter({ visible: true }).click();
   await vis(page, "❤️ J'aime").click();
   await vis(page, "Poser ici : D'ABORD").click();

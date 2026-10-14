@@ -16,7 +16,6 @@ test('« Pas maintenant » : rien ne passe, et la Carte le garde', async ({ page
   await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
   await vis(page, 'Pas maintenant').click();
   await expect(page.getByText('Rien ne passe. Tu pourras le proposer plus tard, si tu veux.')).toBeVisible();
-  await page.locator('a[href="/"]').filter({ visible: true }).first().click();
   await page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true }).click();
   await vis(page, 'Papiers').click();
   await expect(page.getByLabel('Le fil de la Carte')).toContainText('pas maintenant');
@@ -38,6 +37,7 @@ test('une nouvelle séance : les personnes présentes, par leur prénom, partici
 
 test('le départ : effacer demande une confirmation qui dit « définitif »', async ({ page }) => {
   await demo(page);
+  await vis(page, /Amina 👋/).click();
   await vis(page, /Je quitte/).click();
   await page.getByLabel('Ma phrase', { exact: true }).filter({ visible: true }).first().fill('un deux trois quatre cinq six');
   await vis(page, 'Emporter').click();

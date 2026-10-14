@@ -16,8 +16,8 @@ test('une tablette neuve est vide : on la met en place, puis une personne entre 
   await page.getByLabel('Son prénom').fill('Nour');
   await page.getByLabel('Une phrase, pour commencer').fill('Je cherche un logement pour mes enfants.');
   await page.getByRole('button', { name: 'Entrer' }).click();
-  await expect(page.getByText('Bonjour Nour 👋')).toBeVisible();
-  await page.getByRole('link', { name: /Mon projet/ }).click();
+  // Elle entre directement dans ses Cartes, accueillie par son prénom.
+  await expect(page.getByText('Bonjour Nour 👋').filter({ visible: true })).toBeVisible();
   // Le moment porte sa date, et dit comment la Carte est née (ici, écrite).
   await expect(page.getByText(/\S+ \d+ \S+ · écrite avec Inès/)).toBeVisible();
   await expect(page.getByText('Nour · avec Inès').filter({ visible: true })).toBeVisible();

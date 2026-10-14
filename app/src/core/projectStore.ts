@@ -26,6 +26,19 @@ export function readSetup(kv: KV): Setup | null {
   }
 }
 
+/** La professionnelle de la séance, retenue pour la journée : on ne la redemande pas à chaque personne. */
+export const SESSION_KEY = 'hlux.session';
+const today = () => new Date().toDateString();
+export function readSession(kv: KV): string | null {
+  try {
+    const s = JSON.parse(kv.getItem(SESSION_KEY) ?? 'null') as { pro: string; day: string } | null;
+    const setup = readSetup(kv);
+    return s && s.day === today() && setup?.team.includes(s.pro) ? s.pro : null;
+  } catch {
+    return null;
+  }
+}
+
 interface ProjectStore {
   /** null tant que l'établissement n'est pas mis en place (premier lancement). */
   setup: Setup | null;
@@ -109,17 +122,21 @@ export function makeProjectStore(kv: KV) {
         return sentence === null ? '' : get().createProfile(firstName, sentence);
       },
       personal: () => get().setup?.kind === 'personal',
-      reload: () => set({ setup: readSetup(kv), profiles: readProfiles(kv), pro: null, person: null, entries: [], backedUpNow: false }),
+      reload: () => set({ setup: readSetup(kv), profiles: readProfiles(kv), pro: readSession(kv), person: null, entries: [], backedUpNow: false }),
       profiles: readProfiles(kv),
-      pro: null,
+      pro: readSession(kv),
       person: null,
       entries: [],
       backedUpNow: false,
       openSession: (pro) => {
         if (!get().setup?.team.includes(pro)) return; // seule l'équipe de l'établissement ouvre une séance
+        kv.setItem(SESSION_KEY, JSON.stringify({ pro, day: today() }));
         set({ pro, person: null, entries: [], backedUpNow: false });
       },
-      closeSession: () => set({ pro: null, person: null, entries: [], backedUpNow: false }),
+      closeSession: () => {
+        kv.removeItem(SESSION_KEY);
+        set({ pro: null, person: null, entries: [], backedUpNow: false });
+      },
       open: (id) => {
         // Sur une tablette, le profil s'ouvre par la séance ; sur son téléphone, la personne entre directement.
         if ((!get().pro && !get().personal()) || !get().profiles.some((p) => p.id === id)) return;

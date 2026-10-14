@@ -31,12 +31,10 @@ test('sur un téléphone, aucun écran ne déborde sur le côté', async ({ page
   await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
   await page.getByRole('button', { name: 'Sarah', exact: true }).click();
   await page.getByRole('button', { name: 'Amina', exact: true }).click();
-  await page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true }).click();
   const faults: Record<string, string[]> = {};
   for (const screen of [/Cartes/, /Ressenti/, /Envies/, /Priorités/, /Regards/, /Chemin/, /Sujets/, /Constat/, /Cap/, /Choix/, /Actions/, /Suivi/]) {
     if (/Sujets/.test(screen.source)) {
-      await page.locator('a[href="/"]').filter({ visible: true }).first().click();
-      await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
+        await page.getByRole('link', { name: /Notre projet/ }).filter({ visible: true }).click();
     } else {
       await page.getByRole('link', { name: screen }).filter({ visible: true }).first().click();
     }

@@ -1,21 +1,20 @@
 // Accueil. Premier lancement : on nomme l'établissement et l'équipe (la tablette démarre vide).
 // Puis la séance locale ouvre la tablette (décision du 2026-10-14).
 // Appui long sur « HLuX » : le mode démonstration, caché, qui entre lui-même ses données.
-// 1. La professionnelle touche son prénom. 2. La personne touche le sien, ou entre avec un prénom et une phrase.
-// 3. « Bonjour Amina », puis Mon projet ou Notre projet. Hors séance, les profils restent fermés.
-import { CompareVersions } from '../components/CompareVersions';
+// Un seul écran « Qui est là ? » : la professionnelle (retenue pour la journée), puis la personne, qui entre
+// directement dans 01 Mes Cartes (décision du 2026-10-14 : moins d'écrans intermédiaires). Hors séance,
+// les profils restent fermés. L'ancien accueil « Bonjour Amina » est devenu le menu du bandeau (PersonMenu).
 import { refusalAr } from '../i18n/refusals';
-import { Link } from 'expo-router';
+import { Link, Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { AidsBar, Wordmark } from '../components/Chrome';
-import { DossierCopy } from '../components/DossierCopy';
-import { QrReceive, QrSend } from '../components/QrCopy';
+import { Wordmark } from '../components/Chrome';
+import { QrReceive } from '../components/QrCopy';
 import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
 import { pickTextFile } from '../core/openFile';
-import { needsBackup, readDossier } from '../core/profiles';
-import { tNow, useAids, useT, useWords } from '../core/useAids';
+import { readDossier } from '../core/profiles';
+import { tNow, useT, useWords } from '../core/useAids';
 import { enterDemo, useMe, useProject, useTeam } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 
@@ -29,24 +28,20 @@ export default function Home() {
   const [place, setPlace] = useState('');
   const [names, setNames] = useState('');
   const [askDemo, setAskDemo] = useState(false);
-  const [confirmErase, setConfirmErase] = useState(false);
   const [period, setPeriod] = useState('');
-  const arabicHome = useAids((a) => a.lang) === 'ar';
   const [device, setDevice] = useState<'facility' | 'personal' | null>(null);
   const [myName, setMyName] = useState('');
   const [mySentence, setMySentence] = useState('');
   const personal = setup?.kind === 'personal';
   const profiles = useProject((s) => s.profiles);
-  const backedUpNow = useProject((s) => s.backedUpNow);
-  const { openSession, closeSession, open, close, createProfile, restoreProfile, purge } = useProject.getState();
+  const { openSession, closeSession, open, createProfile, restoreProfile } = useProject.getState();
+  const [more, setMore] = useState(false);
   const [name, setName] = useState('');
   const [sentence, setSentence] = useState('');
   const [file, setFile] = useState<string | null>(null);
   const [restorePhrase, setRestorePhrase] = useState('');
   const [restoreMsg, setRestoreMsg] = useState('');
-  const [leaving, setLeaving] = useState(false);
-  const [qr, setQr] = useState<'send' | 'receive' | null>(null);
-  const profile = profiles.find((p) => p.id === me.id);
+  const [qr, setQr] = useState<'receive' | null>(null);
 
   // Sur son téléphone, la personne entre directement dans son profil.
   useEffect(() => {
@@ -150,157 +145,81 @@ export default function Home() {
     );
   }
 
-  if (!pro && !personal) {
-    return (
-      <View style={st.page}>
-        {logo}
-        <Text style={st.hello}>{w('whoOpens')}</Text>
-        <View style={st.row}>
-          {team.map((t) => (
-            <Pressable key={t} accessibilityRole="button" onPress={() => openSession(t)} style={st.name}>
-              <Text style={st.nameTxt}>{t}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <Text style={st.note}>{w('closedNote')}</Text>
-      </View>
-    );
-  }
-
-  if (!me.id) {
-    return (
-      <ScrollView contentContainerStyle={st.page}>
-        <Wordmark size={28} />
-        <Text style={st.hello}>{w('whoIsHere')}</Text>
-        <View style={st.row}>
-          {profiles.filter((p) => !p.copyOf).map((p) => (
-            <Pressable key={p.id} accessibilityRole="button" onPress={() => open(p.id)} style={st.name}>
-              <Text style={st.nameTxt}>{p.firstName}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={st.newBox}>
-          <Text style={st.doorTxt}>{w('newPerson')}</Text>
-          <TextInput value={name} onChangeText={setName} placeholder={w('firstName')} style={st.input} accessibilityLabel={w('firstName')} />
-          <TextInput value={sentence} onChangeText={setSentence} placeholder={w('oneSentence')} multiline style={st.input} accessibilityLabel={w('oneSentence')} />
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => {
-              if (createProfile(name, sentence)) {
-                setName('');
-                setSentence('');
-              }
-            }}
-            style={[st.btn, st.primary]}>
-            <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('enter')}</Text>
-          </Pressable>
-        </View>
-        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn} accessibilityState={{ expanded: qr === 'receive' }}>
-          <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
-        </Pressable>
-        {qr === 'receive' ? <QrReceive onDone={(m) => { setQr(null); setRestoreMsg(m); }} /> : null}
-        <View style={st.newBox}>
-          <Text style={st.doorTxt}>{w('restore')}</Text>
-          <Pressable accessibilityRole="button" onPress={choose} style={st.btn}>
-            <Text style={st.btnTxt}>📂 {w('chooseFile')}{file ? ' ✓' : ''}</Text>
-          </Pressable>
-          {file ? <TextInput value={restorePhrase} onChangeText={setRestorePhrase} placeholder={t('Sa phrase de six mots ou plus', 'جملة الملف، من ستّ كلمات أو أكثر')} secureTextEntry style={st.input} accessibilityLabel={t('Phrase du dossier', 'جملة الملف')} /> : null}
-          {file ? (
-            <Pressable accessibilityRole="button" onPress={restore} style={[st.btn, st.primary]}>
-              <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('openIt')}</Text>
-            </Pressable>
-          ) : null}
-          {restoreMsg ? <Text style={st.note} accessibilityLiveRegion="polite">{restoreMsg}</Text> : null}
-        </View>
-        <Link href="/notre-projet/constat" style={[st.door, { borderTopColor: C.pe.value }]}>
-          <Text style={st.doorTxt}>🏛️ {w('ourProject')}</Text>
-        </Link>
-        <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
-          <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
-        </Pressable>
-      </ScrollView>
-    );
-  }
+  // La personne est entrée : directement dans son premier écran.
+  if (me.id) return <Redirect href="/mon-projet/cartes" />;
 
   return (
-    <ScrollView contentContainerStyle={[st.page, { direction: arabicHome ? 'rtl' : 'ltr' }]} {...(arabicHome ? ({ lang: 'ar' } as object) : {})}>
-      <Wordmark size={28} />
-      <Text style={st.hello}>{w('hello')} {me.name} 👋</Text>
-      <CompareVersions />
-      {needsBackup(profile, new Date()) && !leaving ? (
-        <View style={st.newBox}>
-          <Text style={st.reminder}>{w('backupReminder')}</Text>
-          <DossierCopy />
-        </View>
-      ) : null}
+    <ScrollView contentContainerStyle={st.page}>
+      {logo}
+      <Text style={st.hello}>{w('whoIsHere')}</Text>
+      <Text style={st.label}>{t('Qui accompagne ?', 'مَن يرافق؟')}</Text>
       <View style={st.row}>
-        <Link href="/mon-projet/cartes" style={[st.door, { borderTopColor: C.pp.value }]}>
-          <Text style={st.doorTxt}>👤 {w('myProject')}</Text>
-        </Link>
-        {!personal && <Link href="/notre-projet/sujets" style={[st.door, { borderTopColor: C.pe.value }]}>
-          <Text style={st.doorTxt}>🏛️ {w('ourProject')}</Text>
-        </Link>}
+        {team.map((m) => (
+          <Pressable key={m} accessibilityRole="button" accessibilityState={{ selected: pro === m }} onPress={() => openSession(m)} style={[st.chip, pro === m && st.chipOn]}>
+            <Text style={[st.chipTxt, pro === m && { color: C.onAccent }]}>{m}</Text>
+          </Pressable>
+        ))}
       </View>
-      <View style={st.row}>
-        {!personal && (
-          <Pressable accessibilityRole="button" onPress={close} style={st.btn}>
-            <Text style={st.btnTxt}>{w('changePerson')}</Text>
-          </Pressable>
-        )}
-        {!personal && (
-          <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
-            <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
-          </Pressable>
-        )}
-        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'send' ? null : 'send')} style={st.btn} accessibilityState={{ expanded: qr === 'send' }}>
-          <Text style={st.btnTxt}>{w('copyToDevice')}</Text>
-        </Pressable>
-        {!personal && (
-          <Pressable accessibilityRole="button" onPress={() => setLeaving(!leaving)} style={st.btn} accessibilityState={{ expanded: leaving }}>
-            <Text style={st.btnTxt}>🧳 {w('leaving')}</Text>
-          </Pressable>
-        )}
-      </View>
-      {personal && (
-        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn} accessibilityState={{ expanded: qr === 'receive' }}>
-          <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
-        </Pressable>
-      )}
-      {qr === 'send' ? <QrSend /> : null}
-      {personal && qr === 'receive' ? <QrReceive onDone={(m) => { setQr(null); setRestoreMsg(m); }} /> : null}
-      {personal && restoreMsg ? <Text style={st.note} accessibilityLiveRegion="polite">{restoreMsg}</Text> : null}
-      {leaving ? (
-        <View style={st.newBox}>
-          <Text style={st.note}>{w('eraseNote')}</Text>
-          <DossierCopy />
-          <QrSend />
-          {!confirmErase ? (
+      {!pro ? (
+        <Text style={st.note}>{w('closedNote')}</Text>
+      ) : (
+        <>
+          <Text style={st.label}>{t('Avec qui ?', 'مع مَن؟')}</Text>
+          <View style={st.row}>
+            {profiles.filter((p) => !p.copyOf).map((p) => (
+              <Pressable key={p.id} accessibilityRole="button" onPress={() => open(p.id)} style={st.name}>
+                <Text style={st.nameTxt}>{p.firstName}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <View style={st.newBox}>
+            <Text style={st.doorTxt}>{w('newPerson')}</Text>
+            <TextInput value={name} onChangeText={setName} placeholder={w('firstName')} style={st.input} accessibilityLabel={w('firstName')} />
+            <TextInput value={sentence} onChangeText={setSentence} placeholder={w('oneSentence')} multiline style={st.input} accessibilityLabel={w('oneSentence')} />
             <Pressable
               accessibilityRole="button"
-              accessibilityState={{ disabled: !backedUpNow }}
-              disabled={!backedUpNow}
-              onPress={() => setConfirmErase(true)}
-              style={[st.btn, backedUpNow ? st.danger : st.off]}>
-              <Text style={[st.btnTxt, backedUpNow && { color: C.onAccent }]}>{w('eraseHere')}</Text>
+              onPress={() => {
+                if (createProfile(name, sentence)) {
+                  setName('');
+                  setSentence('');
+                }
+              }}
+              style={[st.btn, st.primary]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('enter')}</Text>
             </Pressable>
-          ) : (
-            <View style={st.newBox} accessibilityRole="alert">
-              <Text style={st.reminder}>{t('C’est définitif : sur cette tablette, ton dossier sera effacé. Ta copie, elle, reste avec toi.', 'هذا نهائي: سيُمحى ملفّكِ من هذا الجهاز اللوحي. نسختكِ تبقى معكِ.', 'C’est pour toujours. Ta copie reste avec toi.')}</Text>
-              <View style={st.row}>
-                <Pressable accessibilityRole="button" onPress={() => { setConfirmErase(false); purge(); }} style={[st.btn, st.danger]}>
-                  <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Oui, effacer définitivement', 'نعم، امحي نهائياً')}</Text>
+          </View>
+          <View style={st.row}>
+            <Link href="/notre-projet/constat" style={[st.btn, { borderColor: C.pe.value, borderWidth: 2 }]}>
+              <Text style={st.btnTxt}>🏛️ {w('ourProject')}</Text>
+            </Link>
+            <Pressable accessibilityRole="button" onPress={() => setMore(!more)} style={st.btn} accessibilityState={{ expanded: more }}>
+              <Text style={st.btnTxt}>{t('Un dossier venu d’ailleurs…', 'ملفّ من مكان آخر…')}</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
+              <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
+            </Pressable>
+          </View>
+          {more ? (
+            <View style={st.newBox}>
+              <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn} accessibilityState={{ expanded: qr === 'receive' }}>
+                <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
+              </Pressable>
+              {qr === 'receive' ? <QrReceive onDone={(m) => { setQr(null); setRestoreMsg(m); }} /> : null}
+              <Text style={st.doorTxt}>{w('restore')}</Text>
+              <Pressable accessibilityRole="button" onPress={choose} style={st.btn}>
+                <Text style={st.btnTxt}>📂 {w('chooseFile')}{file ? ' ✓' : ''}</Text>
+              </Pressable>
+              {file ? <TextInput value={restorePhrase} onChangeText={setRestorePhrase} placeholder={t('Sa phrase de six mots ou plus', 'جملة الملف، من ستّ كلمات أو أكثر')} secureTextEntry style={st.input} accessibilityLabel={t('Phrase du dossier', 'جملة الملف')} /> : null}
+              {file ? (
+                <Pressable accessibilityRole="button" onPress={restore} style={[st.btn, st.primary]}>
+                  <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('openIt')}</Text>
                 </Pressable>
-                <Pressable accessibilityRole="button" onPress={() => setConfirmErase(false)} style={st.btn}>
-                  <Text style={st.btnTxt}>{w('cancel')}</Text>
-                </Pressable>
-              </View>
+              ) : null}
             </View>
-          )}
-        </View>
-      ) : null}
-      <View style={{ alignSelf: 'stretch' }}>
-        <AidsBar side="pp" />
-      </View>
+          ) : null}
+          {restoreMsg ? <Text style={st.note} accessibilityLiveRegion="polite">{restoreMsg}</Text> : null}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -319,8 +238,9 @@ const st = StyleSheet.create({
   note: { fontFamily: F.body, fontSize: 14, color: C.muted, textAlign: 'center', maxWidth: 420 },
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 18, borderRadius: S.radiusPill, backgroundColor: C.surface2, borderWidth: 1, borderColor: C.line, alignSelf: 'center' },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
-  danger: { backgroundColor: C.warn.ink, borderColor: C.warn.ink },
-  off: { opacity: 0.5 },
-  reminder: { fontFamily: F.bold, fontSize: 17, color: C.warn.ink },
+  label: { fontFamily: F.bold, fontSize: 16, color: C.slate },
+  chip: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 18, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
+  chipOn: { backgroundColor: C.violetInk, borderColor: C.violetInk },
+  chipTxt: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   btnTxt: { fontFamily: F.bold, fontSize: 16, color: C.ink },
 });

@@ -36,6 +36,15 @@ describe('Profils et séance', () => {
     expect(s.getState().entries).toEqual([]);
   });
 
+  it('la professionnelle reste retenue pour la journée ; fermer la séance l’oublie', () => {
+    const kv = memory();
+    makeProjectStore(kv).getState().openSession('Sarah');
+    const relaunched = makeProjectStore(kv);
+    expect(relaunched.getState().pro).toBe('Sarah');
+    relaunched.getState().closeSession();
+    expect(makeProjectStore(kv).getState().pro).toBeNull();
+  });
+
   it('un prénom et une phrase : un profil étanche, né avec sa première Carte', () => {
     const kv = memory();
     const s = makeProjectStore(kv);

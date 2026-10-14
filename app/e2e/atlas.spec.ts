@@ -20,7 +20,9 @@ async function enter(page: Page, pro = 'Sarah', person: string | null = 'Amina')
 }
 const link = (page: Page, name: RegExp | string) => page.getByRole('link', { name }).filter({ visible: true }).first();
 const mine = async (page: Page, screen: RegExp) => {
-  await link(page, /Mon projet/).click();
+  // Toucher la personne ouvre directement 01 ; depuis Notre projet, le bandeau ramène à Mon projet.
+  const back = page.getByRole('link', { name: /Mon projet/ }).filter({ visible: true });
+  if (await back.count()) await back.first().click();
   if (!/Cartes/.test(screen.source)) await link(page, screen).click();
 };
 const ours = async (page: Page, screen: RegExp) => {
@@ -491,7 +493,6 @@ test.describe('12 Suivi', () => {
   test("Amina relie l'atelier à son chemin.", async ({ page }) => {
     await committed(page, 'Sarah', 'Amina');
     await tap(page, 'CHRS Les Lilas propose : un atelier courriers chaque mardi');
-    await page.locator('a[href="/"]').filter({ visible: true }).first().click();
     await expect(page.getByText('Bonjour Amina 👋').filter({ visible: true })).toBeVisible();
     await mine(page, /Chemin/);
     await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.', { exact: true })).toBeVisible();

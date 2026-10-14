@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { I18nManager, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {say, useAids, useFamily, useLive, useRegister, useWords } from '../core/useAids';
+import { PersonMenu } from './PersonMenu';
 import { useMe, useProject } from '../core/useProject';
 import { SvgXml } from 'react-native-svg';
 
@@ -49,11 +50,21 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const bold = useFamily(true);
   const { phone } = useLayout();
   const live = useLive();
+  const me = useMe();
+  const personal = useProject((s) => s.setup?.kind === 'personal');
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
-        <Link href="/" accessibilityLabel={reg === 'ar' && facing ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>
+        {me.id ? <View style={st.home}><Wordmark /></View> : <Link href="/" accessibilityLabel={reg === 'ar' && facing ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>}
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
+        {/* L'autre projet, à un geste (sur la tablette ; « Notre projet » n'existe pas sur son téléphone). */}
+        {side === 'pp' && !personal ? (
+          <Link href="/notre-projet/sujets" style={[st.other, { borderColor: C.pe.value }]}><Text style={st.otherTxt}>🏛️ {w('ourProject')}</Text></Link>
+        ) : null}
+        {side === 'pe' && me.id ? (
+          <Link href="/mon-projet/cartes" style={[st.other, { borderColor: C.pp.value }]}><Text style={st.otherTxt}>👤 {w('myProject')}</Text></Link>
+        ) : null}
+        <PersonMenu />
         {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
         <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>
           {steps.map(([k, href]) => {
@@ -107,7 +118,9 @@ function Aid({ on, label, onPress, font }: { on: boolean; label: string; onPress
 
 const st = StyleSheet.create({
   page: { flex: 1, backgroundColor: C.bg },
-  top: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line },
+  top: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line, zIndex: 20 },
+  other: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: S.radiusPill, borderWidth: 2, backgroundColor: C.surface },
+  otherTxt: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   home: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, minHeight: S.touch, justifyContent: 'center' },
   proj: { fontFamily: F.bold, color: C.ink, fontSize: 15 },
   stepper: { flex: 1, flexDirection: 'row', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap' },
