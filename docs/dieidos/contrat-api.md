@@ -32,6 +32,7 @@ Gabarits : `.agentic/templates/feature_*.tpl`. Un routeur fin `APIRouter(prefix=
 | `POST /api/assist/generalize` | phrase générale à partir d'une situation individuelle | 3 |
 | `POST /api/assist/narrate` | récit court (simulation, plan, relecture d'un constat) | 2–3 |
 | `POST /api/assist/phrase` | mise en mots d'une phrase dictée par un groupe | 3 |
+| `POST /api/assist/sort` | ordonner une **liste fermée** de pictogrammes d'après une phrase (`{ text, lang, keys[] }` → `{ order: keys[] }`, mêmes clés, aucune autre) | 1 |
 
 - **Requête** : `{ "text": string, "lang": "fr" | "ar", "register": "falc" | "plain" }`. Le client a déjà
   pseudonymisé les prénoms (`[P1]`, `[P2]`…).

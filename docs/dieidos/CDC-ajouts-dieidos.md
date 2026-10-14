@@ -45,7 +45,7 @@ passe les hooks de `pre-commit` et ajoute ses tests au bras témoin habituel.
 
 ### Lot B — Module `features/assist` : aides de reformulation (moyen, prioritaire)
 
-- Cinq routes `POST /api/assist/{simplify|translate|generalize|narrate|phrase}`, format exact dans le
+- Six routes `POST /api/assist/{simplify|translate|generalize|narrate|phrase|sort}`, format exact dans le
   contrat §2. Routeur fin, `response_model`, `require_auth_payload`, E/S via `rig`.
 - **Gardes obligatoires, testées une à une** :
   1. `pii_detect` en entrée **et** en sortie ; une sortie qui ramène un nom est refusée ;
@@ -55,7 +55,8 @@ passe les hooks de `pre-commit` et ajoute ses tests au bras témoin habituel.
   4. prompt système : reformuler, traduire, simplifier, décrire — **jamais** proposer une idée, une
      solution, un chemin, une note, un classement ou une prédiction ;
   5. une seule proposition par appel, jamais de liste à choisir.
-- Degré `llm-config` : 2 pour `simplify`, `translate`, `narrate` ; 3 pour `generalize`, `phrase`.
+- Degré `llm-config` : 1 pour `sort` ; 2 pour `simplify`, `translate`, `narrate` ; 3 pour `generalize`, `phrase`.
+- `sort` (ajout du 2026-10-14) : la réponse est **une permutation des clés reçues**, rien d'autre ; le serveur refuse toute clé inventée. Le client garde l'ordre habituel tant que la route n'existe pas.
 - **Acceptation** : un test par garde (le texte piégé est refusé, son jumeau propre passe) ; un test
   qui vérifie qu'après un appel, aucune table ni aucun log ne contient le texte envoyé.
 - Le client appelle déjà ces routes (`app/src/core/aides.ts`) et bascule sur un exemple hors ligne
