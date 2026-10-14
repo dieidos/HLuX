@@ -2,6 +2,9 @@
 // Seul passe ce qu'elle choisit d'apporter, sous la forme qu'elle choisit ; « Pas maintenant » reste
 // possible. Le sujet entre à l'ordre du jour, avec sa source ; la Carte passe du jaune au vert.
 
+import { More } from '../../components/More';
+import { Picto } from '../../components/Picto';
+import { useThreadCards } from '../../core/useThread';
 import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -28,7 +31,9 @@ export default function Sujets() {
   // Quelle Carte apporter ? C'est la personne qui choisit, parmi les siennes.
   const cards = Object.entries(p.cards);
   const [cardId, setCardId] = useState<string | null>(null);
-  const chosen = cardId ?? (cards.length === 1 ? cards[0][0] : null);
+  const fil = useThreadCards();
+  const fromFil = [...fil].reverse().find((c) => cards.some(([id]) => id === c.id))?.id ?? null;
+  const chosen = cardId ?? fromFil ?? (cards.length === 1 ? cards[0][0] : null);
   const card = chosen ? p.cards[chosen] : null;
   const subjectId = chosen ? `sujet-${me.id}-${chosen}` : '';
   const subject = Object.entries(p.subjects).find(([, x]) => x.card === chosen)?.[1];
@@ -90,11 +95,6 @@ export default function Sujets() {
   return (
     <Screen side="pe" title="subjects" question="Quels sujets travailler ? Seulement si la personne le veut.">
       <ScrollView contentContainerStyle={{ gap: 16 }}>
-        {f.attendance && !newSession && (
-          <Pressable accessibilityRole="button" onPress={() => setNewSession(true)} style={[st.btn, { alignSelf: 'flex-start' }]}>
-            <Text style={st.btnTxt}>＋ Nouvelle séance</Text>
-          </Pressable>
-        )}
         {(!f.attendance || newSession) && (
           <View style={st.ask}>
             <Text style={st.h}>La séance</Text>
@@ -134,7 +134,10 @@ export default function Sujets() {
         {card && (
           <View style={st.sas}>
             <View style={[st.version, { borderTopColor: C.pp.value, backgroundColor: brought ? C.pe.soft : C.pp.soft }]}>
-              <Text style={st.kicker}>{t(`MA VERSION — ${me.name.toUpperCase()}`, `نسختي — ${me.name}`, `MES MOTS — ${me.name.toUpperCase()}`)}</Text>
+              <View style={st.kickRow}>
+                {card.picto ? <Picto name={card.picto} size={32} label={false} /> : null}
+                <Text style={st.kicker}>{t(`MA VERSION — ${me.name.toUpperCase()}`, `نسختي — ${me.name}`, `MES MOTS — ${me.name.toUpperCase()}`)}</Text>
+              </View>
               <Text style={st.quote}>« {card.verbatim} »</Text>
             </View>
             <Text style={st.arrow}>→</Text>
@@ -172,7 +175,7 @@ export default function Sujets() {
               <Pressable onPress={notNowGesture} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{t('Pas maintenant', 'ليس الآن')}</Text></Pressable>
             </View>
             {notNow && <Text style={st.small}>{t('Rien ne passe. Tu pourras le proposer plus tard, si tu veux.', 'لا يمرّ شيء. يمكنكِ اقتراحه لاحقاً إن أردتِ.', 'Rien ne part. Plus tard, si tu veux.')}</Text>}
-            {!session && <Text style={st.small}>{t('D’abord la séance, plus haut : sa date et qui est là.', 'أوّلاً الجلسة، في الأعلى: تاريخها ومن الحاضر.')}</Text>}
+            {!session && <Text style={st.small}>{t('D’abord la séance : sa date et qui est là.', 'أوّلاً الجلسة: تاريخها ومن الحاضر.')}</Text>}
             {session && !collective.trim() && <Text style={st.small}>{t('Écris d’abord la phrase pour le collectif.', 'اكتبي أوّلاً الجملة للمجموعة.')}</Text>}
           </View>
         )}
@@ -186,24 +189,33 @@ export default function Sujets() {
               <Text style={st.small}>{SOURCE_WORDS[a.source]}</Text>
             </View>
           ))}
-          {session ? (
+          {f.attendance && (
             <View style={st.row}>
-              <TextInput value={item} onChangeText={setItem} placeholder="Un point de l’équipe ou du CVS…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 220 }]} accessibilityLabel="Nouveau point à l'ordre du jour" />
-              {(['team', 'cvs'] as const).map((src) => (
-                <Pressable key={src} accessibilityRole="radio" accessibilityState={{ checked: itemSource === src }} onPress={() => setItemSource(src)} style={[st.btn, itemSource === src && st.primary]}>
-                  <Text style={[st.btnTxt, itemSource === src && { color: C.onAccent }]}>{SOURCE_WORDS[src]}</Text>
-                </Pressable>
-              ))}
-              <Pressable accessibilityRole="button" onPress={addItem} style={st.btn}><Text style={st.btnTxt}>Ajouter</Text></Pressable>
+              {f.attendance.present.map((n) => <Text key={n} style={st.chip}>{n}{n === f.attendance!.facilitator ? ' · anime' : ''}</Text>)}
+              {f.attendance.absent.map((n) => <Text key={n} style={[st.chip, st.absent]}>{n} · absente, c’est normal</Text>)}
             </View>
+          )}
+          {f.attendance ? (
+            <More>
+              {session ? (
+                <View style={st.row}>
+                  <TextInput value={item} onChangeText={setItem} placeholder="Un point de l’équipe ou du CVS…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 220 }]} accessibilityLabel="Nouveau point à l'ordre du jour" />
+                  {(['team', 'cvs'] as const).map((src) => (
+                    <Pressable key={src} accessibilityRole="radio" accessibilityState={{ checked: itemSource === src }} onPress={() => setItemSource(src)} style={[st.btn, itemSource === src && st.primary]}>
+                      <Text style={[st.btnTxt, itemSource === src && { color: C.onAccent }]}>{SOURCE_WORDS[src]}</Text>
+                    </Pressable>
+                  ))}
+                  <Pressable accessibilityRole="button" onPress={addItem} style={st.btn}><Text style={st.btnTxt}>Ajouter</Text></Pressable>
+                </View>
+              ) : null}
+              {!newSession && (
+                <Pressable accessibilityRole="button" onPress={() => setNewSession(true)} style={[st.btn, { alignSelf: 'flex-start' }]}>
+                  <Text style={st.btnTxt}>＋ Nouvelle séance</Text>
+                </Pressable>
+              )}
+            </More>
           ) : null}
         </View>
-        {f.attendance && (
-          <View style={st.row}>
-            {f.attendance.present.map((n) => <Text key={n} style={st.chip}>{n}{n === f.attendance!.facilitator ? ' · anime' : ''}</Text>)}
-            {f.attendance.absent.map((n) => <Text key={n} style={[st.chip, st.absent]}>{n} · absente, c’est normal</Text>)}
-          </View>
-        )}
       </ScrollView>
     </Screen>
   );
@@ -212,6 +224,7 @@ export default function Sujets() {
 const st = StyleSheet.create({
   sas: { flexDirection: 'row', gap: 12, alignItems: 'stretch', flexWrap: 'wrap' },
   version: { flex: 1, minWidth: 260, padding: 16, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 6, gap: 6 },
+  kickRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   kicker: { fontFamily: F.bold, fontSize: 12, letterSpacing: 1, color: C.slate },
   quote: { fontFamily: F.display, fontSize: 20, color: C.ink },
   arrow: { alignSelf: 'center', fontSize: 28, color: C.violet },

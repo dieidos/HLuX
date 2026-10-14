@@ -39,13 +39,15 @@ test('sur un téléphone, aucun écran ne déborde sur le côté', async ({ page
   const faults: Record<string, string[]> = {};
   for (const screen of [/Cartes/, /Ressenti/, /Envies/, /Priorités/, /Regards/, /Chemin/, /Sujets/, /Constat/, /Cap/, /Choix/, /Actions/, /Suivi/]) {
     if (/Sujets/.test(screen.source)) {
-        await toOurs(page);
+      await toOurs(page);
     } else {
       await page.getByRole('link', { name: screen }).filter({ visible: true }).first().click();
     }
     await page.waitForTimeout(400);
     const f = await overflowing(page);
-    if (f.length) faults[screen.source] = f;
+    // Et pas de bouton dans un bouton : un lecteur d'écran ne saurait pas lequel il touche.
+    const nested = await page.evaluate(() => [...document.querySelectorAll('button button, [role=button] [role=button], a a')].map((e) => (e.textContent ?? '').trim().slice(0, 30)).slice(0, 3));
+    if (f.length || nested.length) faults[screen.source] = [...f, ...nested.map((n) => `imbriqué:${n}`)];
   }
   expect(faults).toEqual({});
 });

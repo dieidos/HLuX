@@ -3,6 +3,7 @@
 // en mots : situation individuelle → signal à vérifier → difficulté répétée → enjeu confirmé.
 // Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat.
 
+import { More } from '../../components/More';
 import { freshId } from '../../core/ids';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -88,22 +89,6 @@ export default function Constat() {
     <Screen side="pe" title="finding" question="Où en sommes-nous ? On croise plusieurs voix.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
         <View style={st.row}>
-          <Text style={st.small}>{f.mandate ? `${f.mandate} anime, par mandat du groupe.` : 'Personne n’anime pour l’instant.'}</Text>
-          {f.mandate ? (
-            <Pressable accessibilityRole="button" onPress={() => giveMandate('')} style={st.btn}>
-              <Text style={st.btnTxt}>Retirer le mandat</Text>
-            </Pressable>
-          ) : null}
-          <Pressable accessibilityRole="button" accessibilityState={{ expanded: mandating }} onPress={() => setMandating(!mandating)} style={st.btn}>
-            <Text style={st.btnTxt}>{f.mandate ? 'Le confier à une autre personne' : 'Confier l’animation'}</Text>
-          </Pressable>
-          {mandating && PEOPLE.filter((p) => p !== f.mandate).map((p) => (
-            <Pressable key={p} accessibilityRole="button" onPress={() => giveMandate(p)} style={[st.btn, st.on]}>
-              <Text style={[st.btnTxt, { color: C.onAccent }]}>{p}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={st.row}>
           <Text style={st.floor}>🎙️ La parole est à {speaker}</Text>
           {PEOPLE.filter((p) => p !== speaker).map((p) => (
             <Pressable key={p} onPress={() => { act(speaker, { act: 'floor_given', session, to: p }); tell(`La parole est à ${p}.`); }} style={st.btn} accessibilityRole="button">
@@ -155,15 +140,33 @@ export default function Constat() {
         </View>
         {live ? <Text style={st.live} accessibilityLiveRegion="polite">{live}</Text> : null}
         <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l’a dite.</Text>
-        <View style={st.tray}>
-          <Text style={st.cardTitle}>Relire le constat à voix haute</Text>
-          <TextInput value={reading || draft} onChangeText={setReading} multiline style={st.input} accessibilityLabel="Relecture du constat" />
+        <Text style={st.small}>{f.mandate ? `${f.mandate} anime, par mandat du groupe.` : 'Personne n’anime pour l’instant.'}</Text>
+        <More label="Plus : l'animation, la relecture">
           <View style={st.row}>
-            <AideButton kind="narrate" label="Une phrase par carte" text={reading || draft} who="Le groupe" onProposal={setReading} />
-            <Pressable accessibilityRole="button" onPress={() => say(reading || draft)} style={st.btn}><Text style={st.btnTxt}>🔊 Lire à voix haute</Text></Pressable>
+            {f.mandate ? (
+              <Pressable accessibilityRole="button" onPress={() => giveMandate('')} style={st.btn}>
+                <Text style={st.btnTxt}>Retirer le mandat</Text>
+              </Pressable>
+            ) : null}
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: mandating }} onPress={() => setMandating(!mandating)} style={st.btn}>
+              <Text style={st.btnTxt}>{f.mandate ? 'Le confier à une autre personne' : 'Confier l’animation'}</Text>
+            </Pressable>
+            {mandating && PEOPLE.filter((p) => p !== f.mandate).map((p) => (
+              <Pressable key={p} accessibilityRole="button" onPress={() => giveMandate(p)} style={[st.btn, st.on]}>
+                <Text style={[st.btnTxt, { color: C.onAccent }]}>{p}</Text>
+              </Pressable>
+            ))}
           </View>
-          <Text style={st.small}>Si une phrase ne va pas, le groupe corrige la carte elle-même.</Text>
-        </View>
+          <View style={st.tray}>
+            <Text style={st.cardTitle}>Relire le constat à voix haute</Text>
+            <TextInput value={reading || draft} onChangeText={setReading} multiline style={st.input} accessibilityLabel="Relecture du constat" />
+            <View style={st.row}>
+              <AideButton kind="narrate" label="Une phrase par carte" text={reading || draft} who="Le groupe" onProposal={setReading} />
+              <Pressable accessibilityRole="button" onPress={() => say(reading || draft)} style={st.btn}><Text style={st.btnTxt}>🔊 Lire à voix haute</Text></Pressable>
+            </View>
+            <Text style={st.small}>Si une phrase ne va pas, le groupe corrige la carte elle-même.</Text>
+          </View>
+        </More>
       </ScrollView>
     </Screen>
   );

@@ -3,7 +3,7 @@
 // si l'on veut, un lien vers une étape déjà posée — chemin choisi, alternative ouverte, condition
 // écrite sur sa branche, ou dépendance. Rien n'est proposé à la place de la personne : on écrit soi-même.
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { LinkKind, NodeKind } from '../core/acts';
@@ -32,7 +32,7 @@ const LINKS: [LinkChoice, string, string][] = [
   ['dependency', 'attend…', 'ينتظر…'],
 ];
 
-export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false, cards = [] }: {
+export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false, cards = [], actions = null }: {
   columns: string[];
   lanes: string[];
   nodes: PNode[];
@@ -45,6 +45,8 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
   threadOption?: boolean;
   /** Les Cartes de la personne, pour dire de laquelle l'étape est née (écran 06). */
   cards?: { id: string; title: string }[];
+  /** Les autres boutons de l'écran, sur la même rangée (une seule rangée d'action, comme l'Atlas). */
+  actions?: ReactNode;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -83,6 +85,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
         <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={st.btn}>
           <Text style={st.btnTxt}>{t('＋ Une étape', '＋ خطوة')}</Text>
         </Pressable>
+        {actions}
         {onRemove && nodes.length > 0 && (
           <Pressable accessibilityRole="button" accessibilityState={{ expanded: removing }} onPress={() => setRemoving(!removing)} style={st.btn}>
             <Text style={st.btnTxt}>{t('Retirer une étape', 'إزالة خطوة', 'Enlever une étape')}</Text>

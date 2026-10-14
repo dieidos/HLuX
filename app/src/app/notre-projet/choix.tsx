@@ -56,11 +56,6 @@ export default function Choix() {
   const order: Rank[] = RANKS.map((r) => r[0]);
   const ranked = [...CRITERIA].sort((a, b) => order.indexOf(f.criteria[a[0]] ?? 'not_yet') - order.indexOf(f.criteria[b[0]] ?? 'not_yet'));
 
-  const cycleRank = (c: Criterion) => {
-    const next = order[(order.indexOf(f.criteria[c] ?? 'not_yet') + 1) % order.length];
-    act('groupe', { act: 'criterion_ranked', criterion: c, rank: next });
-    setLive(`${CRITERIA.find((x) => x[0] === c)?.[1] ?? c} : ${RANKS.find((r) => r[0] === next)?.[1] === '?' ? 'pas encore rangé' : RANKS.find((r) => r[0] === next)?.[1]}.`);
-  };
   // Une orientation se nomme : le groupe l'écrit, ou reprend un cap déjà posé.
   const capTitles = Object.values(f.caps).map((c) => c.title).filter((t) => !orientations.some(([, o2]) => o2.title === t));
   const newOrientation = (title: string) => {
@@ -108,9 +103,10 @@ export default function Choix() {
                 <View style={st.row}>
                   {ranked.filter(([c]) => (f.criteria[c] ?? 'not_yet') === r).map(([c, label]) => (
                     <Draggable key={c} id={c} label={label}>
-                      <Pressable onPress={() => cycleRank(c)} style={st.rankRow} accessibilityRole="button" accessibilityLabel={`${label} : ${rl}. Toucher pour changer.`}>
+                      {/* Le critère se range au geste (prendre, poser), comme en 04 — pas de bouton dans le bouton. */}
+                      <View style={st.rankRow}>
                         <Text style={st.crit}>{label}</Text>
-                      </Pressable>
+                      </View>
                     </Draggable>
                   ))}
                 </View>

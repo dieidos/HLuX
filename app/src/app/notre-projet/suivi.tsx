@@ -3,6 +3,7 @@
 // Le résultat se dit en mots ; s'il ne suffit pas, on revient au constat 🔁.
 // Un seul sens : le collectif ne lit jamais le chemin d'Amina ; il lui propose, et c'est elle qui relie.
 
+import { More } from '../../components/More';
 import { dayInWords } from '../../core/dates';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -137,36 +138,40 @@ export default function Suivi() {
             ))}
           </DragArea>
           {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
-          <View style={st.row}>
-            <TextInput value={loadName} onChangeText={setLoadName} placeholder="Ce que nous portons…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 200 }]} accessibilityLabel="Nouvelle charge" />
-            <TextInput value={loadRhythm} onChangeText={setLoadRhythm} placeholder="à quel rythme" style={[st.input, { minHeight: S.touch, minWidth: 160 }]} accessibilityLabel="Rythme de la charge" />
-          </View>
-          <View style={st.row}>
-            <Text style={st.small}>Qui la porte ?</Text>
-            {PEOPLE.map((p) => {
-              const on = loadCarriers.includes(p);
-              return (
-                <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setLoadCarriers(on ? loadCarriers.filter((x) => x !== p) : [...loadCarriers, p])} style={[st.btn, on && st.on]}>
-                  <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
-                </Pressable>
-              );
-            })}
-            <Pressable accessibilityRole="button" onPress={addLoad} style={[st.btn, st.on]}>
-              <Text style={[st.btnTxt, { color: C.onAccent }]}>＋ Une charge</Text>
-            </Pressable>
-          </View>
+          <More label="＋ Ce que nous portons">
+            <View style={st.row}>
+              <TextInput value={loadName} onChangeText={setLoadName} placeholder="Ce que nous portons…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 200 }]} accessibilityLabel="Nouvelle charge" />
+              <TextInput value={loadRhythm} onChangeText={setLoadRhythm} placeholder="à quel rythme" style={[st.input, { minHeight: S.touch, minWidth: 160 }]} accessibilityLabel="Rythme de la charge" />
+            </View>
+            <View style={st.row}>
+              <Text style={st.small}>Qui la porte ?</Text>
+              {PEOPLE.map((p) => {
+                const on = loadCarriers.includes(p);
+                return (
+                  <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setLoadCarriers(on ? loadCarriers.filter((x) => x !== p) : [...loadCarriers, p])} style={[st.btn, on && st.on]}>
+                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
+                  </Pressable>
+                );
+              })}
+              <Pressable accessibilityRole="button" onPress={addLoad} style={[st.btn, st.on]}>
+                <Text style={[st.btnTxt, { color: C.onAccent }]}>＋ Une charge</Text>
+              </Pressable>
+            </View>
+          </More>
           <Text style={st.small}>On remarque les prénoms : chacun apporte ce qu’il peut.</Text>
         </View>
 
         <View style={st.box}>
           <Text style={st.h}>Ce qui en résulte</Text>
           {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.when ? `${r.when} · ` : ''}{r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
-          <TextInput value={result} onChangeText={setResult} multiline placeholder="Ce qui en résulte, en mots : ce qui va mieux, ce qui reste dur" style={st.input} accessibilityLabel="Résultat" />
-          <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
-          <View style={st.row}>
-            <Pressable onPress={() => noteResult(false)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
-            <Pressable onPress={() => noteResult(true)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>🔁 Retour au constat</Text></Pressable>
-          </View>
+          <More label="＋ Un résultat">
+            <TextInput value={result} onChangeText={setResult} multiline placeholder="Ce qui en résulte, en mots : ce qui va mieux, ce qui reste dur" style={st.input} accessibilityLabel="Résultat" />
+            <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
+            <View style={st.row}>
+              <Pressable onPress={() => noteResult(false)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
+              <Pressable onPress={() => noteResult(true)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>🔁 Retour au constat</Text></Pressable>
+            </View>
+          </More>
         </View>
 
         {commitments.length > 0 && (

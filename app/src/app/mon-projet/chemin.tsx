@@ -86,6 +86,13 @@ export default function Chemin() {
               nodes={nodes}
               decisionLabel={t('je choisis', 'أنا أختار')}
               threadOption
+              actions={
+                <>
+                <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: C.onAccent }]}>{w('otherPaths')}</Text></Pressable>
+                <Pressable accessibilityRole="button" onPress={() => setWhatIf(true)} style={st.btn}><Text style={st.btnTxt}>{w('whatIf')}</Text></Pressable>
+                <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: C.onAccent }]}>{w('myPlan')}</Text></Pressable>
+                </>
+              }
               cards={Object.entries(s.cards).map(([id, c]) => ({ id, title: c.title }))}
               onRemove={(id) => {
                 const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
@@ -140,11 +147,6 @@ export default function Chemin() {
           </View>
         ))}
 
-        <View style={st.chips}>
-          <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: C.onAccent }]}>{w('otherPaths')}</Text></Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setWhatIf(true)} style={st.btn}><Text style={st.btnTxt}>{w('whatIf')}</Text></Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: C.onAccent }]}>{w('myPlan')}</Text></Pressable>
-        </View>
 
         {Object.values(s.whatIfs).some((x) => x.kept) && (
           <View style={{ gap: 6 }}>

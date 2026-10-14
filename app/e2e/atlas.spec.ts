@@ -44,6 +44,10 @@ async function drop(page: Page, item: string, zone: string) {
 }
 // La pile de navigation garde les écrans précédents montés (cachés) : on ne vise que ce qui se voit.
 const fill = (page: Page, label: string, text: string) => page.getByLabel(label, { exact: true }).filter({ visible: true }).first().fill(text);
+/** Les outils repliés (« ＋ Une solution »…) : on déplie si le champ n'est pas encore visible. */
+const unfold = async (page: Page, label: string, field: string) => {
+  if (!(await page.getByLabel(field, { exact: true }).filter({ visible: true }).count())) await page.getByRole('button', { name: label, exact: true }).filter({ visible: true }).first().click();
+};
 const tap = (page: Page, name: string | RegExp) => page.getByRole('button', { name, exact: typeof name === 'string' }).filter({ visible: true }).first().click();
 
 // ── 01 Cartes ──────────────────────────────────────────────────────────────────────────────────────
@@ -388,8 +392,9 @@ test.describe('10 Choix', () => {
   test('Le groupe range six critères ; cinq personnes donnent leur avis.', async ({ page }) => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Choix/);
-    await page.getByRole('button', { name: /👤 Effet attendu pour les personnes : \?/ }).click();
-    await expect(page.getByRole('button', { name: /👤 Effet attendu pour les personnes : D'ABORD/ })).toBeVisible();
+    // Un critère se range au geste : on le prend, on le pose dans un rang.
+    await drop(page, '👤 Effet attendu pour les personnes', "D'ABORD");
+    await expect(page.getByRole('group', { name: "D'ABORD" }).filter({ visible: true }).first()).toContainText('Effet attendu pour les personnes');
     await orientation(page);
     for (const v of ['Aïcha', 'Bruno', 'Karim', 'Léa', 'Le CVS']) await expect(page.getByRole('button', { name: `${v} : à venir` })).toBeVisible();
   });
@@ -425,6 +430,7 @@ test.describe('10 Choix', () => {
 // ── 11 Actions ─────────────────────────────────────────────────────────────────────────────────────
 
 async function solution(page: Page, title: string, modality = '', rhythm = '') {
+  await unfold(page, '＋ Une solution', 'Nouvelle solution');
   await fill(page, 'Nouvelle solution', title);
   if (modality) await fill(page, 'Modalité', modality);
   if (rhythm) await fill(page, 'Rythme', rhythm);
@@ -458,7 +464,9 @@ test.describe('11 Actions', () => {
     await enter(page, 'Aïcha', null);
     await ours(page, /Actions/);
     await solution(page, 'Atelier courriers du mardi');
-    await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
+    await unfold(page, '＋ La carte-engagement', "Texte de l'engagement");
+    await unfold(page, '＋ La carte-engagement', "Texte de l'engagement");
+  await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
     // Le groupe dit d'où vient l'engagement : ici, une parole consentie.
     await page.getByRole('checkbox', { name: 'Les horaires de la laverie' }).click();
     await page.getByRole('radio', { name: 'Atelier courriers du mardi' }).click();
@@ -475,6 +483,7 @@ async function committed(page: Page, pro = 'Aïcha', person: string | null = nul
   await enter(page, pro, person);
   await ours(page, /Actions/);
   await solution(page, 'Atelier courriers du mardi');
+  await unfold(page, '＋ La carte-engagement', "Texte de l'engagement");
   await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
   await page.getByRole('radio', { name: 'Atelier courriers du mardi' }).click();
   await tap(page, 'Validée par le groupe');
@@ -488,6 +497,7 @@ test.describe('12 Suivi', () => {
     await fill(page, "L'étape", 'premier mardi');
     await tap(page, 'Poser l’étape');
     await expect(page.getByText('premier mardi').first()).toBeVisible();
+    await unfold(page, '＋ Ce que nous portons', 'Nouvelle charge');
     await fill(page, 'Nouvelle charge', "L'atelier du mardi");
     await fill(page, 'Rythme de la charge', 'chaque semaine');
     await page.getByRole('checkbox', { name: 'Léa' }).click();
@@ -510,6 +520,7 @@ test.describe('12 Suivi', () => {
 
   test('Au printemps, trois personnes comprennent seules leurs courriers.', async ({ page }) => {
     await committed(page);
+    await unfold(page, '＋ Un résultat', 'Résultat');
     await fill(page, 'Résultat', 'au printemps trois personnes comprennent seules leurs courriers');
     await tap(page, '✨ Mettre en mots le résultat');
     await tap(page, '🔁 Retour au constat');

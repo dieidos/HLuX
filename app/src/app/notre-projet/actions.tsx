@@ -2,6 +2,7 @@
 // effet pour les personnes ; quand l'équipe et les personnes jugent la faisabilité différemment,
 // l'écart reste affiché. Puis la carte-engagement, avec des noms, une date pour en reparler, et son fil.
 
+import { More } from '../../components/More';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
@@ -122,12 +123,14 @@ export default function Actions() {
             </View>
           ))}
           {solutions.length === 0 && <Text style={st.small}>Plusieurs solutions avant un engagement : écrivez-les, une à une.</Text>}
-          <View style={st.row}>
-            <TextInput value={title} onChangeText={setTitle} placeholder="Une solution…" style={st.input} accessibilityLabel="Nouvelle solution" />
-            <TextInput value={modality} onChangeText={setModality} placeholder="comment (binôme, partenaire…)" style={st.input} accessibilityLabel="Modalité" />
-            <TextInput value={rhythm} onChangeText={setRhythm} placeholder="à quel rythme" style={st.input} accessibilityLabel="Rythme" />
-            <Pressable onPress={addSolution} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
-          </View>
+          <More label="＋ Une solution">
+            <View style={st.row}>
+              <TextInput value={title} onChangeText={setTitle} placeholder="Une solution…" style={st.input} accessibilityLabel="Nouvelle solution" />
+              <TextInput value={modality} onChangeText={setModality} placeholder="comment (binôme, partenaire…)" style={st.input} accessibilityLabel="Modalité" />
+              <TextInput value={rhythm} onChangeText={setRhythm} placeholder="à quel rythme" style={st.input} accessibilityLabel="Rythme" />
+              <Pressable onPress={addSolution} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
+            </View>
+          </More>
         </View>
 
         <View style={st.box}>
@@ -138,42 +141,44 @@ export default function Actions() {
               <Text style={st.small}>fil : {c.thread.join(' → ')}{c.carriers.length ? ` · porté par ${c.carriers.join(', ')}` : ''}{c.review ? ` · on en reparle ${c.review}` : ''}</Text>
             </View>
           ))}
-          <TextInput value={text} onChangeText={setText} multiline placeholder="Ce que nous nous engageons à faire, avec qui, à quel rythme" style={st.input} accessibilityLabel="Texte de l'engagement" />
-          <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
-          {sources.length > 0 && (
+          <More label="＋ La carte-engagement">
+            <TextInput value={text} onChangeText={setText} multiline placeholder="Ce que nous nous engageons à faire, avec qui, à quel rythme" style={st.input} accessibilityLabel="Texte de l'engagement" />
+            <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
+            {sources.length > 0 && (
+              <View style={st.row}>
+                <Text style={st.small}>D’où vient-il ?</Text>
+                {sources.map((x) => {
+                  const on = from.includes(x);
+                  return (
+                    <Pressable key={x} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setFrom(on ? from.filter((y) => y !== x) : [...from, x])} style={[st.btn, on && st.on]}>
+                      <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{x}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
             <View style={st.row}>
-              <Text style={st.small}>D’où vient-il ?</Text>
-              {sources.map((x) => {
-                const on = from.includes(x);
+              <Text style={st.small}>Pour quelle solution ?</Text>
+              {solutions.map(([id, x]) => (
+                <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: chosen === id }} onPress={() => setChosen(id)} style={[st.btn, chosen === id && st.on]}>
+                  <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{x.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <View style={st.row}>
+              <Text style={st.small}>Qui le porte ?</Text>
+              {PEOPLE.map((p) => {
+                const on = carriers.includes(p);
                 return (
-                  <Pressable key={x} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setFrom(on ? from.filter((y) => y !== x) : [...from, x])} style={[st.btn, on && st.on]}>
-                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{x}</Text>
+                  <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setCarriers(on ? carriers.filter((x) => x !== p) : [...carriers, p])} style={[st.btn, on && st.on]}>
+                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
                   </Pressable>
                 );
               })}
             </View>
-          )}
-          <View style={st.row}>
-            <Text style={st.small}>Pour quelle solution ?</Text>
-            {solutions.map(([id, x]) => (
-              <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: chosen === id }} onPress={() => setChosen(id)} style={[st.btn, chosen === id && st.on]}>
-                <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{x.title}</Text>
-              </Pressable>
-            ))}
-          </View>
-          <View style={st.row}>
-            <Text style={st.small}>Qui le porte ?</Text>
-            {PEOPLE.map((p) => {
-              const on = carriers.includes(p);
-              return (
-                <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setCarriers(on ? carriers.filter((x) => x !== p) : [...carriers, p])} style={[st.btn, on && st.on]}>
-                  <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler (au printemps, avec les personnes…)" style={st.input} accessibilityLabel="Date pour en reparler" />
-          <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe</Text></Pressable>
+            <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler (au printemps, avec les personnes…)" style={st.input} accessibilityLabel="Date pour en reparler" />
+            <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe</Text></Pressable>
+          </More>
         </View>
       </ScrollView>
     </Screen>

@@ -30,6 +30,8 @@ test('« Pas maintenant » : rien ne passe, et la Carte le garde', async ({ page
 test('une nouvelle séance : les personnes présentes, par leur prénom, participent', async ({ page }) => {
   await demo(page);
   await toOurs(page);
+  // Ouvrir une séance : un outil de l'équipe, replié sous « ⋯ Plus » avec l'ordre du jour.
+  await vis(page, /Plus/).click();
   await vis(page, '＋ Nouvelle séance').click();
   await page.getByLabel('Date de la séance').fill('jeudi 15 octobre');
   await page.getByLabel('Personnes accompagnées présentes').fill('Nour, Malik');
