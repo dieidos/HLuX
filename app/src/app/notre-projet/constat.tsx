@@ -30,6 +30,8 @@ export default function Constat() {
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
+  const undoF = useFacility((x) => x.undo);
+  const entries = useFacility((x) => x.entries);
   const [title, setTitle] = useState('');
   const [source, setSource] = useState<Source>('team');
   const [reading, setReading] = useState('');
@@ -65,6 +67,12 @@ export default function Constat() {
     const titles = Object.values(f.findings).filter((x) => x.zone === z).map((x) => x.title);
     return titles.length ? `${label} : ${titles.join(', ')}.` : '';
   }).filter(Boolean).join(' ');
+  // Le même geste à l'envers : la carte posée est reprise, sa pose est compensée dans le journal.
+  const takeBack = (id: string) => {
+    const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
+    for (const e of entries) if (e.act?.act === 'finding_placed' && e.act.finding === id && !undone.has(e.rank)) undoF(speaker, e.rank);
+    tell(`${f.findings[id]?.title ?? ''} : reprise.`);
+  };
   const add = () => {
     if (!title.trim()) return;
     act(speaker, { act: 'finding_placed', finding: `c-${Object.keys(f.findings).length + 1}`, title: title.trim(), zone: 'unsure', source, author: speaker });
@@ -127,6 +135,9 @@ export default function Constat() {
               ))}
             </View>
           )}
+          <Zone id="reprendre" label="Reprendre la carte" accepts={(id) => !!f.findings[id]} onDrop={takeBack} style={st.tray}>
+            <Text style={st.small}>↶ Reprendre une carte : la poser ici la retire de la table.</Text>
+          </Zone>
         </DragArea>
         <View style={[st.row, st.addRow]}>
           <TextInput value={title} onChangeText={setTitle} placeholder={`${speaker} pose une carte…`} style={st.input} accessibilityLabel="Nouvelle carte du constat" />

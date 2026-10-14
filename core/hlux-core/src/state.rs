@@ -159,6 +159,12 @@ impl Reducer<ProjectAct> for ProjectReducer {
                     c.moments.push(format!("{when} · dans « {} »", feeling_words(feeling)));
                 }
             }
+            ProjectAct::CardBack { card, when } => {
+                if let Some(c) = s.cards.get_mut(&card) {
+                    c.feeling = None;
+                    c.moments.push(format!("{when} · reposée dans la réserve"));
+                }
+            }
             ProjectAct::IdeaCreated { idea, title, from_card, in_session } => {
                 s.ideas.insert(idea, Idea { title, from_card, in_session, spot: Spot::Tray });
             }
@@ -172,6 +178,9 @@ impl Reducer<ProjectAct> for ProjectReducer {
             }
             ProjectAct::AxisRanked { axis, rank } => {
                 s.axis_ranks.insert(axis, rank);
+            }
+            ProjectAct::AxisUnranked { axis } => {
+                s.axis_ranks.remove(&axis);
             }
             ProjectAct::LineOrdered { axis, author, order } => {
                 s.lines.insert(line_key(axis, &author), order);
@@ -219,9 +228,10 @@ impl Reducer<ProjectAct> for ProjectReducer {
             ProjectAct::CardCreated { card, .. }
             | ProjectAct::CardSimpler { card, .. }
             | ProjectAct::CardTranslated { card, .. }
-            | ProjectAct::CardFelt { card, .. } => format!("card:{card}"),
+            | ProjectAct::CardFelt { card, .. }
+            | ProjectAct::CardBack { card, .. } => format!("card:{card}"),
             ProjectAct::IdeaCreated { idea, .. } | ProjectAct::IdeaPlaced { idea, .. } => format!("idea:{idea}"),
-            ProjectAct::AxisRanked { axis, .. } => format!("axis:{axis:?}"),
+            ProjectAct::AxisRanked { axis, .. } | ProjectAct::AxisUnranked { axis } => format!("axis:{axis:?}"),
             ProjectAct::LineOrdered { axis, author, .. } => format!("line:{}", line_key(*axis, author)),
             ProjectAct::CompanionOrder { .. } => "companion-order".into(),
             ProjectAct::InvitationSent { invitation, .. } | ProjectAct::InvitationAnswered { invitation, .. } => {

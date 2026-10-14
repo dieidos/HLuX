@@ -32,6 +32,8 @@ pub enum ProjectAct {
     // ── 02 Ressenti ──
     /// Prendre → poser dans une zone.
     CardFelt { card: Id, feeling: Feeling, when: String },
+    /// La Carte est reposée dans la réserve : elle n'est plus posée, et son parcours le garde.
+    CardBack { card: Id, when: String },
 
     // ── 03 Envies ──
     /// Une idée naît d'une Carte (ou de la séance).
@@ -42,6 +44,8 @@ pub enum ProjectAct {
     // ── 04 Priorités ──
     /// Volet A : un axe posé dans un rang (des ex æquo sont permis).
     AxisRanked { axis: Circle, rank: Rank },
+    /// L'axe revient parmi ceux à ranger.
+    AxisUnranked { axis: Circle },
     /// Volet B : l'ordre des idées sur une ligne, de gauche (peu) à droite (beaucoup).
     LineOrdered { axis: Circle, author: String, order: Vec<Id> },
 

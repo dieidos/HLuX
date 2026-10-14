@@ -31,6 +31,8 @@ export interface Plan {
 }
 
 export type ProjectAct =
+  | { act: 'card_back'; card: Id; when: string }
+  | { act: 'axis_unranked'; axis: Circle }
   | { act: 'card_created'; card: Id; title: string; picto: string | null; verbatim: string; lang: Lang; origin: Origin; said_with: string | null; when: string }
   | { act: 'card_simpler'; card: Id; text: string }
   | { act: 'card_translated'; card: Id; lang: Lang; text: string }

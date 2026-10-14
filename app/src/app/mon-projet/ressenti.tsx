@@ -4,6 +4,7 @@
 // d'elles crée la Carte (origine « image »), comme si elle avait été choisie à l'écran 01.
 
 import { dayInWords } from '../../core/dates';
+import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -13,7 +14,7 @@ import { DictateButton } from '../../components/DictateButton';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
 import { FEELING_WORDS } from '../../core/project';
-import { say, tNow, useAids, useT, useWords } from '../../core/useAids';
+import {say, tNow, tell, useAids, useT, useWords } from '../../core/useAids';
 import { parsePlacement } from '../../core/voicePlace';
 import { useMe, useProject, useProjectState } from '../../core/useProject';
 import { Picto } from '../../components/Picto';
@@ -34,6 +35,7 @@ const ZONES: [Feeling, WordKey, string][] = [
 ];
 
 export default function Ressenti() {
+  const pathname = usePathname();
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -41,7 +43,6 @@ export default function Ressenti() {
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const undo = useProject((x) => x.undo);
-  const entries = useProject((x) => x.entries);
   const pro = useProject((x) => x.pro);
   const [said, setSaid] = useState<{ text: string; rank: number; card: string } | null>(null);
 
@@ -61,13 +62,9 @@ export default function Ressenti() {
   };
   // Annuler = le même geste à l'envers : la carte revient dans la réserve, et son dernier placement est compensé.
   const back = (card: string) => {
-    const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
-    const last = [...entries].reverse().find((e) => e.act?.act === 'card_felt' && e.act.card === card && !undone.has(e.rank));
-    if (!last) return;
-    undo(me.id, last.rank);
-    const line = tNow(`${s.cards[card]?.title ?? ''} revient dans la réserve.`, `${s.cards[card]?.title ?? ''} تعود إلى علبة البطاقات.`);
+    act(me.id, { act: 'card_back', card, when: dayInWords() });
     setSaid(null);
-    say(line);
+    tell(tNow(`${s.cards[card]?.title ?? ''} revient dans la réserve.`, `${s.cards[card]?.title ?? ''} تعود إلى علبة البطاقات.`), pathname);
   };
 
   const tray = Object.entries(s.cards).filter(([, c]) => !c.feeling);

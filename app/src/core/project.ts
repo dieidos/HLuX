@@ -93,6 +93,15 @@ function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
         s.cards[a.card].moments.push(`${a.when} · dans « ${FEELING_WORDS[a.feeling]} »`);
       }
       break;
+    case 'card_back':
+      if (s.cards[a.card]) {
+        s.cards[a.card].feeling = null;
+        s.cards[a.card].moments.push(`${a.when} · reposée dans la réserve`);
+      }
+      break;
+    case 'axis_unranked':
+      delete s.axisRanks[a.axis];
+      break;
     case 'idea_created':
       s.ideas[a.idea] = { title: a.title, fromCard: a.from_card, inSession: a.in_session, spot: { at: 'tray' } };
       break;

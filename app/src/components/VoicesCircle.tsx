@@ -28,9 +28,9 @@ export function VoicesCircle({ title, voices, placed, current, onPick }: {
           return (
             <Pressable
               key={v}
-              onPress={() => !done && onPick(v)}
+              onPress={() => onPick(v)}
               accessibilityRole="button"
-              accessibilityLabel={`${v} : ${done ? 'a placé' : current === v ? 'en cours' : 'à venir'}`}
+              accessibilityLabel={`${v} : ${done ? 'a placé — toucher pour reprendre' : current === v ? 'en cours' : 'à venir'}`}
               style={[st.voice, done && st.done, current === v && st.now, { left: size / 2 + r * Math.cos(a) - 56, top: size / 2 + r * Math.sin(a) - 28 }]}>
               <Text style={st.name}>{v}</Text>
               <Text style={st.small}>{done ? '✓ a placé' : current === v ? '✏️ en cours' : '⏳ à venir'}</Text>

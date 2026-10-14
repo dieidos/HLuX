@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
 import { DictateButton } from '../../components/DictateButton';
+import { DragArea, Draggable, Zone } from '../../components/Drag';
 import { VoicesCircle } from '../../components/VoicesCircle';
 import { Link } from 'expo-router';
 
@@ -103,12 +104,22 @@ export default function Choix() {
         <GroupPending />
         <View style={st.box}>
           <Text style={st.h}>Le groupe range les six critères</Text>
-          {ranked.map(([c, label]) => (
-            <Pressable key={c} onPress={() => cycleRank(c)} style={st.rankRow} accessibilityRole="button" accessibilityLabel={`${label} : ${RANKS.find((r) => r[0] === (f.criteria[c] ?? 'not_yet'))![1]}. Toucher pour changer.`}>
-              <Text style={st.rank}>{RANKS.find((r) => r[0] === (f.criteria[c] ?? 'not_yet'))![1]}</Text>
-              <Text style={st.crit}>{label}</Text>
-            </Pressable>
-          ))}
+          <DragArea>
+            {RANKS.map(([r, rl]) => (
+              <Zone key={r} id={`rang-${r}`} label={rl === '?' ? 'Pas encore rangé' : rl} onDrop={(c) => { act('groupe', { act: 'criterion_ranked', criterion: c as Criterion, rank: r }); setLive(`${CRITERIA.find((x) => x[0] === c)?.[1] ?? c} : ${rl === '?' ? 'pas encore rangé' : rl}.`); }} style={st.rankZone}>
+                <Text style={st.rank}>{rl}</Text>
+                <View style={st.row}>
+                  {ranked.filter(([c]) => (f.criteria[c] ?? 'not_yet') === r).map(([c, label]) => (
+                    <Draggable key={c} id={c} label={label}>
+                      <Pressable onPress={() => cycleRank(c)} style={st.rankRow} accessibilityRole="button" accessibilityLabel={`${label} : ${rl}. Toucher pour changer.`}>
+                        <Text style={st.crit}>{label}</Text>
+                      </Pressable>
+                    </Draggable>
+                  ))}
+                </View>
+              </Zone>
+            ))}
+          </DragArea>
           <Text style={st.small}>Plusieurs critères peuvent partager un rang.</Text>
         </View>
 
@@ -237,6 +248,7 @@ const st = StyleSheet.create({
   h: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
+  rankZone: { gap: 6, marginBottom: 6 },
   rankRow: { flexDirection: 'row', gap: 12, alignItems: 'center', minHeight: S.touch, paddingHorizontal: 10, borderRadius: 12, backgroundColor: C.surface2 },
   rank: { width: 90, fontFamily: F.bold, fontSize: 12, letterSpacing: 1, color: C.slate },
   crit: { fontFamily: F.bold, fontSize: 15, color: C.ink },

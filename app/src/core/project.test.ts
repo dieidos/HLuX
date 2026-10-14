@@ -55,3 +55,21 @@ describe('Invitations', () => {
   });
 });
 
+describe('Annuler par le geste, sans rien effacer', () => {
+  it('reposée dans la réserve, la Carte n’est plus posée, et son parcours le dit', () => {
+    const e: Entry[] = [...seedAmina(), felt(N), { rank: N + 1, author: 'amina', provenance: 'by_hand', act: { act: 'card_felt', card: 'papiers', feeling: 'fine', when: 'jeudi' } }, { rank: N + 2, author: 'amina', provenance: 'by_hand', act: { act: 'card_back', card: 'papiers', when: 'vendredi' } }];
+    const s = standing(e);
+    expect(s.cards.papiers.feeling).toBeNull();
+    expect(s.cards.papiers.moments.at(-1)).toBe('vendredi · reposée dans la réserve');
+    expect(s.cards.papiers.moments).toHaveLength(4);
+  });
+  it('un axe rangé deux fois revient hors rang en un geste', () => {
+    const e: Entry[] = [
+      { rank: 0, author: 'amina', provenance: 'by_hand', act: { act: 'axis_ranked', axis: 'love', rank: 'first' } },
+      { rank: 1, author: 'amina', provenance: 'by_hand', act: { act: 'axis_ranked', axis: 'love', rank: 'then' } },
+      { rank: 2, author: 'amina', provenance: 'by_hand', act: { act: 'axis_unranked', axis: 'love' } },
+    ];
+    expect(standing(e).axisRanks.love).toBeUndefined();
+  });
+});
+
