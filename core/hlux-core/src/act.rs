@@ -89,6 +89,8 @@ pub enum ProjectAct {
     // ── 07 / 12 — le pont, côté personne ──
     /// Le sujet préparé pour le collectif (deux versions côte à côte).
     SubjectPrepared { subject: Id, card: Id, mine: String, for_collective: String },
+    /// « Pas maintenant » : rien ne passe ; la Carte le garde dans son parcours.
+    SubjectDeclined { card: Id, when: String },
     /// « Je le relie à mon chemin » — un seul sens, du collectif vers elle.
     ProposalLinked { proposal: String, node: Id },
 }

@@ -219,6 +219,11 @@ impl Reducer<ProjectAct> for ProjectReducer {
             ProjectAct::SubjectPrepared { subject, card, mine, for_collective } => {
                 s.subjects.insert(subject, (card, mine, for_collective));
             }
+            ProjectAct::SubjectDeclined { card, when } => {
+                if let Some(c) = s.cards.get_mut(&card) {
+                    c.moments.push(format!("{when} · pas maintenant"));
+                }
+            }
             ProjectAct::ProposalLinked { proposal, node } => s.linked_proposals.push((proposal, node)),
         }
     }
@@ -243,6 +248,7 @@ impl Reducer<ProjectAct> for ProjectReducer {
             ProjectAct::WhatIf { sim, .. } | ProjectAct::WhatIfClosed { sim, .. } => format!("whatif:{sim}"),
             ProjectAct::PlanSet { .. } => "plan".into(),
             ProjectAct::SubjectPrepared { subject, .. } => format!("subject:{subject}"),
+            ProjectAct::SubjectDeclined { card, .. } => format!("card:{card}"),
             ProjectAct::ProposalLinked { proposal, .. } => format!("proposal:{proposal}"),
         }
     }

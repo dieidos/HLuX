@@ -99,6 +99,9 @@ function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
         s.cards[a.card].moments.push(`${a.when} · reposée dans la réserve`);
       }
       break;
+    case 'subject_declined':
+      s.cards[a.card]?.moments.push(`${a.when} · pas maintenant`);
+      break;
     case 'axis_unranked':
       delete s.axisRanks[a.axis];
       break;

@@ -12,7 +12,7 @@ import type { Lean } from '../../core/acts';
 import { say } from '../../core/useAids';
 import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useTeam } from '../../core/useProject';
+import { useParticipants, useProject } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
 import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
@@ -22,7 +22,7 @@ const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deu
 export default function Actions() {
   const { phone } = useLayout();
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
-  const PEOPLE = useTeam();
+  const PEOPLE = useParticipants();
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);

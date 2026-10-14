@@ -15,6 +15,8 @@ import { C, F, S } from '../design/theme';
 /** L'appareil qui envoie : les codes défilent en boucle, l'autre appareil lit à son rythme. */
 export function QrSend() {
   const dossier = useProject((s) => s.dossier);
+  const markBackedUp = useProject((s) => s.markBackedUp);
+  const [arrived, setArrived] = useState(false);
   const t = useT();
   const [frames] = useState(() => {
     const d = dossier();
@@ -39,6 +41,10 @@ export function QrSend() {
           `Code ${i + 1} sur ${frames.length}. Mets l’autre appareil devant.`,
         )}
       </Text>
+      {/* La copie compte (rappel, départ) quand la personne voit son dossier arrivé sur l'autre appareil. */}
+      <Pressable accessibilityRole="button" disabled={arrived} onPress={() => { markBackedUp(new Date()); setArrived(true); }} style={[st.btn, arrived && { opacity: 0.6 }]}>
+        <Text style={st.btnTxt}>{arrived ? t('✓ Copie arrivée', '✓ وصلت النسخة') : t('La copie est arrivée sur l’autre appareil', 'وصلت النسخة إلى الجهاز الآخر')}</Text>
+      </Pressable>
     </View>
   );
 }

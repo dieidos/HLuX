@@ -1,6 +1,7 @@
 // Le journal du profil ouvert, côté interface, et la séance qui l'ouvre (`profiles.ts`, `projectStore.ts`).
 // ⛳ Lot 2 : remplacé par le moteur Rust via UniFFI (SQLite chiffré, une base par profil).
 
+import { useMemo } from 'react';
 import { create } from 'zustand';
 
 import { setKnownNames } from './aides';
@@ -79,4 +80,17 @@ const refreshNames = () => {
 };
 refreshNames();
 useProject.subscribe(refreshNames);
+
+/**
+ * Les participants des séances (07-12) : l'équipe, plus les présents de la séance en cours — personnes
+ * accompagnées par leur prénom du jour (sans lien avec leur profil) et le CVS (décision du 2026-10-14).
+ */
+export function useParticipants(): string[] {
+  const team = useTeam();
+  const present = useFacility((s) => {
+    const a = [...s.entries].reverse().find((e) => e.act?.act === 'attendance' && e.provenance !== 'hypothesis');
+    return a?.act?.act === 'attendance' ? a.act.present : NO_TEAM;
+  });
+  return useMemo(() => [...new Set([...team, ...present])], [team, present]);
+}
 

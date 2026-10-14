@@ -28,6 +28,7 @@ export default function Home() {
   const [place, setPlace] = useState('');
   const [names, setNames] = useState('');
   const [askDemo, setAskDemo] = useState(false);
+  const [confirmErase, setConfirmErase] = useState(false);
   const [device, setDevice] = useState<'facility' | 'personal' | null>(null);
   const [myName, setMyName] = useState('');
   const [mySentence, setMySentence] = useState('');
@@ -260,14 +261,29 @@ export default function Home() {
         <View style={st.newBox}>
           <Text style={st.note}>{w('eraseNote')}</Text>
           <DossierCopy />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !backedUpNow }}
-            disabled={!backedUpNow}
-            onPress={() => purge()}
-            style={[st.btn, backedUpNow ? st.danger : st.off]}>
-            <Text style={[st.btnTxt, backedUpNow && { color: C.onAccent }]}>{w('eraseHere')}</Text>
-          </Pressable>
+          <QrSend />
+          {!confirmErase ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !backedUpNow }}
+              disabled={!backedUpNow}
+              onPress={() => setConfirmErase(true)}
+              style={[st.btn, backedUpNow ? st.danger : st.off]}>
+              <Text style={[st.btnTxt, backedUpNow && { color: C.onAccent }]}>{w('eraseHere')}</Text>
+            </Pressable>
+          ) : (
+            <View style={st.newBox} accessibilityRole="alert">
+              <Text style={st.reminder}>{t('C’est définitif : sur cette tablette, ton dossier sera effacé. Ta copie, elle, reste avec toi.', 'هذا نهائي: سيُمحى ملفّكِ من هذا الجهاز اللوحي. نسختكِ تبقى معكِ.', 'C’est pour toujours. Ta copie reste avec toi.')}</Text>
+              <View style={st.row}>
+                <Pressable accessibilityRole="button" onPress={() => { setConfirmErase(false); purge(); }} style={[st.btn, st.danger]}>
+                  <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Oui, effacer définitivement', 'نعم، امحي نهائياً')}</Text>
+                </Pressable>
+                <Pressable accessibilityRole="button" onPress={() => setConfirmErase(false)} style={st.btn}>
+                  <Text style={st.btnTxt}>{w('cancel')}</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
         </View>
       ) : null}
       <View style={{ alignSelf: 'stretch' }}>

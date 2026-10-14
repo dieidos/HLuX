@@ -14,7 +14,7 @@ import type { Feeling } from '../../core/acts';
 import { QUALIF_WORDS, SOURCE_WORDS, type Qualification, type Source } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useTeam } from '../../core/useProject';
+import { useParticipants, useProject } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 const ZONES: [Feeling, string, string][] = [
@@ -26,7 +26,7 @@ const LADDER: Qualification[] = ['individual', 'signal', 'repeated', 'confirmed'
 
 export default function Constat() {
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
-  const PEOPLE = useTeam();
+  const PEOPLE = useParticipants();
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);

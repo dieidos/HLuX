@@ -18,7 +18,7 @@ import { provenanceOf } from '../../core/facility';
 import { freshId } from '../../core/ids';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useProject, useTeam } from '../../core/useProject';
+import { useParticipants, useProject } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
 const MONTH_NAMES = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -28,7 +28,7 @@ const LANES = ['actions', 'partenaires', 'équipe'];
 
 export default function Suivi() {
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
-  const PEOPLE = useTeam();
+  const PEOPLE = useParticipants();
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);

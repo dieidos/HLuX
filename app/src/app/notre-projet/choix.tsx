@@ -17,7 +17,7 @@ import type { Lean, Rank } from '../../core/acts';
 import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
-import { useTeam } from '../../core/useProject';
+import {useParticipants } from '../../core/useProject';
 import { band, LEANS } from '../../core/views';
 import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
@@ -36,8 +36,8 @@ const LEAN_WORDS: Record<Lean, string> = { little: 'peu', middle: 'entre les deu
 export default function Choix() {
   const { phone } = useLayout();
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
-  const PEOPLE = useTeam();
-  const VOICES = [...PEOPLE, 'Le CVS'];
+  const PEOPLE = useParticipants();
+  const VOICES = PEOPLE.some((p) => /^(le )?cvs$/i.test(p)) ? PEOPLE : [...PEOPLE, 'Le CVS'];
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const orientations = Object.entries(f.orientations);

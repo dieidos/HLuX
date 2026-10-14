@@ -2,13 +2,17 @@
 // Seul passe ce qu'elle choisit d'apporter, sous la forme qu'elle choisit ; « Pas maintenant » reste
 // possible. Le sujet entre à l'ordre du jour, avec sa source ; la Carte passe du jaune au vert.
 
+import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
 import { AideRefusal, askAide, guard } from '../../core/aides';
+import { dayInWords } from '../../core/dates';
+import { freshId } from '../../core/ids';
+import { refusalAr } from '../../i18n/refusals';
 import { SOURCE_WORDS } from '../../core/facility';
-import { say } from '../../core/useAids';
+import { tell, tNow, useT } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useMe, useProject, useProjectState, useTeam } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
@@ -37,6 +41,13 @@ export default function Sujets() {
   // La séance : sa date, qui est là, qui anime. Une absence se dit simplement.
   const [date, setDate] = useState('');
   const [present, setPresent] = useState<string[]>(pro ? [pro] : []);
+  const [guests, setGuests] = useState('');
+  const [cvs, setCvs] = useState(false);
+  // Un point de l'équipe ou du CVS à l'ordre du jour.
+  const [item, setItem] = useState('');
+  const [itemSource, setItemSource] = useState<'team' | 'cvs'>('team');
+  const t = useT();
+  const pathname = usePathname();
   const session = f.attendance?.session ?? '';
 
   const bring = () => {
@@ -50,12 +61,30 @@ export default function Sujets() {
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
     actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
     actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session });
-    say("Oui, j'apporte. Le sujet entre à l'ordre du jour.");
+    tell(tNow("Oui, j'apporte. Le sujet entre à l'ordre du jour.", 'نعم، أقدّمه. يدخل الموضوع جدول الأعمال.', "Oui. Le sujet va au groupe."), pathname);
+  };
+  // « Pas maintenant » : rien ne passe, et la Carte le garde dans son parcours.
+  const notNowGesture = () => {
+    if (!chosen) return;
+    actP(me.id, { act: 'subject_declined', card: chosen, when: dayInWords() });
+    setNotNow(true);
+    tell(tNow('Pas maintenant. Rien ne passe.', 'ليس الآن. لا يمرّ شيء.'), pathname);
+  };
+  const addItem = () => {
+    if (!item.trim() || !session) return;
+    actF(pro || 'groupe', { act: 'agenda_item', item: freshId('point', f.agenda.map((a) => a.item)), title: item.trim(), source: itemSource, session });
+    tell(`${item.trim()} : à l'ordre du jour.`, pathname);
+    setItem('');
   };
   const holdSession = () => {
     if (!date.trim() || !present.length) return;
     setNewSession(false);
-    actF(pro || present[0], { act: 'attendance', session: date.trim(), present, absent: team.filter((t) => !present.includes(t)), facilitator: present.includes(pro) ? pro : present[0] });
+    // Les personnes accompagnées présentes, par leur prénom du jour : sans lien avec leur profil personnel.
+    const people = guests.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+    const all = [...new Set([...present, ...people, ...(cvs ? ['CVS'] : [])])];
+    actF(pro || present[0], { act: 'attendance', session: date.trim(), present: all, absent: team.filter((m) => !present.includes(m)), facilitator: present.includes(pro) ? pro : present[0] });
+    setGuests('');
+    setCvs(false);
   };
 
   return (
@@ -72,24 +101,29 @@ export default function Sujets() {
             <TextInput value={date} onChangeText={setDate} placeholder="La date, en mots (mardi 12 janvier…)" style={st.input} accessibilityLabel="Date de la séance" />
             <Text style={st.small}>Qui est là ?</Text>
             <View style={st.row}>
-              {team.map((t) => {
-                const on = present.includes(t);
+              {team.map((m) => {
+                const on = present.includes(m);
                 return (
-                  <Pressable key={t} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setPresent(on ? present.filter((x) => x !== t) : [...present, t])} style={[st.btn, on && st.primary]}>
-                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{t}</Text>
+                  <Pressable key={m} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setPresent(on ? present.filter((x) => x !== m) : [...present, m])} style={[st.btn, on && st.primary]}>
+                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{m}</Text>
                   </Pressable>
                 );
               })}
+              <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: cvs }} onPress={() => setCvs(!cvs)} style={[st.btn, cvs && st.primary]}>
+                <Text style={[st.btnTxt, cvs && { color: C.onAccent }]}>CVS</Text>
+              </Pressable>
             </View>
+            <TextInput value={guests} onChangeText={setGuests} placeholder="Les personnes accompagnées présentes : leurs prénoms, séparés par des virgules" style={st.input} accessibilityLabel="Personnes accompagnées présentes" />
+            <Text style={st.small}>Leur prénom du jour, sans lien avec leur projet personnel. Chaque avis reste signé.</Text>
             <Pressable accessibilityRole="button" onPress={holdSession} style={[st.btn, st.primary, { alignSelf: 'flex-start' }]}>
               <Text style={[st.btnTxt, { color: C.onAccent }]}>Ouvrir l’ordre du jour</Text>
             </Pressable>
           </View>
         )}
-        {cards.length === 0 && <Text style={st.small}>{me.name} n’a pas encore de Carte : rien à apporter pour l’instant.</Text>}
+        {cards.length === 0 && <Text style={st.small}>{t(`${me.name} n’a pas encore de Carte : rien à apporter pour l’instant.`, `ليس لدى ${me.name} بطاقة بعد: لا شيء لتقديمه الآن.`)}</Text>}
         {cards.length > 1 && (
           <View style={st.row}>
-            <Text style={st.small}>Quelle Carte apporter ?</Text>
+            <Text style={st.small}>{t('Quelle Carte apporter ?', 'أيّ بطاقة أقدّم؟', 'Quelle Carte ?')}</Text>
             {cards.map(([id, c]) => (
               <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: chosen === id }} onPress={() => { setCardId(id); setCollective(''); setNotNow(false); }} style={[st.btn, chosen === id && st.primary]}>
                 <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{c.title}</Text>
@@ -100,29 +134,29 @@ export default function Sujets() {
         {card && (
           <View style={st.sas}>
             <View style={[st.version, { borderTopColor: C.pp.value, backgroundColor: brought ? C.pe.soft : C.pp.soft }]}>
-              <Text style={st.kicker}>MA VERSION — {me.name.toUpperCase()}</Text>
+              <Text style={st.kicker}>{t(`MA VERSION — ${me.name.toUpperCase()}`, `نسختي — ${me.name}`, `MES MOTS — ${me.name.toUpperCase()}`)}</Text>
               <Text style={st.quote}>« {card.verbatim} »</Text>
             </View>
             <Text style={st.arrow}>→</Text>
             <View style={[st.version, { borderTopColor: C.pe.value }]}>
-              <Text style={st.kicker}>POUR LE COLLECTIF</Text>
+              <Text style={st.kicker}>{t('POUR LE COLLECTIF', 'للمجموعة', 'POUR LE GROUPE')}</Text>
               {brought ? <Text style={st.quote}>{subject?.forCollective ?? collective}</Text> : (
                 <>
-                  <TextInput value={collective} onChangeText={setCollective} multiline placeholder="Une phrase pour tous, sans nom ni détail personnel" style={st.input} accessibilityLabel="Version pour le collectif" />
+                  <TextInput value={collective} onChangeText={setCollective} multiline placeholder={t('Une phrase pour tous, sans nom ni détail personnel', 'جملة للجميع، بلا اسم ولا تفاصيل شخصية', 'Une phrase pour tous')} style={st.input} accessibilityLabel={t('Version pour le collectif', 'النسخة للمجموعة')} />
                   <Pressable
                     accessibilityRole="button"
                     onPress={async () => {
                       try {
-                        const r = await askAide({ kind: 'generalize', text: card.verbatim || card.title });
+                        const r = await askAide({ kind: 'generalize', text: card.verbatim || card.title, lang: card.lang });
                         setCollective(r.proposal);
                         setAided(true);
-                        setAideMsg(r.offline ? `Exemple hors ligne (sans IA). ${me.name} relit et peut changer.` : `Proposition. ${me.name} relit et peut changer.`);
+                        setAideMsg(r.offline ? tNow(`Exemple hors ligne (sans IA). ${me.name} relit et peut changer.`, `مثال دون اتصال. ${me.name} تراجع ويمكنها التغيير.`) : tNow(`Proposition. ${me.name} relit et peut changer.`, `اقتراح. ${me.name} تراجع ويمكنها التغيير.`));
                       } catch (e) {
-                        setAideMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu.");
+                        setAideMsg(e instanceof AideRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
                       }
                     }}
                     style={[st.btn, { alignSelf: 'flex-start' }]}>
-                    <Text style={st.btnTxt}>✨ Proposer une formulation générale</Text>
+                    <Text style={st.btnTxt}>{t('✨ Proposer une formulation générale', '✨ اقتراح صياغة عامّة', '✨ Une phrase pour tous')}</Text>
                   </Pressable>
                   {aideMsg ? <Text style={st.small}>{aideMsg}</Text> : null}
                 </>
@@ -132,26 +166,37 @@ export default function Sujets() {
         )}
         {card && !brought && (
           <View style={st.ask}>
-            <Text style={st.question}>{me.name} · C’est bien ce que tu veux dire au collectif ? Ton dossier reste chez toi.</Text>
+            <Text style={st.question}>{t(`${me.name} · C’est bien ce que tu veux dire au collectif ? Ton dossier reste chez toi.`, `${me.name} · هل هذا ما تريدين قوله للمجموعة؟ ملفّكِ يبقى عندكِ.`, `${me.name} · Tu veux dire ça au groupe ? Ton dossier reste à toi.`)}</Text>
             <View style={st.row}>
-              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Oui, j’apporte</Text></Pressable>
-              <Pressable onPress={() => { setNotNow(true); say('Pas maintenant. Rien ne passe.'); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Pas maintenant</Text></Pressable>
+              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Oui, j’apporte', 'نعم، أقدّمه', 'Oui')}</Text></Pressable>
+              <Pressable onPress={notNowGesture} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{t('Pas maintenant', 'ليس الآن')}</Text></Pressable>
             </View>
-            {notNow && <Text style={st.small}>Rien ne passe. Tu pourras le proposer plus tard, si tu veux.</Text>}
-            {!session && <Text style={st.small}>D’abord la séance, plus haut : sa date et qui est là.</Text>}
-            {session && !collective.trim() && <Text style={st.small}>Écris d’abord la phrase pour le collectif.</Text>}
+            {notNow && <Text style={st.small}>{t('Rien ne passe. Tu pourras le proposer plus tard, si tu veux.', 'لا يمرّ شيء. يمكنكِ اقتراحه لاحقاً إن أردتِ.', 'Rien ne part. Plus tard, si tu veux.')}</Text>}
+            {!session && <Text style={st.small}>{t('D’abord la séance, plus haut : sa date et qui est là.', 'أوّلاً الجلسة، في الأعلى: تاريخها ومن الحاضر.')}</Text>}
+            {session && !collective.trim() && <Text style={st.small}>{t('Écris d’abord la phrase pour le collectif.', 'اكتبي أوّلاً الجملة للمجموعة.')}</Text>}
           </View>
         )}
 
         <View style={st.agenda}>
           <Text style={st.h}>Ordre du jour{session ? ` · ${session}` : ''}</Text>
-          {f.agenda.length === 0 && <Text style={st.small}>Rien pour l’instant.</Text>}
-          {f.agenda.map((a) => (
+          {f.agenda.filter((a) => !session || a.session === session).length === 0 && <Text style={st.small}>Rien pour l’instant.</Text>}
+          {f.agenda.filter((a) => !session || a.session === session).map((a) => (
             <View key={a.item} style={[st.item, a.item === subjectId && st.itemNew]}>
               <Text style={st.itemTitle}>{a.title}</Text>
               <Text style={st.small}>{SOURCE_WORDS[a.source]}</Text>
             </View>
           ))}
+          {session ? (
+            <View style={st.row}>
+              <TextInput value={item} onChangeText={setItem} placeholder="Un point de l’équipe ou du CVS…" style={[st.input, { minHeight: S.touch, flex: 1, minWidth: 220 }]} accessibilityLabel="Nouveau point à l'ordre du jour" />
+              {(['team', 'cvs'] as const).map((src) => (
+                <Pressable key={src} accessibilityRole="radio" accessibilityState={{ checked: itemSource === src }} onPress={() => setItemSource(src)} style={[st.btn, itemSource === src && st.primary]}>
+                  <Text style={[st.btnTxt, itemSource === src && { color: C.onAccent }]}>{SOURCE_WORDS[src]}</Text>
+                </Pressable>
+              ))}
+              <Pressable accessibilityRole="button" onPress={addItem} style={st.btn}><Text style={st.btnTxt}>Ajouter</Text></Pressable>
+            </View>
+          ) : null}
         </View>
         {f.attendance && (
           <View style={st.row}>
