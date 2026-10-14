@@ -76,14 +76,14 @@ export default function Envies() {
             <Text style={st.small}>{w('bornOf')} :</Text>
             <View style={st.chips}>
               {Object.entries(s.cards).map(([id, c]) => (
-                <Pressable key={id} onPress={() => setFrom(from === id ? null : id)} style={[st.pick, from === id && st.pickOn]}>
+                <Pressable accessibilityRole="button" key={id} onPress={() => setFrom(from === id ? null : id)} style={[st.pick, from === id && st.pickOn]}>
                   <Text style={st.btnTxt}>{c.title}</Text>
                 </Pressable>
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer</Text></Pressable>
-              <Pressable onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
         </View>

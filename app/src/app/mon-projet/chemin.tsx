@@ -54,23 +54,23 @@ export default function Chemin() {
             <TextInput value={question} onChangeText={setQuestion} style={st.input} accessibilityLabel="Ma question Et si" />
             <View style={st.chips}>
               {movable.map((n) => (
-                <Pressable key={n.id} onPress={() => setMoved({ node: n.id, when: SEASONS[(SEASONS.indexOf((moved?.node === n.id ? moved.when : n.when)) + 1) % SEASONS.length] })} style={[st.pick, moved?.node === n.id && st.pickOn]}>
+                <Pressable accessibilityRole="button" key={n.id} onPress={() => setMoved({ node: n.id, when: SEASONS[(SEASONS.indexOf((moved?.node === n.id ? moved.when : n.when)) + 1) % SEASONS.length] })} style={[st.pick, moved?.node === n.id && st.pickOn]}>
                   <Text style={st.btnTxt}>{n.label} → plus tard</Text>
                 </Pressable>
               ))}
             </View>
             <PathView columns={SEASONS} lanes={LANES} nodes={copy} links={s.links} showOthers dashed />
             <View style={st.chips}>
-              <Pressable onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>{w('keepIdea')}</Text></Pressable>
-              <Pressable onPress={() => closeWhatIf(false)} style={st.btn}><Text style={st.btnTxt}>{w('closeIt')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>{w('keepIdea')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => closeWhatIf(false)} style={st.btn}><Text style={st.btnTxt}>{w('closeIt')}</Text></Pressable>
             </View>
           </View>
         )}
 
         <View style={st.chips}>
           <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: '#fff' }]}>{w('otherPaths')}</Text></Pressable>
-          <Pressable onPress={() => setWhatIf(true)} style={st.btn}><Text style={st.btnTxt}>{w('whatIf')}</Text></Pressable>
-          <Pressable onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: '#fff' }]}>{w('myPlan')}</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setWhatIf(true)} style={st.btn}><Text style={st.btnTxt}>{w('whatIf')}</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: '#fff' }]}>{w('myPlan')}</Text></Pressable>
         </View>
 
         <View style={st.export}>

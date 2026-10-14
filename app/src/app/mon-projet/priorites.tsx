@@ -104,9 +104,9 @@ export default function Priorites() {
                     <View style={st.chips}>
                       {orderOn(axis).map((id, i, all) => (
                         <View key={id} style={st.idea}>
-                          <Pressable onPress={() => move(axis, id, -1)} disabled={i === 0} accessibilityLabel={`${s.ideas[id].title} vers peu`} style={st.arrow}><Text style={st.arrowTxt}>◀</Text></Pressable>
+                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, -1)} disabled={i === 0} accessibilityLabel={`${s.ideas[id].title} vers peu`} style={st.arrow}><Text style={st.arrowTxt}>◀</Text></Pressable>
                           <Text style={st.ideaTxt}>{s.ideas[id].title}</Text>
-                          <Pressable onPress={() => move(axis, id, 1)} disabled={i === all.length - 1} accessibilityLabel={`${s.ideas[id].title} vers beaucoup`} style={st.arrow}><Text style={st.arrowTxt}>▶</Text></Pressable>
+                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, 1)} disabled={i === all.length - 1} accessibilityLabel={`${s.ideas[id].title} vers beaucoup`} style={st.arrow}><Text style={st.arrowTxt}>▶</Text></Pressable>
                         </View>
                       ))}
                     </View>

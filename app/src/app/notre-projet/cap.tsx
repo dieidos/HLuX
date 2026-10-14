@@ -69,7 +69,7 @@ export default function Cap() {
             </View>
             <View style={st.row}>
               <TextInput value={title} onChangeText={setTitle} placeholder="Une carte de cap, dite par le groupe…" style={st.input} accessibilityLabel="Nouvelle carte de cap" />
-              <Pressable onPress={() => { if (title.trim()) { act(by, { act: 'cap_placed', cap: `cap-${caps.length + 1}`, title: title.trim(), by, spot: { at: 'tray' } }); setTitle(''); } }} style={[st.btn, st.on]}>
+              <Pressable accessibilityRole="button" onPress={() => { if (title.trim()) { act(by, { act: 'cap_placed', cap: `cap-${caps.length + 1}`, title: title.trim(), by, spot: { at: 'tray' } }); setTitle(''); } }} style={[st.btn, st.on]}>
                 <Text style={[st.btnTxt, { color: '#fff' }]}>Ajouter</Text>
               </Pressable>
             </View>
@@ -82,8 +82,8 @@ export default function Cap() {
           <Text style={st.h}>Changement attendu</Text>
           <TextInput value={change} onChangeText={setChange} multiline placeholder="« Chaque personne comprend ses courriers, ou sait qui l'aide à les lire. »" style={st.input} accessibilityLabel="Changement attendu" />
           <View style={st.row}>
-            <Pressable onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: false })} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
-            <Pressable onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: true })} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: false })} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: true })} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>
           </View>
           {f.expectedChange && <Text style={st.small}>{f.expectedChange.validated ? '✓ validé' : 'à discuter'} : {f.expectedChange.text}</Text>}
         </View>

@@ -130,18 +130,18 @@ export default function Regards() {
             <Text style={st.small}>Sur quelle idée ? (une seule)</Text>
             <View style={st.chips}>
               {ideas.map(([id, i]) => (
-                <Pressable key={id} onPress={() => setIdea(id)} style={[st.pick, idea === id && st.pickOn]}><Text style={st.btnTxt}>{i.title}</Text></Pressable>
+                <Pressable accessibilityRole="button" key={id} onPress={() => setIdea(id)} style={[st.pick, idea === id && st.pickOn]}><Text style={st.btnTxt}>{i.title}</Text></Pressable>
               ))}
             </View>
             <View style={st.chips}>
               {(['fr', 'ar'] as Lang[]).map((l) => (
-                <Pressable key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? 'en français' : 'بالعربية'}</Text></Pressable>
+                <Pressable accessibilityRole="button" key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? 'en français' : 'بالعربية'}</Text></Pressable>
               ))}
             </View>
             <Text style={st.small}>Lien temporaire, sans compte. Il s'envoie par SMS, WhatsApp ou mail depuis la tablette.</Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Inviter</Text></Pressable>
-              <Pressable onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Inviter</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
         </View>
@@ -164,7 +164,7 @@ function SarahOrder() {
   return (
     <View style={st.chips}>
       {AXES.map(([a, k]) => (
-        <Pressable key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={`Rang de Sarah pour ${w(k)}`}>
+        <Pressable accessibilityRole="button" key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={`Rang de Sarah pour ${w(k)}`}>
           <Text style={st.btnTxt}>{w(k)} · {current[a] ? { first: "D'abord", then: 'Ensuite', also: 'Aussi', less: 'Moins', not_yet: '?' }[current[a]!] : '?'}</Text>
         </Pressable>
       ))}

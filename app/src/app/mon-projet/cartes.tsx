@@ -37,7 +37,7 @@ export default function Cartes() {
     <Screen side="pp" title="cards" question={w('whichCard')}>
       <ScrollView contentContainerStyle={st.grid}>
         {Object.entries(s.cards).map(([id, c]) => (
-          <Pressable key={id} onPress={() => { setOpen(id); say(c.verbatim || c.title); }} accessibilityLabel={c.title}>
+          <Pressable accessibilityRole="button" key={id} onPress={() => { setOpen(id); say(c.verbatim || c.title); }} accessibilityLabel={c.title}>
             <CardView card={c} />
           </Pressable>
         ))}
@@ -58,7 +58,7 @@ export default function Cartes() {
             {big.moments.map((m) => <Text key={m} style={st.chip}>{m}</Text>)}
             {!big.feeling && <Text style={st.chip}>{w('notPlaced')}</Text>}
             <Text style={st.muted}>{w('keepsAll')}</Text>
-            <Pressable onPress={() => setOpen(null)} style={st.btn}><Text style={st.btnTxt}>Fermer</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => setOpen(null)} style={st.btn}><Text style={st.btnTxt}>Fermer</Text></Pressable>
           </View>
         </View>
       )}
@@ -71,14 +71,14 @@ export default function Cartes() {
             <Text style={st.muted}>…ou je choisis une image</Text>
             <View style={st.pictos}>
               {(Object.keys(PICTOS) as PictoKey[]).map((k) => (
-                <Pressable key={k} onPress={() => setPicto(k)} style={[st.pick, picto === k && st.pickOn]} accessibilityLabel={PICTOS[k].fr}>
+                <Pressable accessibilityRole="button" key={k} onPress={() => setPicto(k)} style={[st.pick, picto === k && st.pickOn]} accessibilityLabel={PICTOS[k].fr}>
                   <Picto name={k} size={56} />
                 </Pressable>
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer ma Carte</Text></Pressable>
-              <Pressable onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer ma Carte</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
         </View>
