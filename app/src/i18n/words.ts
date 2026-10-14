@@ -61,6 +61,22 @@ export const WORDS = {
   ranks: { fr: '1 · Je range', ar: '1 · أرتّب', falc: '1 · Je range' },
   lines: { fr: '2 · Je situe mes idées', ar: '2 · أضع أفكاري', falc: '2 · Je place mes idées' },
   littleMuch: { fr: 'peu ←→ beaucoup', ar: 'قليلاً ←→ كثيراً', falc: 'un peu ←→ beaucoup' },
+  // 05 Regards
+  viewsQuestion: { fr: "Qui peut m'aider à choisir ? Nous comparons nos regards.", ar: 'من يساعدني على الاختيار؟ نقارن نظراتنا.', falc: 'Qui peut m’aider ?' },
+  sheInvites: { fr: "c'est elle qui invite", ar: 'هي من تدعو', falc: 'Amina invite' },
+  inSession: { fr: 'en séance · toutes les idées', ar: 'في الجلسة · كلّ الأفكار', falc: 'avec moi, en séance' },
+  invited: { fr: 'invitée', ar: 'مدعوّة', falc: 'invitée' },
+  answered: { fr: 'a répondu ✓', ar: 'أجابت ✓', falc: 'a répondu ✓' },
+  notYetAnswered: { fr: 'pas encore', ar: 'ليس بعد', falc: 'pas encore' },
+  onlyHerIdea: { fr: '👁️ Chacun voit son idée ; ton dossier reste à toi.', ar: 'كلّ واحد يرى فكرته فقط، وملفّكِ يبقى لكِ.', falc: 'Chacun voit seulement sa carte.' },
+  invite: { fr: '＋ Inviter un proche', ar: '＋ دعوة شخص قريب', falc: '＋ Inviter' },
+  myView: { fr: 'Mon regard', ar: 'نظرتي', falc: 'Mon regard' },
+  together: { fr: 'Nos regards réunis', ar: 'نظراتنا معاً', falc: 'Ensemble' },
+  sarahOrder: { fr: "Avec l'ordre de Sarah", ar: 'بترتيب سارة', falc: "L'ordre de Sarah" },
+  narrow: { fr: '😊 bande étroite : on se rejoint', ar: 'شريط ضيّق: نلتقي', falc: '😊 on pense pareil' },
+  wide: { fr: '💬 bande large : à en parler', ar: 'شريط عريض: لنتحدّث', falc: '💬 on en parle' },
+  revealTogether: { fr: 'Découvrir les regards ensemble', ar: 'نكتشف النظرات معاً', falc: 'Voir ensemble' },
+  silenceOk: { fr: 'Le silence est une réponse acceptable.', ar: 'الصمت جواب مقبول.', falc: 'On peut ne pas répondre.' },
 } as const;
 
 export type WordKey = keyof typeof WORDS;
