@@ -8,7 +8,7 @@ import { CardView } from '../../components/CardView';
 import { DictateButton } from '../../components/DictateButton';
 import { Screen } from '../../components/Chrome';
 import { Picto } from '../../components/Picto';
-import { AideRefusal, askAide } from '../../core/aides';
+import { AideRefusal, askAide, sortPictos } from '../../core/aides';
 import { cardThread } from '../../core/thread';
 import { useFacilityState } from '../../core/useFacility';
 import { say, tNow, useT, useWords } from '../../core/useAids';
@@ -42,6 +42,19 @@ export default function Cartes() {
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState('');
   const [picto, setPicto] = useState<PictoKey | null>(null);
+  // « …ou je choisis une image » : l'IA peut ordonner les images d'après la phrase, sur geste ; elle ne choisit pas.
+  const [order, setOrder] = useState<PictoKey[]>(Object.keys(PICTOS) as PictoKey[]);
+  const [sortMsg, setSortMsg] = useState('');
+  const sortByText = async () => {
+    try {
+      const keys = Object.keys(PICTOS) as PictoKey[];
+      const sorted = (await sortPictos(text, keys)) as PictoKey[];
+      setOrder(sorted);
+      setSortMsg(sorted === keys ? tNow('Les images restent dans l’ordre habituel.', 'تبقى الصور بترتيبها المعتاد.') : tNow('Les images les plus proches de ta phrase sont devant. C’est toi qui choisis.', 'الصور الأقرب إلى جملتكِ في المقدّمة. أنتِ من تختارين.'));
+    } catch (e) {
+      setSortMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
+    }
+  };
   const [spoken, setSpoken] = useState(false);
   const big = open ? s.cards[open] : null;
 
@@ -133,8 +146,14 @@ export default function Cartes() {
             <TextInput value={text} onChangeText={setText} placeholder={t("J'écris ce que je veux dire…", 'أكتب ما أريد قوله…', "J'écris ici…")} style={st.input} multiline accessibilityLabel={t("J'écris", 'أكتب')} />
             <DictateButton onText={(said) => { setText(said); setSpoken(true); }} />
             <Text style={st.muted}>{t('…ou je choisis une image', '…أو أختار صورة')}</Text>
+            {text.trim() ? (
+              <Pressable accessibilityRole="button" onPress={sortByText} style={st.btn}>
+                <Text style={st.btnTxt}>{t('✨ Les images proches de ma phrase', '✨ الصور القريبة من جملتي')}</Text>
+              </Pressable>
+            ) : null}
+            {sortMsg ? <Text style={st.muted} accessibilityLiveRegion="polite">{sortMsg}</Text> : null}
             <View style={st.pictos}>
-              {(Object.keys(PICTOS) as PictoKey[]).map((k) => (
+              {order.map((k) => (
                 <Pressable accessibilityRole="button" key={k} onPress={() => setPicto(k)} style={[st.pick, picto === k && st.pickOn]} accessibilityLabel={PICTOS[k].fr}>
                   <Picto name={k} size={56} />
                 </Pressable>
