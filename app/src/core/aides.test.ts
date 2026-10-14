@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { askAide, AideRefusal, guard, offlineExample, pseudonymize, sortPictos } from './aides';
+import { askAide, AideRefusal, guard, offlineExample, pseudonymize, setKnownNames, sortPictos } from './aides';
 
 afterEach(() => {
   delete process.env.EXPO_PUBLIC_DIEIDOS_URL;
@@ -28,6 +28,7 @@ describe('Aides IA', () => {
 
   it('avec dieidos : le texte part pseudonymisé, la réponse revient avec les prénoms', async () => {
     process.env.EXPO_PUBLIC_DIEIDOS_URL = 'https://dieidos.test';
+    setKnownNames(['Amina', 'Sarah']); // l'application tient la liste à jour (personnes, équipe, invités)
     const fetcher = vi.fn(async (_u: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
       expect(body.text).not.toContain('Amina');

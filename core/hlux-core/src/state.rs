@@ -106,8 +106,14 @@ impl Reducer<ProjectAct> for ProjectReducer {
         let pending = e.provenance == Provenance::Hypothesis;
         match act.clone() {
             ProjectAct::CardCreated { card, title, picto, verbatim, lang, origin, said_with, when } => {
+                // Le moment dit comment la Carte est née : dite, écrite, ou choisie en image.
+                let verb = match origin {
+                    Origin::Spoken => "dite",
+                    Origin::Written => "écrite",
+                    Origin::Picture => "choisie",
+                };
                 let moment = match &said_with {
-                    Some(w) => format!("{when} · dite avec {w}"),
+                    Some(w) => format!("{when} · {verb} avec {w}"),
                     None => when,
                 };
                 s.cards.insert(
@@ -124,17 +130,27 @@ impl Reducer<ProjectAct> for ProjectReducer {
                     },
                 );
             }
+            // Une proposition de la machine (« hypothesis ») ne touche pas la Carte : elle attend un humain.
+            // Validée, elle est ré-écrite en « generated » avec `confirmed_by`, et c'est celle-là qui compte.
             ProjectAct::CardSimpler { card, text } => {
                 if let Some(c) = s.cards.get_mut(&card) {
-                    c.simpler = Some(text);
-                    c.awaiting_validation = pending;
+                    if pending {
+                        c.awaiting_validation = true;
+                    } else {
+                        c.simpler = Some(text);
+                        c.awaiting_validation = false;
+                    }
                 }
             }
             ProjectAct::CardTranslated { card, lang, text } => {
                 if let Some(c) = s.cards.get_mut(&card) {
-                    c.translations.retain(|(l, _)| *l != lang);
-                    c.translations.push((lang, text));
-                    c.awaiting_validation = pending;
+                    if pending {
+                        c.awaiting_validation = true;
+                    } else {
+                        c.translations.retain(|(l, _)| *l != lang);
+                        c.translations.push((lang, text));
+                        c.awaiting_validation = false;
+                    }
                 }
             }
             ProjectAct::CardFelt { card, feeling, when } => {

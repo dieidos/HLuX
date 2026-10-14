@@ -52,7 +52,7 @@ export default function Constat() {
   const place = (id: string, zone: Feeling) => {
     const fromA = fromAgenda.find((a) => a.item === id);
     const existing = f.findings[id];
-    act(speaker, { act: 'finding_placed', finding: id, title: existing?.title ?? fromA?.title ?? id, zone, source: existing?.source ?? fromA?.source ?? 'team', author: existing?.author ?? (fromA ? 'Amina' : speaker) });
+    act(speaker, { act: 'finding_placed', finding: id, title: existing?.title ?? fromA?.title ?? id, zone, source: existing?.source ?? fromA?.source ?? 'team', author: existing?.author ?? (fromA ? '' : speaker) });
     tell(`${speaker} pose une carte.`);
   };
   const qualify = (id: string) => {
@@ -108,7 +108,7 @@ export default function Constat() {
                     <Draggable id={id} label={c.title}>
                       <View style={st.card}>
                         <Text style={st.cardTitle}>{c.title}</Text>
-                        <Text style={st.small}>{SOURCE_WORDS[c.source]} · {c.author}</Text>
+                        <Text style={st.small}>{SOURCE_WORDS[c.source]}{c.author ? ` · ${c.author}` : ''}</Text>
                       </View>
                     </Draggable>
                     <Pressable onPress={() => qualify(id)} style={st.qual} accessibilityRole="button" accessibilityLabel={`Qualification de « ${c.title} » : ${QUALIF_WORDS[c.level]}. Toucher pour changer.`}>

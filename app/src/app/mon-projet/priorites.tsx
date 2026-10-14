@@ -2,6 +2,7 @@
 // aussi) ; volet B : sur une ligne par axe, dans l'ordre des rangs, je situe mes idées de peu à
 // beaucoup. Aucun chiffre : un ordre, et une phrase qui dit ce qui a bougé.
 
+import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -11,7 +12,7 @@ import type { Circle, Rank } from '../../core/acts';
 import { lineKey } from '../../core/project';
 import { shifted } from '../../core/views';
 import { SlideChip } from '../../components/Slide';
-import { say, tNow, useT, useWords } from '../../core/useAids';
+import {tNow, tell, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
@@ -23,6 +24,7 @@ const RANKS: [Rank, WordKey][] = [['first', 'first'], ['then', 'then'], ['also',
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
 
 export default function Priorites() {
+  const pathname = usePathname();
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -30,7 +32,6 @@ export default function Priorites() {
   const act = useProject((x) => x.act);
   const [pane, setPane] = useState<'a' | 'b'>('a');
   const [open, setOpen] = useState<Circle | null>(null);
-  const [live, setLive] = useState('');
 
   const ideas = Object.entries(s.ideas).filter(([, i]) => i.spot.at !== 'discarded');
   const rankOf = (a: Circle) => s.axisRanks[a];
@@ -51,8 +52,7 @@ export default function Priorites() {
     const msg = places > 0
       ? tNow(`« ${title} » passe devant ${other}.`, `« ${title} » تتقدّم على ${other}.`)
       : tNow(`« ${title} » se tient plus à gauche que ${other}.`, `« ${title} » تبقى أقرب إلى «قليلاً» من ${other}.`, `« ${title} » est plus près de « peu » que ${other}.`);
-    setLive(msg);
-    say(msg);
+    tell(msg, pathname);
   };
 
   return (
@@ -72,7 +72,7 @@ export default function Priorites() {
               <Zone key={r} id={r} label={w(k)} style={st.rankRow}
                 onDrop={(axis) => {
                   act(me.id, { act: 'axis_ranked', axis: axis as Circle, rank: r });
-                  say(`${w(AXES.find((a) => a[0] === axis)![1])} : ${w(k)}.`);
+                  tell(`${w(AXES.find((a) => a[0] === axis)![1])} : ${w(k)}.`, pathname);
                 }}>
                 <Text style={st.rankLabel}>{w(k)}</Text>
                 <View style={st.chips}>
@@ -121,7 +121,6 @@ export default function Priorites() {
               </View>
             );
           })}
-          {live ? <Text style={st.live} accessibilityLiveRegion="polite">{live}</Text> : null}
         </ScrollView>
       )}
     </Screen>
@@ -136,7 +135,7 @@ const st = StyleSheet.create({
   rankRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, backgroundColor: C.surface },
   rankLabel: { width: 150, fontFamily: F.bold, fontSize: 13, letterSpacing: 1, color: C.slate },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, flex: 1 },
-  axis: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderWidth: 1, borderColor: C.line },
+  axis: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderWidth: 1, borderColor: C.line },
   axisTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   line: { padding: 12, borderRadius: S.radius, backgroundColor: C.surface, gap: 8 },

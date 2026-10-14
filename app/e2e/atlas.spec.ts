@@ -89,7 +89,7 @@ test.describe('02 Ressenti', () => {
     await link(page, /Cartes/).click();
     await tap(page, 'Papiers');
     await expect(page.getByText('« Les lettres de la CAF, je les laisse fermées. »').filter({ visible: true }).first()).toBeVisible();
-    await expect(page.getByLabel('Le fil de la Carte')).toContainText("Ressentie · aujourd'hui · dans « c'est difficile »");
+    await expect(page.getByLabel('Le fil de la Carte')).toContainText(/Ressentie · \S+ \d+ \S+ · dans « c'est difficile »/);
   });
 });
 
@@ -152,7 +152,7 @@ test.describe('04 Priorités', () => {
     // Créée en dernier, elle est à droite : on la ramène, puis elle glisse vers la droite.
     await tap(page, 'Comprendre vers peu');
     await tap(page, 'Comprendre vers beaucoup');
-    await expect(page.getByText('« Comprendre » passe devant Formation.')).toBeVisible();
+    await expect(page.getByText('« Comprendre » passe devant Formation.').filter({ visible: true }).first()).toBeVisible();
   });
 
   test('« Comprendre » arrive en tête de ce qui compte pour elle.', async ({ page }) => {

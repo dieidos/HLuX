@@ -32,6 +32,8 @@ export default function Sujets() {
   const [collective, setCollective] = useState('');
   const [notNow, setNotNow] = useState(false);
   const [aideMsg, setAideMsg] = useState('');
+  const [aided, setAided] = useState(false);
+  const [newSession, setNewSession] = useState(false);
   // La séance : sa date, qui est là, qui anime. Une absence se dit simplement.
   const [date, setDate] = useState('');
   const [present, setPresent] = useState<string[]>(pro ? [pro] : []);
@@ -40,22 +42,28 @@ export default function Sujets() {
   const bring = () => {
     if (!card || !collective.trim() || !session) return;
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
-    actP(me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() });
+    actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
     actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session });
     say("Oui, j'apporte. Le sujet entre à l'ordre du jour.");
   };
   const holdSession = () => {
     if (!date.trim() || !present.length) return;
+    setNewSession(false);
     actF(pro || present[0], { act: 'attendance', session: date.trim(), present, absent: team.filter((t) => !present.includes(t)), facilitator: present.includes(pro) ? pro : present[0] });
   };
 
   return (
     <Screen side="pe" title="subjects" question="Quels sujets travailler ? Seulement si la personne le veut.">
       <ScrollView contentContainerStyle={{ gap: 16 }}>
-        {!f.attendance && (
+        {f.attendance && !newSession && (
+          <Pressable accessibilityRole="button" onPress={() => setNewSession(true)} style={[st.btn, { alignSelf: 'flex-start' }]}>
+            <Text style={st.btnTxt}>＋ Nouvelle séance</Text>
+          </Pressable>
+        )}
+        {(!f.attendance || newSession) && (
           <View style={st.ask}>
             <Text style={st.h}>La séance</Text>
-            <TextInput value={date} onChangeText={setDate} placeholder="mardi 12 janvier" style={st.input} accessibilityLabel="Date de la séance" />
+            <TextInput value={date} onChangeText={setDate} placeholder="La date, en mots (mardi 12 janvier…)" style={st.input} accessibilityLabel="Date de la séance" />
             <Text style={st.small}>Qui est là ?</Text>
             <View style={st.row}>
               {team.map((t) => {
@@ -101,6 +109,7 @@ export default function Sujets() {
                       try {
                         const r = await askAide({ kind: 'generalize', text: card.verbatim || card.title });
                         setCollective(r.proposal);
+                        setAided(true);
                         setAideMsg(r.offline ? `Exemple hors ligne (sans IA). ${me.name} relit et peut changer.` : `Proposition. ${me.name} relit et peut changer.`);
                       } catch (e) {
                         setAideMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu.");

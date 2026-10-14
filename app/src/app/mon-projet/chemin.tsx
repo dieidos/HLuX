@@ -2,6 +2,7 @@
 // « Et si… ? » joue sur une COPIE (cadre en pointillé) : le vrai chemin ne bouge pas ; deux sorties
 // explicites. Puis le plan, en quatre cases, dans ses mots.
 
+import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -11,15 +12,20 @@ import { DossierCopy } from '../../components/DossierCopy';
 import { PathEditor } from '../../components/PathEditor';
 import { PathView } from '../../components/PathView';
 import { PlanEditor } from '../../components/PlanEditor';
-import { say, tNow, useT, useWords } from '../../core/useAids';
+import { seasonsFrom } from '../../core/dates';
+import {tNow, tell, useT, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 
-const SEASONS = ['automne', 'hiver', 'printemps', 'été'];
 const LANES = ['démarches', 'formation', 'activité', 'permis'];
 
 export default function Chemin() {
+  const pathname = usePathname();
+  // Les saisons commencent par celle d'aujourd'hui, plus celles des étapes déjà posées.
+  const nodesSeasons = Object.values(useProjectState().nodes).map((n) => n.when);
+  const SEASONS = [...new Set([...seasonsFrom(), ...nodesSeasons])];
+  const [storyAided, setStoryAided] = useState(false);
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -47,14 +53,17 @@ export default function Chemin() {
 
   const closeWhatIf = (kept: boolean) => {
     const sim = `sim-${Object.keys(s.whatIfs).length + 1}`;
-    act(me.id, { act: 'what_if', sim, question, moves: moved ? [[moved.node, moved.when]] : [], story: story.trim() || null });
+    // Un récit proposé par l'IA, gardé par la personne, est « généré », confirmé par elle.
+    const aided = storyAided && !!story.trim();
+    act(aided ? 'hlux-ia' : me.id, { act: 'what_if', sim, question, moves: moved ? [[moved.node, moved.when]] : [], story: story.trim() || null }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
     act(me.id, { act: 'what_if_closed', sim, kept });
-    say(kept
+    tell(kept
       ? tNow("L'idée est gardée. Ton vrai chemin n'a pas bougé.", 'احتفظتِ بالفكرة. طريقكِ الحقيقي لم يتغيّر.', "Tu gardes l'idée. Ton chemin ne change pas.")
-      : tNow("C'est refermé. Ton vrai chemin n'a pas bougé.", 'أُغلقت النسخة. طريقكِ الحقيقي لم يتغيّر.', "C'est fermé. Ton chemin ne change pas."));
+      : tNow("C'est refermé. Ton vrai chemin n'a pas bougé.", 'أُغلقت النسخة. طريقكِ الحقيقي لم يتغيّر.', "C'est fermé. Ton chemin ne change pas."), pathname);
     setWhatIf(false);
     setMoved(null);
     setStory('');
+    setStoryAided(false);
   };
 
   return (
@@ -76,7 +85,7 @@ export default function Chemin() {
                 const id = `etape-${nodes.length + 1}`;
                 act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: false });
                 if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
-                say(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`));
+                tell(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`), pathname);
               }}
             />
           </>
@@ -92,7 +101,7 @@ export default function Chemin() {
               ))}
             </View>
             <PathView columns={SEASONS} lanes={lanes} nodes={copy} links={s.links} showOthers dashed />
-            <AideButton kind="narrate" label={t("Raconter ce qui s'ouvre, ce qui se ferme", 'أحكي ما يُفتح وما يُغلق', 'Raconter')} text={facts} who={me.name} onProposal={setStory} />
+            <AideButton kind="narrate" label={t("Raconter ce qui s'ouvre, ce qui se ferme", 'أحكي ما يُفتح وما يُغلق', 'Raconter')} text={facts} who={me.name} onProposal={(p) => { setStory(p); setStoryAided(true); }} />
             {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel={t('Récit de la copie', 'حكاية النسخة')} /> : null}
             <View style={st.chips}>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{w('keepIdea')}</Text></Pressable>
@@ -109,7 +118,7 @@ export default function Chemin() {
               onPress={() => {
                 act(me.id, { act: 'node_set', node: `propose-${id}`, lane: 'démarches', kind: 'event', label: text, when: 'hiver', thread: false });
                 act(me.id, { act: 'proposal_linked', proposal: id, node: `propose-${id}` });
-                say(tNow('Relié à ton chemin.', 'رُبط بطريقكِ.'));
+                tell(tNow('Relié à ton chemin.', 'رُبط بطريقكِ.'), pathname);
               }}
               style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
               <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Je le relie à mon chemin', 'أربطه بطريقي')}</Text>

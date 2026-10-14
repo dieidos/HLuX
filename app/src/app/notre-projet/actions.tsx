@@ -127,7 +127,7 @@ export default function Actions() {
               <Text style={st.small}>fil : {c.thread.join(' → ')} · on en reparle {c.review}</Text>
             </View>
           ))}
-          <TextInput value={text} onChangeText={setText} multiline placeholder="« Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »" style={st.input} accessibilityLabel="Texte de l'engagement" />
+          <TextInput value={text} onChangeText={setText} multiline placeholder="Ce que nous nous engageons à faire, avec qui, à quel rythme" style={st.input} accessibilityLabel="Texte de l'engagement" />
           <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
           <View style={st.row}>
             <Text style={st.small}>Pour quelle solution ?</Text>

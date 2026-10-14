@@ -3,6 +3,7 @@
 // (reposer la carte dans la réserve). La réserve offre aussi les 10 cartes-pictos de l'Atlas : poser l'une
 // d'elles crée la Carte (origine « image »), comme si elle avait été choisie à l'écran 01.
 
+import { dayInWords } from '../../core/dates';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -50,10 +51,10 @@ export default function Ressenti() {
     if (id.startsWith('picto:')) {
       const k = id.slice(6) as PictoKey;
       card = `carte-${Object.keys(s.cards).length + 1}`;
-      act(me.id, { act: 'card_created', card, title: PICTOS[k].fr, picto: k, verbatim: '', lang: 'fr', origin: 'picture', said_with: pro, when: "aujourd'hui" });
+      act(me.id, { act: 'card_created', card, title: PICTOS[k].fr, picto: k, verbatim: '', lang: 'fr', origin: 'picture', said_with: pro, when: dayInWords() });
     }
     const title = id.startsWith('picto:') ? PICTOS[id.slice(6) as PictoKey].fr : s.cards[card].title;
-    const e = act(me.id, { act: 'card_felt', card, feeling, when: "aujourd'hui" });
+    const e = act(me.id, { act: 'card_felt', card, feeling, when: dayInWords() });
     const text = tNow(`${title} va dans « ${FEELING_WORDS[feeling]} ».`, `${title} تُوضع في « ${FEELING_AR[feeling]} ».`);
     setSaid({ text, rank: e.rank, card });
     say(text);

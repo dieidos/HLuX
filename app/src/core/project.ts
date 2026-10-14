@@ -56,6 +56,9 @@ export const emptyProject = (): ProjectState => ({
   nodes: {}, links: [], whatIfs: {}, plan: { first: [], waiting: [], with_whom: [], open: [] }, subjects: {}, linkedProposals: [],
 });
 
+/** Comment la Carte est née, dans le premier moment : dite, écrite ou choisie en image. */
+const ORIGIN_VERB: Record<Origin, string> = { spoken: 'dite', written: 'écrite', picture: 'choisie' };
+
 export const lineKey = (axis: Circle, author: string) => `${axis}/${author}`;
 
 function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
@@ -65,16 +68,23 @@ function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
       s.cards[a.card] = {
         title: a.title, picto: a.picto, verbatim: a.verbatim, lang: a.lang, origin: a.origin, saidWith: a.said_with,
         simpler: null, translations: {}, feeling: null, awaitingValidation: false,
-        moments: [a.said_with ? `${a.when} · dite avec ${a.said_with}` : a.when],
+        moments: [a.said_with ? `${a.when} · ${ORIGIN_VERB[a.origin]} avec ${a.said_with}` : a.when],
       };
       break;
+    // Une proposition de la machine ne touche pas la Carte : elle attend un humain (comme le cœur Rust).
     case 'card_simpler':
-      if (s.cards[a.card]) Object.assign(s.cards[a.card], { simpler: a.text, awaitingValidation: pending });
+      if (s.cards[a.card]) {
+        if (pending) s.cards[a.card].awaitingValidation = true;
+        else Object.assign(s.cards[a.card], { simpler: a.text, awaitingValidation: false });
+      }
       break;
     case 'card_translated':
       if (s.cards[a.card]) {
-        s.cards[a.card].translations[a.lang] = a.text;
-        s.cards[a.card].awaitingValidation = pending;
+        if (pending) s.cards[a.card].awaitingValidation = true;
+        else {
+          s.cards[a.card].translations[a.lang] = a.text;
+          s.cards[a.card].awaitingValidation = false;
+        }
       }
       break;
     case 'card_felt':

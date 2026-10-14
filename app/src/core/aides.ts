@@ -65,7 +65,12 @@ export function offlineExample(req: AideRequest): string {
   }
 }
 
-const NAMES = ['Amina', 'Sarah', 'Salma', 'Robert', 'Aïcha', 'Bruno', 'Karim', 'Léa'];
+/** Les prénoms à masquer avant tout envoi : tenus à jour par l'application (`setKnownNames`). */
+let NAMES: string[] = [];
+export function setKnownNames(names: string[]) {
+  // Les plus longs d'abord : « Marie-Anne » avant « Marie ».
+  NAMES = [...new Set(names.map((n) => n.trim()).filter((n) => n.length > 1))].sort((a, b) => b.length - a.length);
+}
 
 export async function askAide(req: AideRequest, fetcher: typeof fetch = fetch): Promise<AideResult> {
   guard(req.text);

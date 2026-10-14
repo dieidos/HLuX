@@ -146,7 +146,7 @@ export default function Suivi() {
         <View style={st.box}>
           <Text style={st.h}>Ce qui en résulte</Text>
           {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
-          <TextInput value={result} onChangeText={setResult} multiline placeholder="« Au printemps : 5 personnes chaque mardi, 3 comprennent seules leurs courriers. Les relances restent dures. »" style={st.input} accessibilityLabel="Résultat" />
+          <TextInput value={result} onChangeText={setResult} multiline placeholder="Ce qui en résulte, en mots : ce qui va mieux, ce qui reste dur" style={st.input} accessibilityLabel="Résultat" />
           <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
           <View style={st.row}>
             <Pressable onPress={() => noteResult(false)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>

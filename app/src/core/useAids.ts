@@ -64,3 +64,13 @@ export function tNow(fr: string, ar: string, falc?: string) {
   const { lang, simple } = useAids.getState();
   return lang === 'ar' ? ar : simple ? falc ?? fr : fr;
 }
+
+/** La dernière phrase de conséquence, et l'écran où elle a été dite. */
+export const useLive = create<{ text: string; path: string }>()(() => ({ text: '', path: '' }));
+
+/** Dire ET montrer la conséquence d'un geste. */
+export function tell(text: string, path: string) {
+  say(text);
+  useLive.setState({ text, path });
+}
+

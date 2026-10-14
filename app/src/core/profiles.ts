@@ -8,6 +8,7 @@
 //   profils restent fermés. L'OAuth dieidos remplacera la première étape.
 // - Aucun code ni mot de passe pour la personne (garde-fou de l'écran 01).
 
+import { dayInWords } from './dates';
 import type { Entry } from './acts';
 
 export interface Profile {
@@ -65,7 +66,7 @@ export function firstEntries(id: string, sentence: string, saidWith: string): En
     rank: 0, author: id, provenance: 'by_hand',
     act: {
       act: 'card_created', card: 'carte-1', title: verbatim.split(/\s+/).slice(0, 3).join(' '), picto: null,
-      verbatim, lang: 'fr', origin: 'written', said_with: saidWith, when: "aujourd'hui",
+      verbatim, lang: 'fr', origin: 'written', said_with: saidWith, when: dayInWords(),
     },
   }];
 }

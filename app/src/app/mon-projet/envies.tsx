@@ -2,6 +2,7 @@
 // Une idée naît d'une Carte et en garde le lien ; elle se déplace quand on veut ;
 // l'écarter par le bord est le seul geste irréversible, et l'écran le dit.
 
+import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -9,12 +10,13 @@ import { Screen } from '../../components/Chrome';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import { Ikigai } from '../../components/Ikigai';
 import type { Spot } from '../../core/acts';
-import { say, useT, useWords } from '../../core/useAids';
+import {tell, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
 export default function Envies() {
+  const pathname = usePathname();
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -27,7 +29,7 @@ export default function Envies() {
   const place = (idea: string, spot: Spot, words: string) => {
     act(me.id, { act: 'idea_placed', idea, spot });
     const line = `${s.ideas[idea].title} : ${words}.`;
-    say(line);
+    tell(line, pathname);
   };
   const create = () => {
     if (!title.trim()) return;
@@ -99,7 +101,7 @@ const st = StyleSheet.create({
   tray: { flex: 1, minWidth: 260, backgroundColor: C.surface2 },
   discard: { width: 220, justifyContent: 'center', borderColor: C.discard },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  idea: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderTopColor: C.violet },
+  idea: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderTopColor: C.violet },
   ideaTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   born: { fontFamily: F.body, fontSize: 12, color: C.muted },
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },

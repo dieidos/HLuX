@@ -95,7 +95,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
           <View style={st.row}>{LINKS.map(([k, fr, ar]) => chip(link === k, t(fr, ar), () => setLink(k), k))}</View>
           {link !== 'none' && <View style={st.row}>{nodes.map((n) => chip(from === n.id, n.label, () => setFrom(n.id), n.id))}</View>}
           {(link === 'condition' || link === 'dependency') && (
-            <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? t('si plus de 8 viennent…', 'إذا جاء أكثر من 8…') : t('attend la convention…', 'ينتظر الاتفاقية…')} style={st.input} accessibilityLabel={link === 'condition' ? t('La condition', 'الشرط') : t("Ce qu'elle attend", 'ما تنتظره')} />
+            <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? t('si…', 'إذا…') : t('attend…', 'ينتظر…')} style={st.input} accessibilityLabel={link === 'condition' ? t('La condition', 'الشرط') : t("Ce qu'elle attend", 'ما تنتظره')} />
           )}
         </>
       )}

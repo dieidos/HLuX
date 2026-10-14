@@ -3,6 +3,7 @@
 
 import { create } from 'zustand';
 
+import { setKnownNames } from './aides';
 import { clearDemo, writeDemo } from './demo';
 import { currentMode, type Mode } from './mode';
 import { makeProjectStore } from './projectStore';
@@ -68,4 +69,14 @@ useAids.subscribe((a, before) => {
   if (!s.person || (a.lang === before.lang && a.simple === before.simple)) return;
   s.setPrefs(a.lang, a.simple);
 });
+
+// Les prénoms connus de la tablette (personnes, équipe, invités de la personne ouverte) sont masqués
+// avant tout appel d'aide : la liste suit l'application.
+const refreshNames = () => {
+  const s = useProject.getState();
+  const guests = s.entries.flatMap((e) => (e.act?.act === 'invitation_sent' ? [e.act.guest] : []));
+  setKnownNames([...s.profiles.map((p) => p.firstName), ...(s.setup?.team ?? []), ...guests]);
+};
+refreshNames();
+useProject.subscribe(refreshNames);
 

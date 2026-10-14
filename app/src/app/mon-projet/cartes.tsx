@@ -1,6 +1,7 @@
 // 01 Cartes — « Quelle Carte reprendre ? Ou j'en ajoute une. »
 // Cartes existantes ; Nouvelle Carte (je parle / j'écris / je choisis une image) ; Carte en grand.
 
+import { dayInWords } from '../../core/dates';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -80,7 +81,7 @@ export default function Cartes() {
     const id = `carte-${Object.keys(s.cards).length + 1}`;
     act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
-      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: "aujourd'hui",
+      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: dayInWords(),
     });
     say(tNow('Ta Carte est créée.', 'تمّ إنشاء بطاقتكِ.'));
     setAdding(false); setText(''); setPicto(null); setSpoken(false);

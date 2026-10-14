@@ -1,8 +1,8 @@
 // 05 Regards — Amina au centre choisit qui l'éclaire, et sur quoi : chaque invité voit une seule idée,
 // dans sa langue. On voit qui a répondu, jamais le contenu, jusqu'à « découvrir ensemble ».
-// Puis quatre lectures : Mon regard · Le regard de… · Nos regards réunis · Avec l'ordre de Sarah.
+// Puis quatre lectures : Mon regard · Le regard de… · Nos regards réunis · Avec l'ordre de la professionnelle.
 
-import { Link } from 'expo-router';
+import {Link, usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -10,7 +10,7 @@ import { AideButton } from '../../components/AideButton';
 import { Screen } from '../../components/Chrome';
 import type { Channel, Circle, Lang, Lean, Rank } from '../../core/acts';
 import { expired, lineKey } from '../../core/project';
-import { say, tNow, useT, useWords } from '../../core/useAids';
+import {tNow, tell, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { band, leanOf } from '../../core/views';
 import { C, F, S } from '../../design/theme';
@@ -22,6 +22,8 @@ const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
 const CHANNEL_KEYS: Channel[] = ['sms', 'mail', 'in_session'];
 
 export default function Regards() {
+  const pathname = usePathname();
+  const pro = useProject((x) => x.pro) ?? '';
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -36,6 +38,7 @@ export default function Regards() {
   const [lang, setLang] = useState<Lang>('fr');
   const [channel, setChannel] = useState<Channel>('sms');
   const [ideaText, setIdeaText] = useState('');
+  const [ideaAided, setIdeaAided] = useState(false);
   const [days, setDays] = useState(7);
 
   const ideas = Object.entries(s.ideas).filter(([, i]) => i.spot.at !== 'discarded');
@@ -50,9 +53,10 @@ export default function Regards() {
     if (lang === 'ar' && !ideaText.trim()) return;
     const id = `inv-${invitations.length + 1}`;
     const expires = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString().slice(0, 10);
-    act(me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires, channel, idea_text: lang === 'ar' ? ideaText.trim() : null });
-    say(tNow(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`, `${guest.trim()} مدعوّة إلى فكرة « ${s.ideas[idea].title} ».`));
-    setForm(false); setGuest(''); setRelation(''); setIdea(null); setIdeaText('');
+    const aided = lang === 'ar' && ideaAided;
+    act(aided ? 'hlux-ia' : me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires, channel, idea_text: lang === 'ar' ? ideaText.trim() : null }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
+    tell(tNow(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`, `${guest.trim()} مدعوّة إلى فكرة « ${s.ideas[idea].title} ».`), pathname);
+    setForm(false); setGuest(''); setRelation(''); setIdea(null); setIdeaText(''); setIdeaAided(false);
   };
 
   const lines = (ranks: Partial<Record<Circle, Rank>>, who: 'mine' | 'together' | string) => (
@@ -94,7 +98,7 @@ export default function Regards() {
       <ScrollView contentContainerStyle={{ gap: 14 }}>
         <View style={st.ring}>
           <View style={st.center}><Text style={st.name}>{me.name}</Text><Text style={st.small}>{w('sheInvites')}</Text></View>
-          <View style={st.sat}><Text style={st.name}>Sarah</Text><Text style={st.small}>{w('inSession')}</Text></View>
+          <View style={st.sat}><Text style={st.name}>{pro}</Text><Text style={st.small}>{w('inSession')}</Text></View>
           {invitations.map(([id, inv]) => (
             <View key={id} style={st.sat}>
               <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
@@ -111,13 +115,13 @@ export default function Regards() {
         <Text style={st.small}>{w('onlyHerIdea')} {w('silenceOk')}</Text>
 
         {!s.viewsRevealed ? (
-          <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); say(tNow('Les regards se découvrent ensemble.', 'نكتشف النظرات معاً.', 'On regarde ensemble.')); }} style={[st.btn, st.primary]} accessibilityRole="button">
+          <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); tell(tNow('Les regards se découvrent ensemble.', 'نكتشف النظرات معاً.', 'On regarde ensemble.'), pathname); }} style={[st.btn, st.primary]} accessibilityRole="button">
             <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('revealTogether')}</Text>
           </Pressable>
         ) : (
           <>
             <View style={st.tabs}>
-              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, t(`Le regard de ${i.guest}`, `نظرة ${i.guest}`)]), ['together', w('together')], ['sarah', w('sarahOrder')]].map(([k, label]) => (
+              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, t(`Le regard de ${i.guest}`, `نظرة ${i.guest}`)]), ['together', w('together')], ['sarah', t(`Avec l'ordre de ${pro}`, `بترتيب ${pro}`, `L'ordre de ${pro}`)]].map(([k, label]) => (
                 <Pressable key={k} onPress={() => setTab(k)} style={[st.tab, tab === k && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === k }}>
                   <Text style={[st.btnTxt, tab === k && { color: C.onAccent }]}>{label}</Text>
                 </Pressable>
@@ -125,7 +129,7 @@ export default function Regards() {
             </View>
             {tab === 'sarah' ? (
               <>
-                <SarahOrder />
+                <CompanionOrder />
                 {lines(sarahRanks, 'together')}
               </>
             ) : (
@@ -139,8 +143,8 @@ export default function Regards() {
         <View style={st.overlay}>
           <ScrollView style={st.sheetScroll} contentContainerStyle={st.sheet}>
             <Text style={st.sheetTitle}>{w('invite')}</Text>
-            <TextInput value={guest} onChangeText={setGuest} placeholder={t('Prénom (ex. Salma)', 'الاسم (مثلاً سلمى)')} style={st.input} accessibilityLabel={t('Prénom', 'الاسم')} />
-            <TextInput value={relation} onChangeText={setRelation} placeholder={t('Lien (ex. ma sœur)', 'الصلة (مثلاً أختي)')} style={st.input} accessibilityLabel={t('Lien', 'الصلة')} />
+            <TextInput value={guest} onChangeText={setGuest} placeholder={t('Son prénom', 'اسمها')} style={st.input} accessibilityLabel={t('Prénom', 'الاسم')} />
+            <TextInput value={relation} onChangeText={setRelation} placeholder={t('Qui est-ce pour toi ?', 'من هي بالنسبة لكِ؟')} style={st.input} accessibilityLabel={t('Lien', 'الصلة')} />
             <Text style={st.small}>{t('Sur quelle idée ? (une seule)', 'على أيّ فكرة؟ (فكرة واحدة فقط)', 'Quelle idée ? Une seule.')}</Text>
             <View style={st.chips}>
               {ideas.map(([id, i]) => (
@@ -155,7 +159,7 @@ export default function Regards() {
             {lang === 'ar' && idea ? (
               <View style={{ gap: 6 }}>
                 <TextInput value={ideaText} onChangeText={setIdeaText} placeholder={t("L'idée, en arabe", 'الفكرة، بالعربية')} style={[st.input, { writingDirection: 'rtl' }]} accessibilityLabel={t("L'idée en arabe", 'الفكرة بالعربية')} />
-                <AideButton kind="translate" lang="ar" label={t("Traduire l'idée", 'ترجمة الفكرة')} text={s.ideas[idea].title} who={me.name} onProposal={setIdeaText} />
+                <AideButton kind="translate" lang="ar" label={t("Traduire l'idée", 'ترجمة الفكرة')} text={s.ideas[idea].title} who={me.name} onProposal={(p) => { setIdeaText(p); setIdeaAided(true); }} />
               </View>
             ) : null}
             <View style={st.chips}>
@@ -180,8 +184,9 @@ export default function Regards() {
   );
 }
 
-/** L'ordre de Sarah : une autre lecture, posée en séance, qui ne déplace aucune marque. */
-function SarahOrder() {
+/** L'ordre de la professionnelle de la séance : une autre lecture, posée avec la personne, qui ne déplace aucune marque. */
+function CompanionOrder() {
+  const pro = useProject((x) => x.pro) ?? '';
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const w = useWords();
@@ -190,12 +195,12 @@ function SarahOrder() {
   const cycle = (axis: Circle) => {
     const next = ORDER[(ORDER.indexOf(current[axis] ?? 'not_yet') + 1) % ORDER.length];
     const ranks = { ...current, [axis]: next };
-    act('sarah', { act: 'companion_order', by: 'Sarah', ranks: Object.entries(ranks) as [Circle, Rank][] });
+    act(pro, { act: 'companion_order', by: pro, ranks: Object.entries(ranks) as [Circle, Rank][] });
   };
   return (
     <View style={st.chips}>
       {AXES.map(([a, k]) => (
-        <Pressable accessibilityRole="button" key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={t(`Rang de Sarah pour ${w(k)}`, `ترتيب سارة لـ ${w(k)}`)}>
+        <Pressable accessibilityRole="button" key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={t(`Rang de ${pro} pour ${w(k)}`, `ترتيب ${pro} لـ ${w(k)}`)}>
           <Text style={st.btnTxt}>{w(k)} · {current[a] ? { first: t("D'abord", 'أوّلاً'), then: t('Ensuite', 'ثمّ'), also: t('Aussi', 'أيضاً'), less: t('Moins', 'أقلّ'), not_yet: '?' }[current[a]!] : '?'}</Text>
         </Pressable>
       ))}
@@ -211,7 +216,7 @@ const st = StyleSheet.create({
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   status: { fontFamily: F.bold, fontSize: 13, color: C.slate },
   statusOk: { color: C.pe.ink },
-  link: { fontFamily: F.bold, fontSize: 13, color: C.violetInk, textDecorationLine: 'underline' },
+  link: { fontFamily: F.bold, fontSize: 15, color: C.violetInk, textDecorationLine: 'underline', minHeight: S.touch, paddingVertical: 12 },
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 16, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, alignSelf: 'flex-start' },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
   btnTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
