@@ -31,6 +31,8 @@ export default function Chemin() {
   const t = useT();
   const s = useProjectState();
   const act = useProject((x) => x.act);
+  const undo = useProject((x) => x.undo);
+  const entries = useProject((x) => x.entries);
   const [others, setOthers] = useState(false);
   const [whatIf, setWhatIf] = useState(false);
   const [question, setQuestion] = useState('');
@@ -81,9 +83,15 @@ export default function Chemin() {
               lanes={lanes}
               nodes={nodes}
               decisionLabel={t('je choisis', 'أنا أختار')}
+              threadOption
+              onRemove={(id) => {
+                const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
+                const last = [...entries].reverse().find((e) => e.act?.act === 'node_set' && e.act.node === id && !undone.has(e.rank));
+                if (last) undo(me.id, last.rank);
+              }}
               onAdd={(n) => {
                 const id = `etape-${nodes.length + 1}`;
-                act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: false });
+                act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: n.thread });
                 if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
                 tell(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`), pathname);
               }}
@@ -116,7 +124,7 @@ export default function Chemin() {
             <Text style={st.small}>{t('Le collectif ne lit jamais ton chemin. C’est toi qui y fais entrer ce qu’il propose.', 'المجموعة لا تقرأ طريقكِ أبداً. أنتِ من تُدخلين فيه ما تقترحه.', 'Le collectif ne voit pas ton chemin. C’est toi qui choisis.')}</Text>
             <Pressable
               onPress={() => {
-                act(me.id, { act: 'node_set', node: `propose-${id}`, lane: 'démarches', kind: 'event', label: text, when: 'hiver', thread: false });
+                act(me.id, { act: 'node_set', node: `propose-${id}`, lane: LANES[0], kind: 'event', label: text, when: SEASONS[0], thread: false });
                 act(me.id, { act: 'proposal_linked', proposal: id, node: `propose-${id}` });
                 tell(tNow('Relié à ton chemin.', 'رُبط بطريقكِ.'), pathname);
               }}

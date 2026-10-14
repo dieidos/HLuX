@@ -1,10 +1,12 @@
 import { SvgXml } from 'react-native-svg';
 
 import { PICTOS, type PictoKey } from '../design/pictos';
+import { useRegister } from '../core/useAids';
 import { C } from '../design/theme';
 
 /** Un picto de l'Atlas : deux aplats de couleur et un tracé blanc cerné. */
 export function Picto({ name, size = 56, label = true }: { name: string; size?: number; label?: boolean }) {
+  const reg = useRegister();
   const p = PICTOS[name as PictoKey];
   if (!p) return null;
   const caption = label
@@ -15,5 +17,5 @@ export function Picto({ name, size = 56, label = true }: { name: string; size?: 
     <g clip-path="url(#c)"><rect width="100" height="100" fill="${p.a}"/><path d="M58 0H100V100H38z" fill="${p.b}"/></g>
     <g fill="${C.picto.fill}" stroke="${C.picto.stroke}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round" transform="translate(9,1) scale(.82)">${p.g}</g>
     ${caption}</svg>`;
-  return <SvgXml xml={xml} width={size} height={size} accessibilityLabel={p.fr} />;
+  return <SvgXml xml={xml} width={size} height={size} accessibilityLabel={reg === 'ar' ? p.ar : p.fr} />;
 }

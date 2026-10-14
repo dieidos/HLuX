@@ -7,6 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { Animated, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
+import { useT } from '../core/useAids';
 import { reduceMotionNow } from '../design/motion';
 import { C } from '../design/theme';
 
@@ -73,6 +74,7 @@ export function DragArea({ children }: { children: ReactNode }) {
  *  (pas de bouton autour des cartes : elles restent elles-mêmes touchables). */
 export function Zone({ id, onDrop, style, children, label, accepts }: { id: string; onDrop: (item: string) => void; style?: ViewStyle; children: ReactNode; label: string; accepts?: (item: string) => boolean }) {
   const d = useDrag();
+  const t = useT();
   const ref = useRef<View>(null);
   const measure = useCallback(() => {
     ref.current?.measureInWindow((x, y, w, h) => d.register(id, { x, y, w, h }, onDrop, accepts));
@@ -85,8 +87,8 @@ export function Zone({ id, onDrop, style, children, label, accepts }: { id: stri
     <View ref={ref} onLayout={measure} accessibilityLabel={label} style={[st.zone, style, lit && st.zoneLit, d.hover === id && st.zoneHover]}>
       {children}
       {lit && (
-        <Pressable onPress={() => d.placeHeld(id)} accessibilityRole="button" accessibilityLabel={`Poser ici : ${label}`} style={st.here}>
-          <Text style={st.hereTxt}>⤓ Poser ici</Text>
+        <Pressable onPress={() => d.placeHeld(id)} accessibilityRole="button" accessibilityLabel={t(`Poser ici : ${label}`, `ضعيها هنا: ${label}`)} style={st.here}>
+          <Text style={st.hereTxt}>{t('⤓ Poser ici', '⤓ ضعيها هنا', '⤓ Ici')}</Text>
         </Pressable>
       )}
     </View>

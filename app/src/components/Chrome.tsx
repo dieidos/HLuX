@@ -50,7 +50,7 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
-        <Link href="/" accessibilityLabel="Accueil" style={st.home}><Wordmark /></Link>
+        <Link href="/" accessibilityLabel={reg === 'ar' && side === 'pp' ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
         {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
         <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>

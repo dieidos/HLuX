@@ -30,6 +30,8 @@ export default function Priorites() {
   const t = useT();
   const s = useProjectState();
   const act = useProject((x) => x.act);
+  const undo = useProject((x) => x.undo);
+  const entries = useProject((x) => x.entries);
   const [pane, setPane] = useState<'a' | 'b'>('a');
   const [open, setOpen] = useState<Circle | null>(null);
 
@@ -43,6 +45,14 @@ export default function Priorites() {
     return [...stored.filter((id) => ids.includes(id)), ...ids.filter((id) => !stored.includes(id))];
   };
 
+  // Annuler un rang = reposer l'axe parmi ceux à ranger : son dernier rang est compensé dans le journal.
+  const unrank = (axis: string) => {
+    const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
+    const last = [...entries].reverse().find((e) => e.act?.act === 'axis_ranked' && e.act.axis === axis && !undone.has(e.rank));
+    if (!last) return;
+    undo(me.id, last.rank);
+    tell(tNow(`${w(AXES.find((x) => x[0] === axis)![1])} : à ranger.`, `${w(AXES.find((x) => x[0] === axis)![1])}: للترتيب.`), pathname);
+  };
   const move = (axis: Circle, id: string, places: number) => {
     const { order, passed } = shifted(orderOn(axis), id, places);
     if (!passed) return;
@@ -82,11 +92,11 @@ export default function Priorites() {
                 </View>
               </Zone>
             ))}
-            <View style={st.chips}>
+            <Zone id="a-ranger" label={t('À ranger', 'للترتيب')} accepts={(a) => !!rankOf(a as Circle)} onDrop={unrank} style={st.chips}>
               {AXES.filter(([a]) => !rankOf(a)).map(([a, ak, color]) => (
                 <Draggable key={a} id={a} label={w(ak)}><View style={[st.axis, { borderTopColor: color }]}><Text style={st.axisTxt}>{w(ak)}</Text></View></Draggable>
               ))}
-            </View>
+            </Zone>
             <Text style={st.small}>{w('shareRank')}</Text>
           </View>
         </DragArea>

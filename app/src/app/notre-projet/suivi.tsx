@@ -30,6 +30,8 @@ export default function Suivi() {
   const opener = useProject((x) => x.pro) ?? PEOPLE[0] ?? '';
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
+  const undoF = useFacility((x) => x.undo);
+  const facilityEntries = useFacility((x) => x.entries);
   const [others, setOthers] = useState(false);
   const [loadName, setLoadName] = useState('');
   const [loadRhythm, setLoadRhythm] = useState('');
@@ -88,6 +90,11 @@ export default function Suivi() {
           lanes={lanes}
           nodes={nodes}
           decisionLabel="décidé ensemble"
+          onRemove={(id) => {
+            const undone = new Set(facilityEntries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
+            const last = [...facilityEntries].reverse().find((e) => e.act?.act === 'node_set' && e.act.node === id && !undone.has(e.rank));
+            if (last) undoF(by, last.rank);
+          }}
           onAdd={(n) => {
             const id = `suivi-${nodes.length + 1}`;
             act(by, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when });

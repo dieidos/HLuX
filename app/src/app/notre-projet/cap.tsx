@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
 
-import { DragArea, Draggable } from '../../components/Drag';
+import {DragArea, Draggable, Zone } from '../../components/Drag';
 import { Screen } from '../../components/Chrome';
 import { Ikigai } from '../../components/Ikigai';
 import type { Circle, Crossing, Spot } from '../../core/acts';
@@ -92,14 +92,18 @@ export default function Cap() {
           <Ikigai
             label={(k) => WORDS[k]}
             onDrop={place}
-            at={(spot) => caps.flatMap(([id, c]) => c.placements.filter((p) => same(p.spot, spot)).map((p) => (
-              <View key={`${id}-${p.by}`} style={[st.mark, p.by !== by && st.ghost]}>
-                <Text style={st.markTxt}>{c.title}</Text>
-                <Text style={st.markBy}>{p.by}</Text>
-              </View>
-            )))}
+            at={(spot) => caps.flatMap(([id, c]) => c.placements.filter((p) => same(p.spot, spot)).map((p) => {
+              const mark = (
+                <View key={`${id}-${p.by}`} style={[st.mark, p.by !== by && st.ghost]}>
+                  <Text style={st.markTxt}>{c.title}</Text>
+                  <Text style={st.markBy}>{p.by}</Text>
+                </View>
+              );
+              // Sa propre marque se reprend : on la repose ailleurs, ou dans le bac.
+              return p.by === by && hands === null ? <Draggable key={`${id}-${p.by}`} id={id} label={`${c.title} · ${p.by}`}>{mark}</Draggable> : mark;
+            }))}
           />
-          <View style={st.tray}>
+          <Zone id="bac" label="Le bac" accepts={(id) => !!f.caps[id]?.placements.some((p) => p.by === by && p.spot.at !== 'tray')} onDrop={(id) => place(id, { at: 'tray' }, 'reprise')} style={st.tray}>
             <Text style={st.small}>Cartes de cap à placer par {by} :</Text>
             <View style={st.row}>
               {[...unplaced.map(([id, c]) => [id, c.title] as const), ...fromFindings.map(([id, c]) => [`cap-${id}`, c.title] as const)].map(([id, t]) => (
@@ -112,7 +116,7 @@ export default function Cap() {
                 <Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text>
               </Pressable>
             </View>
-          </View>
+          </Zone>
         </DragArea>
         {caps.some(([, c]) => new Set(c.placements.filter((p) => p.spot.at !== 'tray').map((p) => JSON.stringify(p.spot))).size > 1) && (
           <Text style={st.note}>Deux placements · à discuter. Les deux positions restent à l’écran.</Text>

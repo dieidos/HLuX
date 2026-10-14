@@ -17,6 +17,8 @@ export interface NewStep {
   kind: NodeKind;
   label: string;
   link: { from: string; link: LinkKind } | null;
+  /** L'étape en cours du fil (écran 06) : elle pulse sur le chemin. */
+  thread: boolean;
 }
 
 type LinkChoice = 'none' | 'chosen' | 'open' | 'condition' | 'dependency';
@@ -28,13 +30,17 @@ const LINKS: [LinkChoice, string, string][] = [
   ['dependency', 'attend…', 'ينتظر…'],
 ];
 
-export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
+export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false }: {
   columns: string[];
   lanes: string[];
   nodes: PNode[];
   /** « je choisis » (06) ou « décidé ensemble » (12). */
   decisionLabel: string;
   onAdd: (s: NewStep) => void;
+  /** Retirer une étape : le même geste à l'envers (une compensation dans le journal). */
+  onRemove?: (id: string) => void;
+  /** Proposer « l'étape en cours » (écran 06). */
+  threadOption?: boolean;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -46,6 +52,8 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
   const [from, setFrom] = useState<string | null>(null);
   const [link, setLink] = useState<LinkChoice>('none');
   const [words, setWords] = useState('');
+  const [current, setCurrent] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const add = () => {
     const l = (newLane.trim() || lane).trim();
@@ -53,7 +61,8 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
     const lk: LinkKind | null =
       link === 'none' || !from ? null : link === 'condition' || link === 'dependency' ? { kind: link, words: words.trim() } : { kind: link };
     if (lk && 'words' in lk && !lk.words) return; // une condition ou une attente s'écrit
-    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null });
+    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null, thread: current });
+    setCurrent(false);
     setLabel('');
     setNewLane('');
     setFrom(null);
@@ -64,9 +73,21 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
 
   if (!open) {
     return (
-      <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={st.btn}>
-        <Text style={st.btnTxt}>{t('＋ Une étape', '＋ خطوة')}</Text>
-      </Pressable>
+      <View style={st.row}>
+        <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={st.btn}>
+          <Text style={st.btnTxt}>{t('＋ Une étape', '＋ خطوة')}</Text>
+        </Pressable>
+        {onRemove && nodes.length > 0 && (
+          <Pressable accessibilityRole="button" accessibilityState={{ expanded: removing }} onPress={() => setRemoving(!removing)} style={st.btn}>
+            <Text style={st.btnTxt}>{t('Retirer une étape', 'إزالة خطوة', 'Enlever une étape')}</Text>
+          </Pressable>
+        )}
+        {removing && onRemove && nodes.map((n) => (
+          <Pressable key={n.id} accessibilityRole="button" accessibilityLabel={t(`Retirer « ${n.label} »`, `إزالة « ${n.label} »`)} onPress={() => { onRemove(n.id); setRemoving(false); }} style={st.pick}>
+            <Text style={st.pickTxt}>✕ {n.label}</Text>
+          </Pressable>
+        ))}
+      </View>
     );
   }
   const chip = (on: boolean, text: string, onPress: () => void, key: string) => (
@@ -98,6 +119,11 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
             <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? t('si…', 'إذا…') : t('attend…', 'ينتظر…')} style={st.input} accessibilityLabel={link === 'condition' ? t('La condition', 'الشرط') : t("Ce qu'elle attend", 'ما تنتظره')} />
           )}
         </>
+      )}
+      {threadOption && (
+        <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: current }} onPress={() => setCurrent(!current)} style={[st.pick, current && st.pickOn]}>
+          <Text style={st.pickTxt}>{t('📍 C’est l’étape en cours', '📍 هذه هي الخطوة الحالية', '📍 Je suis là')}</Text>
+        </Pressable>
       )}
       <View style={st.row}>
         <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.primary]}>

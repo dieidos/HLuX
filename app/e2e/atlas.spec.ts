@@ -445,6 +445,8 @@ test.describe('11 Actions', () => {
     await ours(page, /Actions/);
     await solution(page, 'Atelier courriers du mardi');
     await fill(page, "Texte de l'engagement", 'un atelier courriers chaque mardi');
+    // Le groupe dit d'où vient l'engagement : ici, une parole consentie.
+    await page.getByRole('checkbox', { name: 'Les horaires de la laverie' }).click();
     await page.getByRole('radio', { name: 'Atelier courriers du mardi' }).click();
     await tap(page, 'Validée par le groupe');
     await expect(page.getByText('✓ un atelier courriers chaque mardi')).toBeVisible();

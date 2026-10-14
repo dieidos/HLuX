@@ -3,11 +3,11 @@
 // condition écrite sur sa branche, dépendance tracée. Au repos, seul le chemin choisi se montre.
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 
 import type { LinkKind, NodeKind } from '../core/acts';
-import { useT } from '../core/useAids';
+import {useRegister, useT } from '../core/useAids';
 import { useReducedMotion } from '../design/motion';
 import { C, F } from '../design/theme';
 
@@ -15,13 +15,26 @@ export interface PNode { id: string; lane: string; kind: NodeKind; label: string
 export interface PLink { from: string; to: string; link: LinkKind }
 
 const LANE_H = 86;
+
+/** Les saisons, mois et couloirs connus, dits en arabe à l'écran (la donnée reste celle du journal). */
+const AR_WORDS: Record<string, string> = {
+  automne: 'الخريف', hiver: 'الشتاء', printemps: 'الربيع', été: 'الصيف',
+  janvier: 'يناير', février: 'فبراير', mars: 'مارس', avril: 'أبريل', mai: 'مايو', juin: 'يونيو',
+  juillet: 'يوليو', août: 'أغسطس', septembre: 'سبتمبر', octobre: 'أكتوبر', novembre: 'نوفمبر', décembre: 'ديسمبر',
+  démarches: 'الإجراءات', formation: 'التكوين', activité: 'النشاط', permis: 'رخصة السياقة',
+  actions: 'الأعمال', partenaires: 'الشركاء', équipe: 'الفريق',
+};
 const HEAD_W = 110;
 
 export function PathView({ columns, lanes, nodes, links, showOthers, dashed = false }: {
   columns: string[]; lanes: string[]; nodes: PNode[]; links: PLink[]; showOthers: boolean; dashed?: boolean;
 }) {
   const t = useT();
-  const [width, setWidth] = useState(800);
+  const reg = useRegister();
+  const say = (v: string) => (reg === 'ar' ? AR_WORDS[v] ?? v : v);
+  // Une colonne garde au moins 96 px : sur un téléphone, le chemin défile à l'horizontale plutôt que de s'écraser.
+  const [avail, setAvail] = useState(800);
+  const width = Math.max(avail, HEAD_W + columns.length * 96);
   const colW = (width - HEAD_W) / columns.length;
   const shown = new Set<string>();
   // Au repos : les nœuds reliés par le chemin choisi (et les nœuds isolés).
@@ -44,12 +57,13 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
   const height = 40 + lanes.length * LANE_H;
 
   return (
-    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={[st.frame, dashed && st.dashed, { height }]}>
+    <ScrollView horizontal showsHorizontalScrollIndicator onLayout={(e) => setAvail(e.nativeEvent.layout.width)}>
+    <View style={[st.frame, dashed && st.dashed, { height, width }]}>
       {columns.map((c, i) => (
-        <Text key={c} style={[st.col, { left: HEAD_W + i * colW + 8 }]}>{c.toUpperCase()}</Text>
+        <Text key={c} style={[st.col, { left: HEAD_W + i * colW + 8 }]}>{say(c).toUpperCase()}</Text>
       ))}
       {lanes.map((l, i) => (
-        <Text key={l} style={[st.lane, { top: 40 + i * LANE_H + LANE_H / 2 - 9 }]}>{l}</Text>
+        <Text key={l} style={[st.lane, { top: 40 + i * LANE_H + LANE_H / 2 - 9 }]}>{say(l)}</Text>
       ))}
       <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
         {visLinks.map((l) => {
@@ -91,6 +105,7 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
         </View>
       )}
     </View>
+    </ScrollView>
   );
 }
 

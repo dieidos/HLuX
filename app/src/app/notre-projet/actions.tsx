@@ -34,6 +34,7 @@ export default function Actions() {
   const [rhythm, setRhythm] = useState('');
   const [chosen, setChosen] = useState<string | null>(null);
   const [live, setLive] = useState('');
+  const [from, setFrom] = useState<string[]>([]);
   const solutions = Object.entries(f.solutions);
   const decision = Object.values(f.orientations).find((o) => o.decision)?.decision;
   const commitments = Object.entries(f.commitments);
@@ -51,17 +52,19 @@ export default function Actions() {
     say(t);
     setLive(t);
   };
-  // Le fil de l'engagement : la parole consentie qui l'a fait naître, l'orientation décidée, la solution.
-  const thread = (sol: string) => {
-    const said = f.agenda.filter((a) => a.source === 'consented_word').map((a) => a.title);
-    const oriented = Object.values(f.orientations).filter((o) => o.decision).map((o) => o.title);
-    return [...said, ...oriented, f.solutions[sol]?.title ?? '', 'engagement'].filter(Boolean);
-  };
+  // Le fil de l'engagement : le groupe dit d'où il vient — la parole consentie, l'orientation décidée —,
+  // puis la solution. Rien n'est deviné : on ne relie que ce que le groupe désigne.
+  const sources = [
+    ...f.agenda.filter((a) => a.source === 'consented_word').map((a) => a.title),
+    ...Object.values(f.orientations).filter((o) => o.decision).map((o) => o.title),
+  ];
+  const thread = (sol: string) => [...sources.filter((x) => from.includes(x)), f.solutions[sol]?.title ?? '', 'engagement'].filter(Boolean);
   const commit = () => {
     if (!text.trim() || !chosen) return;
     const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
     act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: chosen, thread: thread(chosen), review: review.trim() }, prov, conf);
     setAided(false);
+    setFrom([]);
     say('Carte-engagement validée.');
     setLive('Carte-engagement validée.');
     setText('');
@@ -129,6 +132,19 @@ export default function Actions() {
           ))}
           <TextInput value={text} onChangeText={setText} multiline placeholder="Ce que nous nous engageons à faire, avec qui, à quel rythme" style={st.input} accessibilityLabel="Texte de l'engagement" />
           <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
+          {sources.length > 0 && (
+            <View style={st.row}>
+              <Text style={st.small}>D’où vient-il ?</Text>
+              {sources.map((x) => {
+                const on = from.includes(x);
+                return (
+                  <Pressable key={x} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setFrom(on ? from.filter((y) => y !== x) : [...from, x])} style={[st.btn, on && st.on]}>
+                    <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{x}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
           <View style={st.row}>
             <Text style={st.small}>Pour quelle solution ?</Text>
             {solutions.map(([id, x]) => (

@@ -12,7 +12,7 @@ import { Picto } from '../../components/Picto';
 import { AideRefusal, askAide, sortPictos } from '../../core/aides';
 import { cardThread } from '../../core/thread';
 import { useFacilityState } from '../../core/useFacility';
-import { say, tNow, useT, useWords } from '../../core/useAids';
+import {say, tNow, useAids, useT, useWords } from '../../core/useAids';
 import { usePending, useProject, useProjectState, useMe } from '../../core/useProject';
 import { PICTOS, type PictoKey } from '../../design/pictos';
 import { C, F, S } from '../../design/theme';
@@ -26,7 +26,14 @@ const ORIGIN = {
   picture: ['🖼️ choisie en image', '🖼️ اختيرت بصورة'],
 } as const;
 
+/** Les étapes du fil de la Carte, dites en arabe. */
+const STEP_AR: Record<string, string> = {
+  Dite: 'قيلت', Ressentie: 'أُحسّت', 'Une envie en est née': 'وُلدت منها رغبة', 'Apportée au collectif': 'قُدّمت للمجموعة',
+  'Un engagement du collectif': 'التزام من المجموعة', 'Reliée à mon chemin': 'رُبطت بطريقي',
+};
+
 export default function Cartes() {
+  const arabic = useAids().lang === 'ar';
   const me = useMe();
   const w = useWords();
   const t = useT();
@@ -81,7 +88,7 @@ export default function Cartes() {
     const id = `carte-${Object.keys(s.cards).length + 1}`;
     act(me.id, {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
-      picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: dayInWords(),
+      picto, verbatim: text.trim(), lang: arabic ? 'ar' : 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: dayInWords(),
     });
     say(tNow('Ta Carte est créée.', 'تمّ إنشاء بطاقتكِ.'));
     setAdding(false); setText(''); setPicto(null); setSpoken(false);
@@ -117,7 +124,7 @@ export default function Cartes() {
               {cardThread(open!, s, f).map((x, i) => (
                 <View key={`${x.step}-${i}`} style={st.step}>
                   <View style={st.dot} />
-                  <Text style={st.stepTxt}><Text style={{ fontFamily: F.bold }}>{x.step}</Text> · {x.detail}</Text>
+                  <Text style={st.stepTxt}><Text style={{ fontFamily: F.bold }}>{t(x.step, STEP_AR[x.step] ?? x.step)}</Text> · {x.detail}</Text>
                 </View>
               ))}
             </View>
@@ -145,7 +152,7 @@ export default function Cartes() {
           <View style={st.bigCard}>
             <Text style={st.bigTitle}>{w('newCard')}</Text>
             <TextInput value={text} onChangeText={setText} placeholder={t("J'écris ce que je veux dire…", 'أكتب ما أريد قوله…', "J'écris ici…")} style={st.input} multiline accessibilityLabel={t("J'écris", 'أكتب')} />
-            <DictateButton onText={(said) => { setText(said); setSpoken(true); }} />
+            <DictateButton lang={arabic ? 'ar' : 'fr'} onText={(said) => { setText(said); setSpoken(true); }} />
             <Text style={st.muted}>{t('…ou je choisis une image', '…أو أختار صورة')}</Text>
             {text.trim() ? (
               <Pressable accessibilityRole="button" onPress={sortByText} style={st.btn}>

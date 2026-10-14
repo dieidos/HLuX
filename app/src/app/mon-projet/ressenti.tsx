@@ -77,7 +77,10 @@ export default function Ressenti() {
   const [heard, setHeard] = useState('');
   const spoken = (text: string, final: boolean) => {
     if (!final) return;
-    const p = parsePlacement(text, Object.entries(s.cards).map(([id, c]) => ({ id, title: c.title })));
+    const p = parsePlacement(text, [
+      ...Object.entries(s.cards).map(([id, c]) => ({ id, title: c.title })),
+      ...reserve.flatMap((k) => [{ id: `picto:${k}`, title: PICTOS[k].fr }, { id: `picto:${k}`, title: PICTOS[k].ar }]),
+    ]);
     if (p) {
       setHeard('');
       place(p.card, p.feeling);
