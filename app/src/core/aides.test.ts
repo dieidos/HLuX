@@ -50,9 +50,9 @@ describe('Aides IA', () => {
     expect(await sortPictos('Les lettres de la CAF', keys)).toEqual(keys);
     process.env.EXPO_PUBLIC_DIEIDOS_URL = 'https://dieidos.test';
     const ok = vi.fn(async () => new Response(JSON.stringify({ order: ['papiers', 'logement', 'famille'] }), { status: 200 }));
-    expect(await sortPictos('Les lettres de la CAF', keys, ok as unknown as typeof fetch)).toEqual(['papiers', 'logement', 'famille']);
+    expect(await sortPictos('Les lettres de la CAF', keys, 'fr', ok as unknown as typeof fetch)).toEqual(['papiers', 'logement', 'famille']);
     const forged = vi.fn(async () => new Response(JSON.stringify({ order: ['papiers', 'arme'] }), { status: 200 }));
-    expect(await sortPictos('Les lettres de la CAF', keys, forged as unknown as typeof fetch)).toEqual(keys);
+    expect(await sortPictos('Les lettres de la CAF', keys, 'fr', forged as unknown as typeof fetch)).toEqual(keys);
   });
 });
 

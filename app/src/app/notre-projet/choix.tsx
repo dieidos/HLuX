@@ -58,6 +58,7 @@ export default function Choix() {
   const cycleRank = (c: Criterion) => {
     const next = order[(order.indexOf(f.criteria[c] ?? 'not_yet') + 1) % order.length];
     act('groupe', { act: 'criterion_ranked', criterion: c, rank: next });
+    setLive(`${CRITERIA.find((x) => x[0] === c)?.[1] ?? c} : ${RANKS.find((r) => r[0] === next)?.[1] === '?' ? 'pas encore rangé' : RANKS.find((r) => r[0] === next)?.[1]}.`);
   };
   // Une orientation se nomme : le groupe l'écrit, ou reprend un cap déjà posé.
   const capTitles = Object.values(f.caps).map((c) => c.title).filter((t) => !orientations.some(([, o2]) => o2.title === t));

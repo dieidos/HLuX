@@ -494,9 +494,9 @@ test.describe('12 Suivi', () => {
     await page.locator('a[href="/"]').filter({ visible: true }).first().click();
     await expect(page.getByText('Bonjour Amina 👋').filter({ visible: true })).toBeVisible();
     await mine(page, /Chemin/);
-    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.')).toBeVisible();
+    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.', { exact: true })).toBeVisible();
     await tap(page, 'Je le relie à mon chemin');
-    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.')).toHaveCount(0);
+    await expect(page.getByText('CHRS Les Lilas propose : un atelier courriers chaque mardi.', { exact: true })).toHaveCount(0);
   });
 
   test('Au printemps, trois personnes comprennent seules leurs courriers.', async ({ page }) => {

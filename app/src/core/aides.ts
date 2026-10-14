@@ -107,7 +107,7 @@ export async function askAide(req: AideRequest, fetcher: typeof fetch = fetch): 
  * personne qui choisit. Route dieidos `POST /api/assist/sort` (décision du 2026-10-14). La réponse doit
  * être une permutation exacte des clés envoyées, sinon on garde l'ordre habituel. Sans dieidos : l'ordre habituel.
  */
-export async function sortPictos(text: string, keys: string[], fetcher: typeof fetch = fetch): Promise<string[]> {
+export async function sortPictos(text: string, keys: string[], lang: 'fr' | 'ar' = 'fr', fetcher: typeof fetch = fetch): Promise<string[]> {
   const base = process.env.EXPO_PUBLIC_DIEIDOS_URL;
   if (!base || !text.trim()) return keys;
   guard(text);
@@ -116,7 +116,7 @@ export async function sortPictos(text: string, keys: string[], fetcher: typeof f
     const r = await fetcher(`${base}/api/assist/sort`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: p.text, lang: 'fr', keys }),
+      body: JSON.stringify({ text: p.text, lang, keys }),
     });
     if (!r.ok) return keys;
     const { order } = (await r.json()) as { order: string[] };

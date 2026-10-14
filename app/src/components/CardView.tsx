@@ -5,6 +5,7 @@ import { useFamily, useRegister, useT } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 import { PICTOS, type PictoKey } from '../design/pictos';
 import { Picto } from './Picto';
+import { momentAr } from '../i18n/moments';
 
 const STATE: Record<NonNullable<Card['feeling']>, string> = { fine: '😊', unsure: '🤔', hard: '😟' };
 
@@ -19,7 +20,7 @@ export function CardView({ card, compact = false, brought = false }: { card: Car
       {card.picto ? <Picto name={card.picto} size={compact ? 44 : 64} label={false} /> : null}
       <View style={{ flexShrink: 1 }}>
         <Text style={[st.title, { fontFamily: bold }]}>{title}{card.feeling ? ` ${STATE[card.feeling]}` : ''}</Text>
-        {!compact && <Text style={st.moment}>{card.moments[card.moments.length - 1]}</Text>}
+        {!compact && <Text style={st.moment}>{reg === 'ar' ? momentAr(card.moments[card.moments.length - 1]) : card.moments[card.moments.length - 1]}</Text>}
       </View>
     </View>
   );

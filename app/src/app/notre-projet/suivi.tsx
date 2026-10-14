@@ -47,6 +47,7 @@ export default function Suivi() {
     act(author, { act: 'result', text: result.trim(), back_to_finding: back }, prov, conf);
     setResult('');
     setAided(false);
+    setLive(aided ? 'Résultat proposé : à valider pour le groupe.' : 'Résultat noté.');
     if (back) {
       say('Retour au constat.');
       router.push('/notre-projet/constat');
@@ -105,6 +106,7 @@ export default function Suivi() {
             act(by, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when });
             if (n.link) act(by, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
             say(`${n.label} : posé sur le chemin collectif, ${n.when}.`);
+            setLive(`${n.label} : posé sur le chemin collectif, ${n.when}.`);
           }}
         />
         <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}>
@@ -174,7 +176,7 @@ export default function Suivi() {
               f.proposals[`p-${id}`] ? (
                 <Text key={id} style={st.result}>📣 {f.proposals[`p-${id}`]}</Text>
               ) : (
-                <Pressable key={id} onPress={() => act(by, { act: 'proposal', proposal: `p-${id}`, text: c.text })} style={[st.btn, st.on]} accessibilityRole="button">
+                <Pressable key={id} onPress={() => { act(by, { act: 'proposal', proposal: `p-${id}`, text: c.text }); setLive(`${place} propose : ${c.text}. Chaque personne choisit de le relier, ou non.`); }} style={[st.btn, st.on]} accessibilityRole="button">
                   <Text style={[st.btnTxt, { color: C.onAccent }]}>{place} propose : {c.text}</Text>
                 </Pressable>
               ),

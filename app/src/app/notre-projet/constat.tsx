@@ -3,6 +3,7 @@
 // en mots : situation individuelle → signal à vérifier → difficulté répétée → enjeu confirmé.
 // Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat.
 
+import { freshId } from '../../core/ids';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -75,7 +76,9 @@ export default function Constat() {
   };
   const add = () => {
     if (!title.trim()) return;
-    act(speaker, { act: 'finding_placed', finding: `c-${Object.keys(f.findings).length + 1}`, title: title.trim(), zone: 'unsure', source, author: speaker });
+    // Une parole consentie n'est signée par personne d'autre que sa source (A11).
+    act(speaker, { act: 'finding_placed', finding: freshId('c', Object.keys(f.findings)), title: title.trim(), zone: 'unsure', source, author: source === 'consented_word' ? '' : speaker });
+    tell(`${speaker} pose une carte : ${title.trim()}.`);
     setTitle('');
   };
 

@@ -14,7 +14,7 @@ import { QrReceive, QrSend } from '../components/QrCopy';
 import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
 import { pickTextFile } from '../core/openFile';
 import { needsBackup, readDossier } from '../core/profiles';
-import { tNow, useT, useWords } from '../core/useAids';
+import { tNow, useAids, useT, useWords } from '../core/useAids';
 import { enterDemo, useMe, useProject, useTeam } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 
@@ -29,6 +29,7 @@ export default function Home() {
   const [names, setNames] = useState('');
   const [askDemo, setAskDemo] = useState(false);
   const [confirmErase, setConfirmErase] = useState(false);
+  const arabicHome = useAids((a) => a.lang) === 'ar';
   const [device, setDevice] = useState<'facility' | 'personal' | null>(null);
   const [myName, setMyName] = useState('');
   const [mySentence, setMySentence] = useState('');
@@ -219,7 +220,7 @@ export default function Home() {
   }
 
   return (
-    <ScrollView contentContainerStyle={st.page}>
+    <ScrollView contentContainerStyle={[st.page, { direction: arabicHome ? 'rtl' : 'ltr' }]} {...(arabicHome ? ({ lang: 'ar' } as object) : {})}>
       <Wordmark size={28} />
       <Text style={st.hello}>{w('hello')} {me.name} 👋</Text>
       {needsBackup(profile, new Date()) && !leaving ? (

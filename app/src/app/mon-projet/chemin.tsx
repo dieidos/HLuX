@@ -14,7 +14,7 @@ import { PathView } from '../../components/PathView';
 import { PlanEditor } from '../../components/PlanEditor';
 import { seasonsFrom } from '../../core/dates';
 import { freshId } from '../../core/ids';
-import {tNow, tell, useT, useWords } from '../../core/useAids';
+import { tNow, tell, useAids, useT, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
@@ -88,7 +88,10 @@ export default function Chemin() {
               onRemove={(id) => {
                 const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
                 const last = [...entries].reverse().find((e) => e.act?.act === 'node_set' && e.act.node === id && !undone.has(e.rank));
-                if (last) undo(me.id, last.rank);
+                if (last) {
+                  undo(me.id, last.rank);
+                  tell(tNow(`${s.nodes[id]?.label ?? ''} : retirée de ton chemin.`, `${s.nodes[id]?.label ?? ''}: أُزيلت من طريقكِ.`), pathname);
+                }
               }}
               onAdd={(n) => {
                 const id = freshId('etape', Object.keys(s.nodes));
@@ -110,7 +113,7 @@ export default function Chemin() {
               ))}
             </View>
             <PathView columns={SEASONS} lanes={lanes} nodes={copy} links={s.links} showOthers dashed />
-            <AideButton kind="narrate" label={t("Raconter ce qui s'ouvre, ce qui se ferme", 'أحكي ما يُفتح وما يُغلق', 'Raconter')} text={facts} who={me.name} onProposal={(p) => { setStory(p); setStoryAided(true); }} />
+            <AideButton kind="narrate" lang={useAids.getState().lang} label={t("Raconter ce qui s'ouvre, ce qui se ferme", 'أحكي ما يُفتح وما يُغلق', 'Raconter')} text={facts} who={me.name} onProposal={(p) => { setStory(p); setStoryAided(true); }} />
             {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel={t('Récit de la copie', 'حكاية النسخة')} /> : null}
             <View style={st.chips}>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{w('keepIdea')}</Text></Pressable>
@@ -162,7 +165,7 @@ export default function Chemin() {
               onChange={(plan) => act(me.id, { act: 'plan_set', plan })}
             />
             <View style={{ flexBasis: '100%', gap: 6 }}>
-              <AideButton kind="narrate" label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={setPlanWords} />
+              <AideButton kind="narrate" lang={useAids.getState().lang} label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={setPlanWords} />
               {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel={t('Mon plan dans mes mots', 'خطّتي بكلماتي')} /> : null}
             </View>
           </View>
