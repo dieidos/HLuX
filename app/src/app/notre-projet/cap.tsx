@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AideButton } from '../../components/AideButton';
 
 import { DragArea, Draggable } from '../../components/Drag';
 import { Screen } from '../../components/Chrome';
@@ -81,6 +82,7 @@ export default function Cap() {
         <View style={st.change}>
           <Text style={st.h}>Changement attendu</Text>
           <TextInput value={change} onChangeText={setChange} multiline placeholder="« Chaque personne comprend ses courriers, ou sait qui l'aide à les lire. »" style={st.input} accessibilityLabel="Changement attendu" />
+          <AideButton kind="phrase" label="Mettre en mots ce que le groupe a dit" text={change} who="Le groupe" onProposal={setChange} />
           <View style={st.row}>
             <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: false })} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
             <Pressable accessibilityRole="button" onPress={() => change.trim() && act(by, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated: true })} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>

@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { AideButton } from '../../components/AideButton';
 import { Screen } from '../../components/Chrome';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
@@ -27,6 +28,7 @@ export default function Constat() {
   const act = useFacility((x) => x.act);
   const [title, setTitle] = useState('');
   const [source, setSource] = useState<Source>('team');
+  const [reading, setReading] = useState('');
   const speaker = f.floor ?? f.mandate ?? 'Aïcha';
   const session = f.attendance?.session ?? 'séance';
   // Les sujets consentis (écran 07) arrivent sur la table, à placer.
@@ -43,6 +45,11 @@ export default function Constat() {
     act(speaker, { act: 'finding_qualified', finding: id, level: next });
     say(`${f.findings[id].title} : ${QUALIF_WORDS[next]}.`);
   };
+  // La relecture : une phrase par zone, lue à voix haute ; le groupe corrige les cartes, pas la machine.
+  const draft = ZONES.map(([z, label]) => {
+    const titles = Object.values(f.findings).filter((x) => x.zone === z).map((x) => x.title);
+    return titles.length ? `${label} : ${titles.join(', ')}.` : '';
+  }).filter(Boolean).join(' ');
   const add = () => {
     if (!title.trim()) return;
     act(speaker, { act: 'finding_placed', finding: `c-${Object.keys(f.findings).length + 1}`, title: title.trim(), zone: 'unsure', source, author: speaker });
@@ -98,6 +105,15 @@ export default function Constat() {
           <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Poser</Text></Pressable>
         </View>
         <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l'a dite.</Text>
+        <View style={st.tray}>
+          <Text style={st.cardTitle}>Relire le constat à voix haute</Text>
+          <TextInput value={reading || draft} onChangeText={setReading} multiline style={st.input} accessibilityLabel="Relecture du constat" />
+          <View style={st.row}>
+            <AideButton kind="narrate" label="Une phrase par carte" text={reading || draft} who="Le groupe" onProposal={setReading} />
+            <Pressable accessibilityRole="button" onPress={() => say(reading || draft)} style={st.btn}><Text style={st.btnTxt}>🔊 Lire à voix haute</Text></Pressable>
+          </View>
+          <Text style={st.small}>Si une phrase ne va pas, le groupe corrige la carte elle-même.</Text>
+        </View>
       </ScrollView>
     </Screen>
   );

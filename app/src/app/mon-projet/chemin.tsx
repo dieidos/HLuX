@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
+import { AideButton } from '../../components/AideButton';
 import { BackupRefusal, exportDossier, MIN_WORDS } from '../../core/backup';
 import { saveFile } from '../../core/saveFile';
 import { PathView } from '../../components/PathView';
@@ -27,6 +28,8 @@ export default function Chemin() {
   const [question, setQuestion] = useState('Et si le rendez-vous à la CAF était repoussé ?');
   const [moved, setMoved] = useState<{ node: string; when: string } | null>(null);
   const [plan, setPlan] = useState(false);
+  const [story, setStory] = useState('');
+  const [planWords, setPlanWords] = useState('');
   const [phrase, setPhrase] = useState('');
   const [saved, setSaved] = useState('');
   const entries = useProject((x) => x.entries);
@@ -36,14 +39,18 @@ export default function Chemin() {
   const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n }));
   const copy = nodes.map((n) => (moved && n.id === moved.node ? { ...n, when: moved.when } : n));
   const movable = nodes.filter((n) => n.kind === 'event');
+  const movedNode = moved ? nodes.find((n) => n.id === moved.node) : null;
+  const facts = movedNode ? `${question} Sur la copie : « ${movedNode.label} » passe de ${movedNode.when} à ${moved!.when}.` : question;
+  const planFacts = `D'abord : ${s.plan.first.join(', ')}. Ça attend : ${s.plan.waiting.map(([a, b]) => `${a} (${b})`).join(', ')}. Avec qui : ${s.plan.with_whom.join(', ')}. Reste ouvert : ${s.plan.open.join(', ')}.`;
 
   const closeWhatIf = (kept: boolean) => {
     const sim = `sim-${Object.keys(s.whatIfs).length + 1}`;
-    act('amina', { act: 'what_if', sim, question, moves: moved ? [[moved.node, moved.when]] : [], story: null });
+    act('amina', { act: 'what_if', sim, question, moves: moved ? [[moved.node, moved.when]] : [], story: story.trim() || null });
     act('amina', { act: 'what_if_closed', sim, kept });
     say(kept ? "L'idée est gardée. Ton vrai chemin n'a pas bougé." : "C'est refermé. Ton vrai chemin n'a pas bougé.");
     setWhatIf(false);
     setMoved(null);
+    setStory('');
   };
 
   return (
@@ -63,6 +70,8 @@ export default function Chemin() {
               ))}
             </View>
             <PathView columns={SEASONS} lanes={LANES} nodes={copy} links={s.links} showOthers dashed />
+            <AideButton kind="narrate" label="Raconter ce qui s'ouvre, ce qui se ferme" text={facts} who="Amina" onProposal={setStory} />
+            {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel="Récit de la copie" /> : null}
             <View style={st.chips}>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>{w('keepIdea')}</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(false)} style={st.btn}><Text style={st.btnTxt}>{w('closeIt')}</Text></Pressable>
@@ -121,6 +130,10 @@ export default function Chemin() {
                 {items.map((i) => <Text key={i} style={st.tileItem}>{i}</Text>)}
               </View>
             ))}
+            <View style={{ flexBasis: '100%', gap: 6 }}>
+              <AideButton kind="narrate" label="Dire mon plan en quelques phrases" text={planFacts} who="Amina" onProposal={setPlanWords} />
+              {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel="Mon plan dans mes mots" /> : null}
+            </View>
           </View>
         )}
       </ScrollView>

@@ -23,6 +23,7 @@ describe('Aides IA', () => {
     expect(r.offline).toBe(true);
     expect(r.proposal).toBe('Comprendre les courriers administratifs est difficile pour plusieurs personnes.');
     expect(offlineExample({ kind: 'simplify', text: 'Les lettres de la CAF, je les laisse fermées.' })).toContain('Les lettres');
+    expect(offlineExample({ kind: 'phrase', text: 'au printemps cinq personnes viennent' })).toBe('Au printemps cinq personnes viennent.');
   });
 
   it('avec dieidos : le texte part pseudonymisé, la réponse revient avec les prénoms', async () => {

@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
 import type { Lean } from '../../core/acts';
@@ -112,6 +113,7 @@ export default function Actions() {
             </View>
           ))}
           <TextInput value={text} onChangeText={setText} multiline placeholder="« Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »" style={st.input} accessibilityLabel="Texte de l'engagement" />
+          <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={setText} />
           <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler" style={st.input} accessibilityLabel="Date pour en reparler" />
           <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Validée par le groupe</Text></Pressable>
         </View>

@@ -56,6 +56,10 @@ export function offlineExample(req: AideRequest): string {
       return req.lang === 'ar' ? '(traduction en arabe : disponible avec dieidos)' : '(traduction en français : disponible avec dieidos)';
     case 'generalize':
       return `${t.split(/[.,]/)[0]} est difficile pour plusieurs personnes.`;
+    case 'phrase': {
+      const u = t.charAt(0).toUpperCase() + t.slice(1);
+      return /[.!?]$/.test(u) ? u : `${u}.`;
+    }
     default:
       return t;
   }

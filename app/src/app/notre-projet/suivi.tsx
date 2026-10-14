@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
 import { PathView } from '../../components/PathView';
@@ -93,6 +94,7 @@ export default function Suivi() {
           <Text style={st.h}>Ce qui en résulte</Text>
           {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
           <TextInput value={result} onChangeText={setResult} multiline placeholder="« Au printemps : 5 personnes chaque mardi, 3 comprennent seules leurs courriers. Les relances restent dures. »" style={st.input} accessibilityLabel="Résultat" />
+          <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={setResult} />
           <View style={st.row}>
             <Pressable onPress={() => { if (result.trim()) { act('groupe', { act: 'result', text: result.trim(), back_to_finding: false }); setResult(''); } }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
             <Pressable onPress={() => { if (result.trim()) { act('groupe', { act: 'result', text: result.trim(), back_to_finding: true }); setResult(''); say('Retour au constat.'); } }} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>🔁 Retour au constat</Text></Pressable>

@@ -8,6 +8,8 @@ import { CardView } from '../../components/CardView';
 import { Screen } from '../../components/Chrome';
 import { Picto } from '../../components/Picto';
 import { AideRefusal, askAide } from '../../core/aides';
+import { cardThread } from '../../core/thread';
+import { useFacilityState } from '../../core/useFacility';
 import { say, useWords } from '../../core/useAids';
 import { usePending, useProject, useProjectState } from '../../core/useProject';
 import { PICTOS, type PictoKey } from '../../design/pictos';
@@ -16,6 +18,7 @@ import { C, F, S } from '../../design/theme';
 export default function Cartes() {
   const w = useWords();
   const s = useProjectState();
+  const f = useFacilityState();
   const act = useProject((x) => x.act);
   const confirm = useProject((x) => x.confirm);
   const undo = useProject((x) => x.undo);
@@ -75,9 +78,16 @@ export default function Cartes() {
             <Text style={st.bigTitle}>{big.title}</Text>
             {big.verbatim ? <Text style={st.verbatim}>« {big.verbatim} »</Text> : null}
             {big.simpler ? <Text style={st.simpler}>Plus simple : {big.simpler}</Text> : null}
-            {big.moments.map((m) => <Text key={m} style={st.chip}>{m}</Text>)}
             {!big.feeling && <Text style={st.chip}>{w('notPlaced')}</Text>}
             <Text style={st.muted}>{w('keepsAll')}</Text>
+            <View style={st.thread} accessibilityLabel="Le fil de la Carte">
+              {cardThread(open!, s, f).map((t, i) => (
+                <View key={`${t.step}-${i}`} style={st.step}>
+                  <View style={st.dot} />
+                  <Text style={st.stepTxt}><Text style={{ fontFamily: F.bold }}>{t.step}</Text> · {t.detail}</Text>
+                </View>
+              ))}
+            </View>
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
               <Pressable accessibilityRole="button" onPress={() => aide(open!, 'simplify')} style={st.btn}><Text style={st.btnTxt}>💬 Version plus simple</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => aide(open!, 'translate')} style={st.btn}><Text style={st.btnTxt}>🌐 En arabe</Text></Pressable>
@@ -133,6 +143,10 @@ const st = StyleSheet.create({
   verbatim: { fontFamily: F.display, fontSize: 22, color: C.ink },
   simpler: { fontFamily: F.body, fontSize: 16, color: C.text },
   chip: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: S.radiusPill, backgroundColor: C.surface2, fontFamily: F.body, fontSize: 13, color: C.slate },
+  thread: { gap: 6, paddingLeft: 4, borderLeftWidth: 2, borderLeftColor: C.line, marginLeft: 6 },
+  step: { flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: -9 },
+  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: C.pp.value },
+  stepTxt: { flexShrink: 1, fontFamily: F.body, fontSize: 15, color: C.text },
   proposal: { gap: 6, padding: 10, borderRadius: 12, backgroundColor: '#f6effb', borderWidth: 1, borderStyle: 'dashed', borderColor: C.violet },
   input: { minHeight: 80, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },
   pictos: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
