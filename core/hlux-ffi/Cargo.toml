@@ -8,7 +8,21 @@ publish.workspace = true
 
 [lib]
 crate-type = ["lib", "staticlib", "cdylib"]
+name = "hlux_ffi"
+
+# Le générateur, embarqué (comme ab-ante-ffi) : lui seul porte le drapeau `cli`.
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi-bindgen.rs"
+required-features = ["tool"]
 
 [dependencies]
 hlux-core = { path = "../hlux-core" }
+ab-ante-core.workspace = true
 serde_json.workspace = true
+thiserror.workspace = true
+# ⚠️ Sans `cli` : la bibliothèque qu'importe l'application ne tire pas `clap`.
+uniffi = { version = "0.28" }
+
+[features]
+tool = ["uniffi/cli"]
