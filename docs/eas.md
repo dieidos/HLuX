@@ -32,3 +32,4 @@
    - Les tests de parité restent : même journal, même état.
 4. Passer `rusqlite` en `bundled-sqlcipher`, avec la clé du profil tirée du Keychain / Keystore, puis retirer le chiffrement MMKV provisoire.
 5. Parcours Maestro sur tablette réelle (les 36 notes, déjà en Playwright sur l'aperçu web).
+6. **Vérifier sur appareil** : la copie par QR entre deux appareils (`expo-camera`, `react-native-qrcode-svg`) et la dictée hors ligne en français et en arabe (`expo-speech-recognition`, iPad et Android 13+). Vérifier aussi que, sans reconnaissance hors ligne, le bouton refuse au lieu de passer par le réseau.
