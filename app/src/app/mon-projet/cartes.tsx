@@ -91,7 +91,7 @@ const st = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
   new: { minWidth: 220, padding: 16, borderRadius: S.radius, borderWidth: 2, borderStyle: 'dashed', borderColor: C.line, backgroundColor: C.surface },
   plus: { fontSize: 32, color: C.slate },
-  newTitle: { fontFamily: F.body, fontWeight: '700', fontSize: 17, color: C.ink },
+  newTitle: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   muted: { fontFamily: F.body, fontSize: 13, color: C.muted },
   overlay: { position: 'absolute', inset: 0, backgroundColor: 'rgba(13,17,23,.35)', alignItems: 'center', justifyContent: 'center', padding: 24 },
   bigCard: { width: '100%', maxWidth: 620, gap: 10, padding: 24, borderRadius: 20, backgroundColor: C.surface, borderTopWidth: 8, borderTopColor: C.pp.value },
@@ -105,5 +105,5 @@ const st = StyleSheet.create({
   pickOn: { borderColor: C.violet },
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 18, borderRadius: S.radiusPill, backgroundColor: C.surface2, borderWidth: 1, borderColor: C.line, alignSelf: 'flex-start' },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
-  btnTxt: { fontFamily: F.body, fontWeight: '700', fontSize: 16, color: C.ink },
+  btnTxt: { fontFamily: F.bold, fontSize: 16, color: C.ink },
 });

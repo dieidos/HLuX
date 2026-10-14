@@ -21,7 +21,7 @@ const PE: [WordKey, string][] = [
 /** HLuX, aux couleurs exactes du logo, sans fond ni contour. */
 export function Wordmark({ size = 15 }: { size?: number }) {
   return (
-    <Text style={{ fontFamily: F.wordmark, fontSize: size, fontWeight: '700', letterSpacing: 0.8 }} accessibilityLabel="HLuX">
+    <Text style={{ fontFamily: F.wordmark, fontSize: size, letterSpacing: 0.8 }} accessibilityLabel="HLuX">
       <Text style={{ color: C.logo.first }}>HL</Text>
       <Text style={{ color: C.logo.second }}>u</Text>
       <Text style={{ color: C.logo.third }}>X</Text>
@@ -86,10 +86,10 @@ const st = StyleSheet.create({
   page: { flex: 1, backgroundColor: C.bg },
   top: { flexDirection: 'row', alignItems: 'center', gap: S.gap, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.surface, borderBottomWidth: 1, borderColor: C.line },
   home: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
-  proj: { fontFamily: F.body, fontWeight: '700', color: C.ink, fontSize: 15 },
+  proj: { fontFamily: F.bold, color: C.ink, fontSize: 15 },
   stepper: { flex: 1, flexDirection: 'row', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap' },
   step: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: S.radiusPill, backgroundColor: C.surface2, minHeight: 32 },
-  stepTxt: { fontFamily: F.body, fontSize: 13, fontWeight: '700', color: C.muted },
+  stepTxt: { fontFamily: F.bold, fontSize: 13, color: C.muted },
   head: { paddingHorizontal: 24, paddingTop: 16, gap: 4 },
   title: { fontFamily: F.display, fontSize: S.title, color: C.ink },
   question: { fontFamily: F.body, fontSize: S.body, color: C.text },
@@ -97,6 +97,6 @@ const st = StyleSheet.create({
   aids: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, backgroundColor: C.surface, borderTopWidth: 1, borderColor: C.line },
   aid: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.surface2, borderWidth: 1, borderColor: C.line },
   aidOn: { backgroundColor: C.violetInk, borderColor: C.violetInk },
-  aidTxt: { fontFamily: F.body, fontWeight: '700', color: C.ink, fontSize: 15 },
-  who: { marginStart: 'auto', fontFamily: F.body, fontSize: 13, color: C.muted, fontWeight: '700' },
+  aidTxt: { fontFamily: F.bold, color: C.ink, fontSize: 15 },
+  who: { marginStart: 'auto', fontFamily: F.bold, fontSize: 13, color: C.muted },
 });

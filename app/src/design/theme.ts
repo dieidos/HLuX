@@ -23,6 +23,7 @@ export const F = {
   display: tokens.font.display,
   wordmark: tokens.font.wordmark,
   body: tokens.font.body,
+  bold: `${tokens.font.body}Bold`,
   arabic: tokens.font.arabic,
 };
 

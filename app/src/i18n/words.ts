@@ -36,6 +36,20 @@ export const WORDS = {
   unsure: { fr: '🤔 Je ne sais pas', ar: '🤔 لا أعرف', falc: '🤔 Je ne sais pas' },
   hard: { fr: "😟 C'est difficile", ar: '😟 صعب', falc: "😟 C'est difficile" },
   howFeel: { fr: 'Comment ça va pour moi ? Je prends une carte, je la pose.', ar: 'كيف حالي؟ آخذ بطاقة وأضعها.', falc: 'Je prends une carte. Je la pose.' },
+  // 03 Envies
+  love: { fr: "❤️ J'aime", ar: '❤️ أحبّ', falc: "❤️ J'aime" },
+  able: { fr: "🛠️ J'en suis capable", ar: '🛠️ أنا قادرة', falc: '🛠️ Je sais faire' },
+  useful: { fr: '🤝 Je suis utile', ar: '🤝 أنا مفيدة', falc: "🤝 J'aide" },
+  living: { fr: "💶 J'en vis", ar: '💶 أعيش منه', falc: "💶 J'en vis" },
+  passion: { fr: 'Passion', ar: 'شغف', falc: 'Passion' },
+  mission: { fr: 'Mission', ar: 'رسالة', falc: 'Mission' },
+  profession: { fr: 'Profession', ar: 'مهنة', falc: 'Métier' },
+  vocation: { fr: 'Vocation', ar: 'دعوة', falc: 'Vocation' },
+  wishQuestion: { fr: "Qu'est-ce que j'aimerais ? J'imagine des possibles.", ar: 'ماذا أحبّ أن أفعل؟ أتخيّل الممكن.', falc: "Ce que j'aimerais." },
+  tray: { fr: 'À placer', ar: 'للترتيب', falc: 'À placer' },
+  discard: { fr: 'Écarter (on ne peut pas revenir)', ar: 'إبعاد (لا رجعة فيه)', falc: 'Enlever pour toujours' },
+  newIdea: { fr: '＋ Une idée', ar: '＋ فكرة', falc: '＋ Une idée' },
+  bornOf: { fr: 'née de', ar: 'نابعة من', falc: 'vient de' },
 } as const;
 
 export type WordKey = keyof typeof WORDS;

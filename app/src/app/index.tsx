@@ -29,5 +29,5 @@ const st = StyleSheet.create({
   hello: { fontFamily: F.display, fontSize: 40, color: C.ink },
   row: { flexDirection: 'row', gap: 20, flexWrap: 'wrap', justifyContent: 'center' },
   door: { minWidth: 260, padding: 28, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 8 },
-  doorTxt: { fontFamily: F.body, fontSize: 22, fontWeight: '700', color: C.ink },
+  doorTxt: { fontFamily: F.bold, fontSize: 22, color: C.ink },
 });

@@ -72,12 +72,12 @@ export default function Ressenti() {
 const st = StyleSheet.create({
   zones: { flexDirection: 'row', gap: 16, flex: 1, flexWrap: 'wrap' },
   zone: { flex: 1, minWidth: 220, minHeight: 220 },
-  zoneTitle: { fontFamily: F.body, fontWeight: '700', fontSize: 18, color: C.ink, marginBottom: 10 },
+  zoneTitle: { fontFamily: F.bold, fontSize: 18, color: C.ink, marginBottom: 10 },
   stack: { gap: 8 },
   tray: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16, padding: 12, borderRadius: S.radius, backgroundColor: C.surface2, minHeight: 72 },
   muted: { fontFamily: F.body, color: C.muted },
   said: { position: 'absolute', bottom: 16, alignSelf: 'center', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, paddingHorizontal: 18, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
-  saidTxt: { fontFamily: F.body, fontSize: 16, fontWeight: '700', color: C.ink },
+  saidTxt: { fontFamily: F.bold, fontSize: 16, color: C.ink },
   undo: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.surface2 },
-  undoTxt: { fontFamily: F.body, fontWeight: '700', color: C.ink },
+  undoTxt: { fontFamily: F.bold, color: C.ink },
 });

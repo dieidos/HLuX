@@ -3,8 +3,8 @@
 // Aussi au toucher simple : toucher une carte la « prend », toucher une zone la « pose »
 // (accessibilité, lecteurs d'écran, et contrôle fin sur tablette).
 
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
-import { Animated, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { C } from '../design/theme';
@@ -29,11 +29,17 @@ export function DragArea({ children }: { children: ReactNode }) {
   const zones = useRef(new Map<string, { r: Rect; onDrop: (item: string) => void }>());
   const heldRef = useRef<string | null>(null);
 
+  // La plus petite zone sous le doigt l'emporte : un croisement de l'Ikigai passe avant son cercle.
   const hit = (x: number, y: number) => {
+    let best: string | null = null;
+    let area = Infinity;
     for (const [id, z] of zones.current) {
-      if (x >= z.r.x && x <= z.r.x + z.r.w && y >= z.r.y && y <= z.r.y + z.r.h) return id;
+      if (x >= z.r.x && x <= z.r.x + z.r.w && y >= z.r.y && y <= z.r.y + z.r.h && z.r.w * z.r.h < area) {
+        best = id;
+        area = z.r.w * z.r.h;
+      }
     }
-    return null;
+    return best;
   };
   const value: Ctx = {
     held,
@@ -59,7 +65,9 @@ export function DragArea({ children }: { children: ReactNode }) {
   return <DragCtx.Provider value={value}>{children}</DragCtx.Provider>;
 }
 
-/** Une zone de dépôt : elle s'éclaire dès qu'une carte est prise. */
+/** Une zone de dépôt : elle s'éclaire dès qu'une carte est prise.
+ *  Au toucher : quand une carte est prise, un bouton « Poser ici » apparaît dans la zone
+ *  (pas de bouton autour des cartes : elles restent elles-mêmes touchables). */
 export function Zone({ id, onDrop, style, children, label }: { id: string; onDrop: (item: string) => void; style?: ViewStyle; children: ReactNode; label: string }) {
   const d = useDrag();
   const ref = useRef<View>(null);
@@ -67,18 +75,17 @@ export function Zone({ id, onDrop, style, children, label }: { id: string; onDro
     ref.current?.measureInWindow((x, y, w, h) => d.register(id, { x, y, w, h }, onDrop));
   }, [d, id, onDrop]);
   const lit = d.held !== null;
+  // Re-mesurer au moment du prendre : la mise en page a pu bouger depuis.
+  useEffect(() => { if (lit) measure(); }, [lit, measure]);
   return (
-    <Pressable
-      ref={ref}
-      onLayout={measure}
-      onPressIn={measure}
-      onPress={() => d.held && d.placeHeld(id)}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={[st.zone, style, lit && st.zoneLit, d.hover === id && st.zoneHover]}
-    >
+    <View ref={ref} onLayout={measure} accessibilityLabel={label} style={[st.zone, style, lit && st.zoneLit, d.hover === id && st.zoneHover]}>
       {children}
-    </Pressable>
+      {lit && (
+        <Pressable onPress={() => d.placeHeld(id)} accessibilityRole="button" accessibilityLabel={`Poser ici : ${label}`} style={st.here}>
+          <Text style={st.hereTxt}>⤓ Poser ici</Text>
+        </Pressable>
+      )}
+    </View>
   );
 }
 
@@ -113,5 +120,7 @@ const st = StyleSheet.create({
   zone: { borderRadius: 18, borderWidth: 2, borderStyle: 'dashed', borderColor: C.line, padding: 14 },
   zoneLit: { borderColor: C.violet, backgroundColor: '#f6effb' },
   zoneHover: { borderStyle: 'solid', backgroundColor: '#efe4f8' },
+  here: { alignSelf: 'flex-start', marginTop: 8, minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.violetInk },
+  hereTxt: { color: '#fff', fontFamily: 'SourceSans3Bold', fontSize: 15 },
   lifted: { zIndex: 10, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
 });

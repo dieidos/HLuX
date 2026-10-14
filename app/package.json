@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo-google-fonts/noto-naskh-arabic": "^0.4.5",
+    "@expo-google-fonts/quicksand": "^0.4.1",
+    "@expo-google-fonts/source-sans-3": "^0.4.2",
     "@expo/metro-runtime": "~57.0.16",
     "expo": "~57.0.28",
     "expo-constants": "~57.0.21",
