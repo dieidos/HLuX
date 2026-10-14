@@ -3,6 +3,7 @@
 // Appui long sur « HLuX » : le mode démonstration, caché, qui entre lui-même ses données.
 // 1. La professionnelle touche son prénom. 2. La personne touche le sien, ou entre avec un prénom et une phrase.
 // 3. « Bonjour Amina », puis Mon projet ou Notre projet. Hors séance, les profils restent fermés.
+import { refusalAr } from '../i18n/refusals';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -56,7 +57,7 @@ export default function Home() {
       setRestorePhrase('');
       setRestoreMsg('');
     } catch (e) {
-      setRestoreMsg(e instanceof BackupRefusal ? e.message : tNow("Ce fichier n'est pas un dossier HLuX.", 'هذا الملف ليس ملفّاً من HLuX.'));
+      setRestoreMsg(e instanceof BackupRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("Ce fichier n'est pas un dossier HLuX.", 'هذا الملف ليس ملفّاً من HLuX.'));
     }
   };
 

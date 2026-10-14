@@ -1,6 +1,7 @@
 // Le bouton d'aide IA, le même partout : un geste explicite, une seule proposition, et un humain qui valide.
 // La proposition remplit le champ ; elle ne compte qu'une fois validée par le bouton habituel de l'écran.
 
+import { refusalAr } from '../i18n/refusals';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -37,7 +38,7 @@ export function AideButton({ kind, label, text, who, onProposal, lang }: Props) 
         `${r.offline ? 'Un exemple' : 'Une idée'}. ${who} relit, puis dit oui.`,
       ));
     } catch (e) {
-      setMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu. Rien n'a changé.", 'لم تُجب المساعدة. لم يتغيّر شيء.'));
+      setMsg(e instanceof AideRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("L'aide n'a pas répondu. Rien n'a changé.", 'لم تُجب المساعدة. لم يتغيّر شيء.'));
     }
   };
   return (

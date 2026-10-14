@@ -31,13 +31,14 @@ export default function Cap() {
   const [by, setBy] = useState(f.mandate || opener);
   const [title, setTitle] = useState('');
   const [live, setLive] = useState('');
+  const [capFor, setCapFor] = useState<string | null>(null);
   const [change, setChange] = useState(f.expectedChange?.text ?? '');
   const [aided, setAided] = useState(false);
   const [hands, setHands] = useState<string[] | null>(null); // null : à tour de rôle
   const sayChange = (validated: boolean) => {
     if (!change.trim()) return;
     const [author, prov, conf] = provenanceOf(aided, validated, by);
-    act(author, { act: 'expected_change', cap: caps[0]?.[0] ?? '', text: change.trim(), validated }, prov, conf);
+    act(author, { act: 'expected_change', cap: capFor ?? caps[0]?.[0] ?? '', text: change.trim(), validated }, prov, conf);
   };
 
   const caps = Object.entries(f.caps);
@@ -123,6 +124,16 @@ export default function Cap() {
         )}
         <View style={st.change}>
           <Text style={st.h}>Changement attendu</Text>
+          {caps.length > 1 && (
+            <View style={st.row}>
+              <Text style={st.small}>Pour quel cap ?</Text>
+              {caps.map(([id, c]) => (
+                <Pressable key={id} accessibilityRole="radio" accessibilityState={{ checked: (capFor ?? caps[0][0]) === id }} onPress={() => setCapFor(id)} style={[st.btn, (capFor ?? caps[0][0]) === id && st.on]}>
+                  <Text style={[st.btnTxt, (capFor ?? caps[0][0]) === id && { color: C.onAccent }]}>{c.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
           <TextInput value={change} onChangeText={setChange} multiline placeholder="Ce que nous voulons voir changer, en une phrase qui s'observe" style={st.input} accessibilityLabel="Changement attendu" />
           <AideButton kind="phrase" label="Mettre en mots ce que le groupe a dit" text={change} who="Le groupe" onProposal={(p) => { setChange(p); setAided(true); }} />
           <View style={st.row}>

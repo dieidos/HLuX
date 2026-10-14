@@ -1,6 +1,7 @@
 // 01 Cartes — « Quelle Carte reprendre ? Ou j'en ajoute une. »
 // Cartes existantes ; Nouvelle Carte (je parle / j'écris / je choisis une image) ; Carte en grand.
 
+import { refusalAr } from '../../i18n/refusals';
 import { dayInWords } from '../../core/dates';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -60,7 +61,7 @@ export default function Cartes() {
       setOrder(sorted);
       setSortMsg(sorted === keys ? tNow('Les images restent dans l’ordre habituel.', 'تبقى الصور بترتيبها المعتاد.') : tNow('Les images les plus proches de ta phrase sont devant. C’est toi qui choisis.', 'الصور الأقرب إلى جملتكِ في المقدّمة. أنتِ من تختارين.'));
     } catch (e) {
-      setSortMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
+      setSortMsg(e instanceof AideRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
     }
   };
   const [spoken, setSpoken] = useState(false);
@@ -77,7 +78,7 @@ export default function Cartes() {
         ? tNow('Exemple hors ligne (sans IA) — à valider.', 'مثال دون اتصال (بلا ذكاء اصطناعي) — للتأكيد.', 'Un exemple. Tu dois dire oui ou non.')
         : tNow('Proposition — à valider.', 'اقتراح — للتأكيد.', 'Une idée. Tu dois dire oui ou non.'));
     } catch (e) {
-      setAideMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
+      setAideMsg(e instanceof AideRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
     }
   };
   const proposalsFor = (card: string) =>

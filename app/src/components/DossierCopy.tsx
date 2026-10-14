@@ -2,6 +2,7 @@
 // Utilisé sur l'écran 06 (garde-fou : l'export reste possible même si le compte de l'établissement est
 // désactivé) et au départ du CHRS (la copie précède l'effacement de la tablette).
 
+import { refusalAr } from '../i18n/refusals';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -27,7 +28,7 @@ export function DossierCopy() {
       setMsg(tNow('Ton dossier chiffré est prêt.', 'ملفّكِ المشفّر جاهز.', 'Ta copie est prête.'));
       setPhrase('');
     } catch (e) {
-      setMsg(e instanceof BackupRefusal ? e.message : tNow('La copie a échoué.', 'لم تنجح النسخة.', 'La copie ne marche pas.'));
+      setMsg(e instanceof BackupRefusal ? tNow(e.message, refusalAr(e.message)) : tNow('La copie a échoué.', 'لم تنجح النسخة.', 'La copie ne marche pas.'));
     }
   };
   return (

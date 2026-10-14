@@ -7,6 +7,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { REFUSALS_AR } from './i18n/refusals';
+
 const ROOT = join(__dirname);
 
 function files(dir: string): string[] {
@@ -71,4 +73,15 @@ describe('Gardes du code', () => {
     expect(/\bfetch\s*\(/.test('await fetch(url)')).toBe(true);
     expect(code(join(ROOT, 'app/notre-projet/choix.tsx'))).not.toMatch(/jamais de vote/);
   });
+
+  it('chaque refus du cœur a sa version arabe (aides, sauvegarde, copie, dictée)', () => {
+    const msgs = ['core/aides.ts', 'core/backup.ts', 'core/qrCopy.ts', 'core/dictation.ts'].flatMap((f) => {
+      const src = readFileSync(join(ROOT, f), 'utf-8');
+      return [...src.matchAll(/(?:Refusal\((?:'(?:export|import)', )?|reason: )(['"])((?:(?!\1).)+)\1/g)].map((m) => m[2]);
+    });
+    expect(msgs.length).toBeGreaterThan(8);
+    const missing = msgs.filter((m) => m !== 'export' && m !== 'import' && !(m in REFUSALS_AR));
+    expect(missing).toEqual([]);
+  });
 });
+

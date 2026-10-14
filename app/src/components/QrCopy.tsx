@@ -1,6 +1,7 @@
 // Copier un dossier par QR, d'un appareil posé à côté d'un autre (logique : `core/qrCopy.ts`).
 // ⛳ La caméra et l'affichage se vérifient sur appareil au premier build EAS (docs/eas.md).
 
+import { refusalAr } from '../i18n/refusals';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -79,7 +80,7 @@ export function QrReceive({ onDone }: { onDone: (msg: string) => void }) {
           : tNow('La copie est arrivée.', 'وصلت النسخة.'));
       }
     } catch (e) {
-      setMsg(e instanceof CopyRefusal ? e.message : tNow("Cette copie ne s'ouvre pas.", 'هذه النسخة لا تُفتح.'));
+      setMsg(e instanceof CopyRefusal ? tNow(e.message, refusalAr(e.message)) : tNow("Cette copie ne s'ouvre pas.", 'هذه النسخة لا تُفتح.'));
     }
   };
   return (

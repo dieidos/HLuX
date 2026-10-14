@@ -97,20 +97,27 @@ export default function Regards() {
     <Screen side="pp" title="views" question={w('viewsQuestion')}>
       <ScrollView contentContainerStyle={{ gap: 14 }}>
         <View style={st.ring}>
-          <View style={st.center}><Text style={st.name}>{me.name}</Text><Text style={st.small}>{w('sheInvites')}</Text></View>
-          <View style={st.sat}><Text style={st.name}>{pro}</Text><Text style={st.small}>{w('inSession')}</Text></View>
-          {invitations.map(([id, inv]) => (
-            <View key={id} style={st.sat}>
-              <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
-              <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? t('en arabe', 'بالعربية') : t('en français', 'بالفرنسية')}</Text>
-              <Text style={[st.status, inv.answered && st.statusOk]}>
-                {inv.answered ? w('answered') : expired(inv, new Date()) ? t('expirée · le lien s’est reposé', 'انتهت · توقّف الرابط', 'fini · le lien ne marche plus') : `${w('invited')} · ${w('notYetAnswered')}`}
-                {inv.channel ? ` · ${channels[inv.channel]}` : ''}
-              </Text>
-              {!inv.answered && !expired(inv, new Date()) && <Link href={`/invite/${id}`} style={st.link}>{t('Ouvrir le lien invité', 'فتح رابط الدعوة')}</Link>}
-            </View>
-          ))}
-          <Pressable onPress={() => setForm(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('invite')}</Text></Pressable>
+          {(() => {
+            // La personne au milieu de l'anneau : la moitié des regards avant elle, l'autre moitié après.
+            const around = [
+              <View key="pro" style={st.sat}><Text style={st.name}>{pro}</Text><Text style={st.small}>{w('inSession')}</Text></View>,
+              ...invitations.map(([id, inv]) => (
+                <View key={id} style={st.sat}>
+                  <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
+                  <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? t('en arabe', 'بالعربية') : t('en français', 'بالفرنسية')}</Text>
+                  <Text style={[st.status, inv.answered && st.statusOk]}>
+                    {inv.answered ? w('answered') : expired(inv, new Date()) ? t('expirée · le lien s’est reposé', 'انتهت · توقّف الرابط', 'fini · le lien ne marche plus') : `${w('invited')} · ${w('notYetAnswered')}`}
+                    {inv.channel ? ` · ${channels[inv.channel]}` : ''}
+                  </Text>
+                  {!inv.answered && !expired(inv, new Date()) && <Link href={`/invite/${id}`} style={st.link}>{t('Ouvrir le lien invité', 'فتح رابط الدعوة')}</Link>}
+                </View>
+              )),
+              <Pressable key="invite" onPress={() => setForm(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('invite')}</Text></Pressable>,
+            ];
+            const mid = Math.ceil(around.length / 2);
+            const center = <View key="me" style={st.center}><Text style={st.name}>{me.name}</Text><Text style={st.small}>{w('sheInvites')}</Text></View>;
+            return [...around.slice(0, mid), center, ...around.slice(mid)];
+          })()}
         </View>
         <Text style={st.small}>{w('onlyHerIdea')} {w('silenceOk')}</Text>
 
@@ -209,7 +216,8 @@ function CompanionOrder() {
 }
 
 const st = StyleSheet.create({
-  ring: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
+  // L'anneau des regards : la personne au milieu, les autres autour, dans un cercle en pointillé.
+  ring: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'center', padding: 24, borderRadius: 240, borderWidth: 2, borderStyle: 'dashed', borderColor: C.line },
   center: { padding: 18, borderRadius: 999, backgroundColor: C.pp.soft, borderWidth: 3, borderColor: C.pp.value, alignItems: 'center' },
   sat: { padding: 12, borderRadius: S.radius, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, gap: 2, maxWidth: 280 },
   name: { fontFamily: F.bold, fontSize: 16, color: C.ink },

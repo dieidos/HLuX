@@ -1,6 +1,7 @@
 // 🎙 Je parle : un geste, la voix devient du texte sur l'appareil ; la personne relit et corrige.
 // ⛳ Se vérifie sur appareil au premier build EAS (docs/eas.md). Sur le web, le bouton dit pourquoi il ne marche pas.
 
+import { refusalAr } from '../i18n/refusals';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -37,7 +38,7 @@ export function DictateButton({ lang = 'fr', label, onText }: { lang?: 'fr' | 'a
     }
     const can = canDictateOnDevice({ platform: Platform.OS, supportsOnDevice: supports, installedLocales: installed, lang });
     if (!can.ok) {
-      setMsg(can.reason);
+      setMsg(tNow(can.reason, refusalAr(can.reason)));
       return;
     }
     const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
