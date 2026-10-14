@@ -45,9 +45,11 @@ export function pseudonymize(text: string, names: string[]): { text: string; res
   let out = text;
   names.forEach((n, i) => {
     const tag = `[P${i + 1}]`;
-    if (out.includes(n)) {
+    // Le prénom entier, quelle que soit la casse (« amina » comme « Amina ») : jamais au milieu d'un autre mot.
+    const re = new RegExp(`(?<!\\p{L})${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?!\\p{L})`, 'giu');
+    if (re.test(out)) {
       map.set(tag, n);
-      out = out.split(n).join(tag);
+      out = out.replace(re, tag);
     }
   });
   return { text: out, restore: (s) => [...map].reduce((acc, [tag, n]) => acc.split(tag).join(n), s) };

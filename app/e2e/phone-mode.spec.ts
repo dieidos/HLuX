@@ -17,3 +17,12 @@ test('sur son téléphone, la personne entre directement dans son projet', async
   await page.reload();
   await expect(page.getByText('Bonjour Nour 👋')).toBeVisible();
 });
+
+test('sans phrase, elle entre quand même ; et son téléphone reçoit une copie à tout moment', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('radio', { name: /Mon téléphone/ }).click();
+  await page.getByLabel('Mon prénom').fill('Nour');
+  await page.getByRole('button', { name: 'Entrer' }).click();
+  await expect(page.getByText('Bonjour Nour 👋')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Recevoir/ })).toBeVisible();
+});

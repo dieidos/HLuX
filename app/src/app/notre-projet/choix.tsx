@@ -37,7 +37,8 @@ export default function Choix() {
   const { phone } = useLayout();
   // L'équipe de l'établissement (saisie au premier lancement) ; la professionnelle qui a ouvert la séance d'abord.
   const PEOPLE = useParticipants();
-  const VOICES = PEOPLE.some((p) => /^(le )?cvs$/i.test(p)) ? PEOPLE : [...PEOPLE, 'Le CVS'];
+  // Le CVS a un regard s'il est présent à la séance (case cochée à l'ouverture), pas d'office.
+  const VOICES = PEOPLE.map((p) => (/^cvs$/i.test(p) ? 'Le CVS' : p));
   const f = useFacilityState();
   const act = useFacility((x) => x.act);
   const orientations = Object.entries(f.orientations);
@@ -156,7 +157,7 @@ export default function Choix() {
             {!o.revealed && (
               <>
                 <Text style={st.small}>🔒 Chacun seul, en privé — sur la tablette qui passe, ou sur son mobile.</Text>
-                <VoicesCircle title={o.title} voices={VOICES} placed={o.placedBy} current={placer} onPick={setPlacer} />
+                <VoicesCircle title={o.title} voices={VOICES} placed={o.placedBy} current={placer} onPick={(p) => { setPlacer(p); setMine({}); }} />
                 {placer && (
                   <View style={st.private}>
                     <Text style={st.h}>{placer}, en privé</Text>

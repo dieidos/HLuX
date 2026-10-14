@@ -30,6 +30,7 @@ export default function Regards() {
   const t = useT();
   const channels: Record<Channel, string> = { sms: '📱 SMS', mail: t('✉️ mail', '✉️ بريد'), in_session: t('🤝 en séance', '🤝 في الجلسة') };
   const s = useProjectState();
+  const companion = pro || s.companionOrder?.by || '';
   const act = useProject((x) => x.act);
   const [tab, setTab] = useState<string>('mine');
   const [form, setForm] = useState(false);
@@ -106,7 +107,7 @@ export default function Regards() {
           {(() => {
             // La personne au milieu de l'anneau : la moitié des regards avant elle, l'autre moitié après.
             const around = [
-              <View key="pro" style={st.sat}><Text style={st.name}>{pro}</Text><Text style={st.small}>{w('inSession')}</Text></View>,
+              ...(pro ? [<View key="pro" style={st.sat}><Text style={st.name}>{pro}</Text><Text style={st.small}>{w('inSession')}</Text></View>] : []),
               ...invitations.map(([id, inv]) => (
                 <View key={id} style={st.sat}>
                   <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
@@ -134,7 +135,7 @@ export default function Regards() {
         ) : (
           <>
             <View style={st.tabs}>
-              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, t(`Le regard de ${i.guest}`, `نظرة ${i.guest}`)]), ['together', w('together')], ['sarah', t(`Avec l'ordre de ${pro}`, `بترتيب ${pro}`, `L'ordre de ${pro}`)]].map(([k, label]) => (
+              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, t(`Le regard de ${i.guest}`, `نظرة ${i.guest}`)]), ['together', w('together')], ...(companion ? [['sarah', t(`Avec l'ordre de ${companion}`, `بترتيب ${companion}`, `L'ordre de ${companion}`)]] : [])].map(([k, label]) => (
                 <Pressable key={k} onPress={() => setTab(k)} style={[st.tab, tab === k && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === k }}>
                   <Text style={[st.btnTxt, tab === k && { color: C.onAccent }]}>{label}</Text>
                 </Pressable>
@@ -200,6 +201,7 @@ export default function Regards() {
 /** L'ordre de la professionnelle de la séance : une autre lecture, posée avec la personne, qui ne déplace aucune marque. */
 function CompanionOrder() {
   const pro = useProject((x) => x.pro) ?? '';
+  const personal = useProject((x) => x.setup?.kind === 'personal');
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const w = useWords();
@@ -210,6 +212,8 @@ function CompanionOrder() {
     const ranks = { ...current, [axis]: next };
     act(pro, { act: 'companion_order', by: pro, ranks: Object.entries(ranks) as [Circle, Rank][] });
   };
+  // Sur son téléphone, sans professionnelle : son ordre déjà posé se lit, il ne se pose pas.
+  if (personal || !pro) return null;
   return (
     <View style={st.chips}>
       {AXES.map(([a, k]) => (

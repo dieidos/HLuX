@@ -41,6 +41,7 @@ export default function Chemin() {
   const [plan, setPlan] = useState(false);
   const [story, setStory] = useState('');
   const [planWords, setPlanWords] = useState('');
+  const [planAided, setPlanAided] = useState(false);
   const facility = useFacilityState();
   const place = useProject((x) => x.setup?.name ?? '');
   const proposals = Object.entries(facility.proposals).filter(([id]) => !s.linkedProposals.some((l) => l.proposal === id));
@@ -85,6 +86,7 @@ export default function Chemin() {
               nodes={nodes}
               decisionLabel={t('je choisis', 'أنا أختار')}
               threadOption
+              cards={Object.entries(s.cards).map(([id, c]) => ({ id, title: c.title }))}
               onRemove={(id) => {
                 const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
                 const last = [...entries].reverse().find((e) => e.act?.act === 'node_set' && e.act.node === id && !undone.has(e.rank));
@@ -95,7 +97,7 @@ export default function Chemin() {
               }}
               onAdd={(n) => {
                 const id = freshId('etape', Object.keys(s.nodes));
-                act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: n.thread });
+                act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: n.thread, card: n.card });
                 if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
                 tell(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`), pathname);
               }}
@@ -165,11 +167,11 @@ export default function Chemin() {
               onChange={(plan) => act(me.id, { act: 'plan_set', plan })}
             />
             <View style={{ flexBasis: '100%', gap: 6 }}>
-              <AideButton kind="narrate" lang={useAids.getState().lang} label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={setPlanWords} />
+              <AideButton kind="narrate" lang={useAids.getState().lang} label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={(x) => { setPlanWords(x); setPlanAided(true); }} />
               {s.plan.words && !planWords ? <Text style={st.tileItem}>« {s.plan.words} »</Text> : null}
               {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel={t('Mon plan dans mes mots', 'خطّتي بكلماتي')} /> : null}
               {planWords ? (
-                <Pressable accessibilityRole="button" onPress={() => { act(me.id, { act: 'plan_set', plan: { ...s.plan, words: planWords.trim() } }); setPlanWords(''); tell(tNow('Ton plan, dans tes mots, est gardé.', 'خطّتكِ بكلماتكِ محفوظة.'), pathname); }} style={[st.btn, st.primary, { alignSelf: 'flex-start' }]}>
+                <Pressable accessibilityRole="button" onPress={() => { act(planAided ? 'hlux-ia' : me.id, { act: 'plan_set', plan: { ...s.plan, words: planWords.trim() } }, planAided ? 'generated' : 'by_hand', planAided ? me.id : undefined); setPlanWords(''); setPlanAided(false); tell(tNow('Ton plan, dans tes mots, est gardé.', 'خطّتكِ بكلماتكِ محفوظة.'), pathname); }} style={[st.btn, st.primary, { alignSelf: 'flex-start' }]}>
                   <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Je garde ces mots', 'أحتفظ بهذه الكلمات')}</Text>
                 </Pressable>
               ) : null}

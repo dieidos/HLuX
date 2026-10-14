@@ -65,7 +65,8 @@ function fold(s: FacilityState, a: FacilityAct): void {
     case 'agenda_item': s.agenda.push({ item: a.item, title: a.title, source: a.source, session: a.session }); break;
     case 'attendance': s.attendance = { session: a.session, present: a.present, absent: a.absent, facilitator: a.facilitator }; break;
     case 'floor_given': s.floor = a.to; break;
-    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: 'individual' }; break;
+    // Déplacer une carte garde sa qualification : seul le groupe la change (finding_qualified).
+    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: s.findings[a.finding]?.level ?? 'individual' }; break;
     case 'finding_qualified': if (s.findings[a.finding]) s.findings[a.finding].level = a.level; break;
     case 'mandate_set': s.mandate = a.to; break;
     case 'cap_placed': {

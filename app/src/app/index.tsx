@@ -125,7 +125,7 @@ export default function Home() {
             <Text style={st.note}>{t('Ton projet reste sur ce téléphone. Personne d’autre n’y entre : le verrou du téléphone suffit.', 'مشروعكِ يبقى على هذا الهاتف. لا يدخله أحد غيركِ: قفل الهاتف يكفي.', 'Ton projet reste sur ton téléphone.')}</Text>
             <TextInput value={myName} onChangeText={setMyName} placeholder={t('Mon prénom', 'اسمي')} style={st.input} accessibilityLabel={t('Mon prénom', 'اسمي')} />
             <TextInput value={mySentence} onChangeText={setMySentence} placeholder={w('oneSentence')} multiline style={st.input} accessibilityLabel={w('oneSentence')} />
-            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configurePersonal(myName, mySentence || ' ')} style={[st.btn, st.primary]}>
+            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configurePersonal(myName, mySentence)} style={[st.btn, st.primary]}>
               <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('enter')}</Text>
             </Pressable>
             <Text style={st.note}>{t('Ou, si ton dossier est déjà sur la tablette de l’établissement :', 'أو، إذا كان ملفّكِ موجوداً على الجهاز اللوحي للمؤسسة:', 'Ou ton dossier de la tablette :')}</Text>
@@ -133,7 +133,7 @@ export default function Home() {
               <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
             </Pressable>
             {qr === 'receive' ? (
-              <QrReceive before={(firstName) => useProject.getState().configurePersonal(firstName, '')} onDone={(m) => { setQr(null); setRestoreMsg(m); }} />
+              <QrReceive before={(firstName) => useProject.getState().configurePersonal(firstName, null)} onDone={(m) => { setQr(null); setRestoreMsg(m); }} />
             ) : null}
           </View>
         )}
@@ -261,7 +261,14 @@ export default function Home() {
           </Pressable>
         )}
       </View>
+      {personal && (
+        <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn} accessibilityState={{ expanded: qr === 'receive' }}>
+          <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
+        </Pressable>
+      )}
       {qr === 'send' ? <QrSend /> : null}
+      {personal && qr === 'receive' ? <QrReceive onDone={(m) => { setQr(null); setRestoreMsg(m); }} /> : null}
+      {personal && restoreMsg ? <Text style={st.note} accessibilityLiveRegion="polite">{restoreMsg}</Text> : null}
       {leaving ? (
         <View style={st.newBox}>
           <Text style={st.note}>{w('eraseNote')}</Text>

@@ -32,7 +32,8 @@ interface ProjectStore {
   /** Premier lancement : le nom de l'établissement et les prénoms de l'équipe. */
   configure: (name: string, team: string[], period?: string) => boolean;
   /** Mon téléphone : la personne entre avec son prénom (et une phrase, si elle veut). */
-  configurePersonal: (firstName: string, sentence: string) => string;
+  /** `sentence` null : le téléphone se met en place pour recevoir un dossier, sans en créer un. */
+  configurePersonal: (firstName: string, sentence: string | null) => string;
   /** Le téléphone de la personne : pas de séance, elle entre directement. */
   personal: () => boolean;
   /** Relire le stockage (après un changement d'espace : vraie vie ↔ démonstration). Ferme la séance. */
@@ -105,7 +106,7 @@ export function makeProjectStore(kv: KV) {
         const setup: Setup = { name: firstName.trim(), team: [], kind: 'personal' };
         kv.setItem(SETUP_KEY, JSON.stringify(setup));
         set({ setup });
-        return sentence.trim() ? get().createProfile(firstName, sentence) : '';
+        return sentence === null ? '' : get().createProfile(firstName, sentence);
       },
       personal: () => get().setup?.kind === 'personal',
       reload: () => set({ setup: readSetup(kv), profiles: readProfiles(kv), pro: null, person: null, entries: [], backedUpNow: false }),
@@ -177,8 +178,8 @@ export function makeProjectStore(kv: KV) {
       dropVersion: (id) => {
         const p = get().profiles.find((x) => x.id === id);
         if (!p?.copyOf) return; // on ne retire ici qu'une « autre version », jamais un dossier
-        if (kv.purge) kv.purge(id);
         kv.removeItem(journalKey(id));
+        if (kv.purge) kv.purge(id);
         const profiles = get().profiles.filter((x) => x.id !== id);
         writeProfiles(kv, profiles);
         set({ profiles });
@@ -196,9 +197,12 @@ export function makeProjectStore(kv: KV) {
       purge: () => {
         const id = get().person;
         if (!get().pro || !id || !get().backedUpNow) return false;
-        if (kv.purge) kv.purge(id);
-        kv.removeItem(journalKey(id));
-        const profiles = get().profiles.filter((p) => p.id !== id);
+        const gone = [id, ...get().profiles.filter((p) => p.copyOf === id).map((p) => p.id)];
+        for (const g of gone) {
+          kv.removeItem(journalKey(g));
+          if (kv.purge) kv.purge(g);
+        }
+        const profiles = get().profiles.filter((p) => !gone.includes(p.id));
         writeProfiles(kv, profiles);
         set({ profiles, person: null, entries: [], backedUpNow: false });
         return true;

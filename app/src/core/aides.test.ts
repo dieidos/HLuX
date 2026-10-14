@@ -18,6 +18,11 @@ describe('Aides IA', () => {
     expect(() => guard('écris à amina@example.org')).toThrow(/numéro ou une adresse/);
   });
 
+  it('pseudonymise un prénom quelle que soit sa casse, jamais au milieu d’un mot', () => {
+    const p = pseudonymize('amina et AMINA ; Aminata reste.', ['Amina']);
+    expect(p.text).toBe('[P1] et [P1] ; Aminata reste.');
+  });
+
   it('pseudonymise les prénoms et les rétablit au retour', () => {
     const p = pseudonymize('Amina en parle avec Sarah.', ['Amina', 'Sarah']);
     expect(p.text).toBe('[P1] en parle avec [P2].');

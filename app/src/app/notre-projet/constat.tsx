@@ -147,7 +147,8 @@ export default function Constat() {
         <View style={[st.row, st.addRow]}>
           <TextInput value={title} onChangeText={setTitle} placeholder={`${speaker} pose une carte…`} style={st.input} accessibilityLabel="Nouvelle carte du constat" />
           <DictateButton label="🎙" onText={(x) => { setTitle(x); setDictatedTitle(true); }} />
-          {(['team', 'cvs', 'consented_word'] as Source[]).map((s) => (
+          {/* Une parole consentie n'arrive que par le sas de 07, jamais choisie ici. */}
+          {(['team', 'cvs'] as Source[]).map((s) => (
             <Pressable accessibilityRole="button" key={s} onPress={() => setSource(s)} style={[st.btn, source === s && st.on]}><Text style={[st.btnTxt, source === s && { color: C.onAccent }]}>{SOURCE_WORDS[s]}</Text></Pressable>
           ))}
           <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Poser</Text></Pressable>

@@ -19,6 +19,11 @@ describe('Le fil de la Carte', () => {
     expect(t[1]).toEqual({ step: 'Ressentie', detail: "aujourd'hui · dans « c'est difficile »" });
   });
 
+  it("passe par l'étape du chemin née de cette Carte", () => {
+    const e: Entry[] = [...seedAmina(), { rank: N, author: 'amina', provenance: 'by_hand', act: { act: 'node_set', node: 'etape-9', lane: 'Papiers', kind: 'event', label: 'Lire avec Sarah', when: 'au printemps', thread: false, card: 'papiers' } }];
+    expect(cardThread('papiers', standing(e), null)).toContainEqual({ step: 'Une étape de mon chemin', detail: 'Lire avec Sarah (au printemps)' });
+  });
+
   it("rejoint l'engagement du collectif quand son fil part de cette Carte", () => {
     const f = emptyFacility();
     f.commitments['e-1'] = { text: 'Atelier courriers, le jeudi', solution: 's', thread: ['Les courriers sont difficiles', '…', 'engagement'], review: 'en mars', carriers: [] };

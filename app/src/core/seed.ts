@@ -49,7 +49,7 @@ function pathAmina(from: number): Entry[] {
 /** Le CHRS Les Lilas tel que l'Atlas le montre au début de l'écran 07 (personnages imaginaires). */
 export function seedLilas(): FEntry[] {
   const acts: FacilityAct[] = [
-    { act: 'attendance', session: 'mardi 12 janvier', present: ['Aïcha', 'Bruno', 'Karim'], absent: ['Léa'], facilitator: 'Aïcha' },
+    { act: 'attendance', session: 'mardi 12 janvier', present: ['Aïcha', 'Bruno', 'Karim', 'CVS'], absent: ['Léa'], facilitator: 'Aïcha' },
     { act: 'agenda_item', item: 'local-cvs', title: 'Le local du CVS', source: 'cvs', session: 'mardi 12 janvier' },
     { act: 'agenda_item', item: 'laverie', title: 'Les horaires de la laverie', source: 'consented_word', session: 'mardi 12 janvier' },
     { act: 'mandate_set', to: 'Aïcha' },

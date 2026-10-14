@@ -71,15 +71,17 @@ useAids.subscribe((a, before) => {
   s.setPrefs(a.lang, a.simple);
 });
 
-// Les prénoms connus de la tablette (personnes, équipe, invités de la personne ouverte) sont masqués
-// avant tout appel d'aide : la liste suit l'application.
+// Les prénoms connus de la tablette (personnes, équipe, invités de la personne ouverte, présents des
+// séances du collectif) sont masqués avant tout appel d'aide : la liste suit l'application.
 const refreshNames = () => {
   const s = useProject.getState();
   const guests = s.entries.flatMap((e) => (e.act?.act === 'invitation_sent' ? [e.act.guest] : []));
-  setKnownNames([...s.profiles.map((p) => p.firstName), ...(s.setup?.team ?? []), ...guests]);
+  const present = useFacility.getState().entries.flatMap((e) => (e.act?.act === 'attendance' ? e.act.present.filter((x) => x !== 'CVS') : []));
+  setKnownNames([...s.profiles.map((p) => p.firstName), ...(s.setup?.team ?? []), ...guests, ...present]);
 };
 refreshNames();
 useProject.subscribe(refreshNames);
+useFacility.subscribe(refreshNames);
 
 /**
  * Les participants des séances (07-12) : l'équipe, plus les présents de la séance en cours — personnes
@@ -88,7 +90,8 @@ useProject.subscribe(refreshNames);
 export function useParticipants(): string[] {
   const team = useTeam();
   const present = useFacility((s) => {
-    const a = [...s.entries].reverse().find((e) => e.act?.act === 'attendance' && e.provenance !== 'hypothesis');
+    const undone = new Set(s.entries.flatMap((e) => (e.undone !== undefined ? [e.undone] : [])));
+    const a = [...s.entries].reverse().find((e) => e.act?.act === 'attendance' && e.provenance !== 'hypothesis' && !undone.has(e.rank));
     return a?.act?.act === 'attendance' ? a.act.present : NO_TEAM;
   });
   return useMemo(() => [...new Set([...team, ...present])], [team, present]);

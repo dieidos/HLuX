@@ -22,6 +22,7 @@ export function cardThread(card: Id, p: ProjectState, f: FacilityState | null): 
   const out: ThreadStep[] = [{ step: born, detail: c.moments[0] }];
   for (const m of c.moments.slice(1)) out.push({ step: stepOf(m), detail: m });
   for (const i of Object.values(p.ideas)) if (i.fromCard === card) out.push({ step: 'Une envie en est née', detail: i.title });
+  for (const n of Object.values(p.nodes)) if (n.card === card) out.push({ step: 'Une étape de mon chemin', detail: `${n.label} (${n.when})` });
   const subjects = Object.values(p.subjects).filter((x) => x.card === card);
   for (const x of subjects) out.push({ step: 'Apportée au collectif', detail: x.forCollective });
   // L'engagement rejoint la Carte par SA parole consentie (la phrase « pour le collectif » de son sujet),

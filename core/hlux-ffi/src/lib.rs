@@ -79,6 +79,22 @@ impl HluxEngine {
         Ok(e.rank.0)
     }
 
+    /// Annuler un geste du collectif.
+    pub fn undo_facility(&self, author: String, rank: u64) -> Result<(), HluxError> {
+        self.engine.lock().expect("moteur").undo_facility(&author, rank).map_err(store_err)
+    }
+
+    /// L'animateur valide un texte de l'aide, après accord du groupe.
+    pub fn confirm_facility(&self, rank: u64, by: String) -> Result<u64, HluxError> {
+        let e = self.engine.lock().expect("moteur").confirm_facility(rank, &by).map_err(store_err)?;
+        Ok(e.rank.0)
+    }
+
+    /// Les propositions au collectif en attente : `[[rang, geste], …]` en JSON.
+    pub fn pending_facility(&self) -> String {
+        serde_json::to_string(&self.engine.lock().expect("moteur").pending_facility()).expect("attente sérialisable")
+    }
+
     /// L'état du Projet Personnalisé, en JSON.
     pub fn project_state(&self) -> String {
         serde_json::to_string(&self.engine.lock().expect("moteur").project_state()).expect("état sérialisable")

@@ -59,7 +59,7 @@ export function adopt(a: ProjectAct, here: Ids, remap: Map<string, string>): Pro
   switch (a.act) {
     case 'card_created': return { ...a, card: fresh(a.card, here.cards, 'carte') };
     case 'idea_created': return { ...a, idea: fresh(a.idea, here.ideas, 'idee'), from_card: a.from_card ? r(a.from_card) : null };
-    case 'node_set': return { ...a, node: fresh(a.node, here.nodes, 'etape') };
+    case 'node_set': return { ...a, node: fresh(a.node, here.nodes, 'etape'), card: a.card ? r(a.card) : a.card };
     case 'invitation_sent': return { ...a, invitation: fresh(a.invitation, here.invitations, 'inv'), idea: r(a.idea) };
     case 'what_if': return { ...a, sim: fresh(a.sim, here.sims, 'sim'), moves: a.moves.map(([n, w]) => [r(n), w]) };
     case 'subject_prepared': return { ...a, subject: fresh(a.subject, here.subjects, 'sujet'), card: r(a.card) };

@@ -76,7 +76,17 @@ pub enum ProjectAct {
 
     // ── 06 Chemin ──
     /// Un nœud ◆ / ● sur un couloir.
-    NodeSet { node: Id, lane: String, kind: NodeKind, label: String, when: String, thread: bool },
+    NodeSet {
+        node: Id,
+        lane: String,
+        kind: NodeKind,
+        label: String,
+        when: String,
+        thread: bool,
+        /// La Carte dont l'étape est née (le fil de la Carte), s'il y en a une.
+        #[serde(default)]
+        card: Option<Id>,
+    },
     /// Un lien entre deux nœuds.
     LinkSet { from: Id, to: Id, link: LinkKind },
     /// « Et si… ? » sur une copie : le vrai chemin ne bouge pas.

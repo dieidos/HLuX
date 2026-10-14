@@ -33,7 +33,7 @@ const ORIGIN = {
 /** Les étapes du fil de la Carte, dites en arabe. */
 const STEP_AR: Record<string, string> = {
   Dite: 'قيلت', Écrite: 'كُتبت', 'Choisie en image': 'اختيرت بصورة', Ressentie: 'أُحسّت',
-  'Reposée dans la réserve': 'أُعيدت إلى علبة البطاقات', 'Pas maintenant': 'ليس الآن', 'Une envie en est née': 'وُلدت منها رغبة', 'Apportée au collectif': 'قُدّمت للمجموعة',
+  'Reposée dans la réserve': 'أُعيدت إلى علبة البطاقات', 'Pas maintenant': 'ليس الآن', 'Une étape de mon chemin': 'خطوة من طريقي', 'Une envie en est née': 'وُلدت منها رغبة', 'Apportée au collectif': 'قُدّمت للمجموعة',
   'Un engagement du collectif': 'التزام من المجموعة', 'Reliée à mon chemin': 'رُبطت بطريقي',
 };
 
@@ -125,6 +125,7 @@ export default function Cartes() {
             {big.verbatim ? <Text style={st.verbatim}>« {big.verbatim} »</Text> : null}
             {big.simpler ? <Text style={st.simpler}>{t('Plus simple : ', 'أبسط: ')}{big.simpler}</Text> : null}
             {big.translations.ar ? <Text style={[st.simpler, { writingDirection: "rtl" }]} {...AR}>🌐 {big.translations.ar}</Text> : null}
+            {big.translations.fr ? <Text style={[st.simpler, { writingDirection: 'ltr' }]} {...({ lang: 'fr' } as object)}>🌐 {big.translations.fr}</Text> : null}
             <Text style={st.chip}>{t(ORIGIN[big.origin][0], ORIGIN[big.origin][1])}{big.saidWith ? t(` · avec ${big.saidWith}`, ` · مع ${big.saidWith}`) : ''}{brought.has(open!) ? t(' · 🟢 apportée au collectif', ' · 🟢 قُدّمت للمجموعة', ' · 🟢 donnée au groupe') : ''}</Text>
             {!big.feeling && <Text style={st.chip}>{w('notPlaced')}</Text>}
             <Text style={st.muted}>{w('keepsAll')}</Text>

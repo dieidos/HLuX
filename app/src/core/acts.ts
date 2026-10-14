@@ -48,7 +48,7 @@ export type ProjectAct =
   | { act: 'invitation_sent'; invitation: Id; guest: string; relation: string; idea: Id; axes: Circle[]; lang: Lang; expires: string; channel?: Channel | null; idea_text?: string | null }
   | { act: 'invitation_answered'; invitation: Id; leans: [Circle, Lean][]; word: string | null }
   | { act: 'views_revealed' }
-  | { act: 'node_set'; node: Id; lane: string; kind: NodeKind; label: string; when: string; thread: boolean }
+  | { act: 'node_set'; node: Id; lane: string; kind: NodeKind; label: string; when: string; thread: boolean; /** la Carte dont l'étape est née */ card?: Id | null }
   | { act: 'link_set'; from: Id; to: Id; link: LinkKind }
   | { act: 'what_if'; sim: Id; question: string; moves: [Id, string][]; story: string | null }
   | { act: 'what_if_closed'; sim: Id; kept: boolean }

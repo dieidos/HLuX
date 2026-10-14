@@ -142,6 +142,47 @@ impl Engine {
             .collect()
     }
 
+    /// Annuler un geste du collectif : une compensation, rien ne s'efface.
+    pub fn undo_facility(&mut self, author: &str, rank: u64) -> Result<(), StoreError> {
+        let t = self.ticket()?;
+        let seed = Self::seed_of(&self.facility);
+        let e = self.facility.undo_one(t, Actor(author.into()), seed, Rank(rank)).map_err(StoreError::Refused)?;
+        self.store.append(self.facility.space(), &e)
+    }
+
+    /// L'animateur valide, après accord du groupe, un texte proposé par l'aide (verrou humain du collectif).
+    pub fn confirm_facility(&mut self, rank: u64, by: &str) -> Result<Entry<FacilityAct>, StoreError> {
+        let original = self
+            .facility
+            .pending()
+            .into_iter()
+            .find(|e| e.rank.0 == rank)
+            .cloned()
+            .ok_or(StoreError::Tampered(rank))?;
+        let ab_ante_core::Body::Said(act) = original.body else { return Err(StoreError::Tampered(rank)) };
+        let t = self.ticket()?;
+        let seed = Self::seed_of(&self.facility);
+        let e = self.facility.record(t, original.author.clone(), Some(Actor(by.into())), Provenance::Generated, seed, act);
+        self.store.append(self.facility.space(), &e)?;
+        let t = self.ticket()?;
+        let seed = Self::seed_of(&self.facility);
+        let u = self.facility.undo_one(t, Actor(by.into()), seed, Rank(rank)).map_err(StoreError::Refused)?;
+        self.store.append(self.facility.space(), &u)?;
+        Ok(e)
+    }
+
+    /// Les propositions de l'aide au collectif, en attente de l'animateur.
+    pub fn pending_facility(&self) -> Vec<(u64, FacilityAct)> {
+        self.facility
+            .pending()
+            .into_iter()
+            .filter_map(|e| match &e.body {
+                ab_ante_core::Body::Said(a) => Some((e.rank.0, a.clone())),
+                ab_ante_core::Body::Undone(_) => None,
+            })
+            .collect()
+    }
+
     /// L'état du Projet Personnalisé.
     pub fn project_state(&self) -> ProjectState {
         self.project.standing(&ProjectReducer)

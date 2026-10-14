@@ -42,7 +42,9 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const path = usePathname();
   const steps = side === 'pp' ? PP : PE;
   const reg = useRegister();
-  const rtl = side === 'pp' && reg === 'ar';
+  // Le sas de 07 est un écran de la personne : il suit sa langue, comme 01-06.
+  const facing = side === 'pp' || path === '/notre-projet/sujets';
+  const rtl = facing && reg === 'ar';
   const body = useFamily();
   const bold = useFamily(true);
   const { phone } = useLayout();
@@ -50,7 +52,7 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
-        <Link href="/" accessibilityLabel={reg === 'ar' && side === 'pp' ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>
+        <Link href="/" accessibilityLabel={reg === 'ar' && facing ? 'الصفحة الرئيسية' : 'Accueil'} style={st.home}><Wordmark /></Link>
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>
         {/* Sur un téléphone, le fil des six étapes défile à l'horizontale plutôt que de se tasser. */}
         <ScrollView horizontal={phone} showsHorizontalScrollIndicator={false} contentContainerStyle={phone ? st.stepperPhone : st.stepper} style={phone ? st.stepScroll : st.stepWide}>
@@ -72,24 +74,25 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
         ) : null}
       </View>
       <View style={st.body}>{children}</View>
-      <AidsBar side={side} />
+      <AidsBar side={side} facing={facing} />
     </View>
   );
 }
 
-export function AidsBar({ side }: { side: 'pp' | 'pe' }) {
+export function AidsBar({ side, facing = side === 'pp' }: { side: 'pp' | 'pe'; facing?: boolean }) {
   const w = useWords();
   const bold = useFamily(true);
   const { listen, simple, lang, toggle, switchLang } = useAids();
   const me = useMe();
   const pro = useProject((s) => s.pro);
   const place = useProject((s) => s.setup?.name ?? '');
+  const personal = useProject((s) => s.setup?.kind === 'personal');
   return (
     <View style={st.aids}>
       <Aid on={listen} label={w('listen')} font={bold} onPress={() => toggle('listen')} />
       <Aid on={simple} label={w('simpler')} font={bold} onPress={() => toggle('simple')} />
-      {side === 'pp' && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
-      <Text style={st.who}>{side === 'pp' ? `${me.name} · ${w('withPro')} ${pro ?? ''}` : place}</Text>
+      {facing && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
+      <Text style={st.who}>{side === 'pp' ? (pro && !personal ? `${me.name} · ${w('withPro')} ${pro}` : me.name) : place}</Text>
     </View>
   );
 }

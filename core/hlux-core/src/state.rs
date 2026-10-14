@@ -63,6 +63,8 @@ pub struct Node {
     pub label: String,
     pub when: String,
     pub thread: bool,
+    /// La Carte dont l'étape est née.
+    pub card: Option<Id>,
 }
 
 /// Un « Et si… ? » : question, déplacements sur la copie, récit, sortie (gardée / refermée).
@@ -200,8 +202,8 @@ impl Reducer<ProjectAct> for ProjectReducer {
                 }
             }
             ProjectAct::ViewsRevealed => s.views_revealed = true,
-            ProjectAct::NodeSet { node, lane, kind, label, when, thread } => {
-                s.nodes.insert(node, Node { lane, kind, label, when, thread });
+            ProjectAct::NodeSet { node, lane, kind, label, when, thread, card } => {
+                s.nodes.insert(node, Node { lane, kind, label, when, thread, card });
             }
             ProjectAct::LinkSet { from, to, link } => {
                 s.links.retain(|(f, t, _)| !(f == &from && t == &to));
@@ -346,7 +348,9 @@ impl Reducer<FacilityAct> for FacilityReducer {
             }
             FacilityAct::FloorGiven { to, .. } => s.floor = Some(to),
             FacilityAct::FindingPlaced { finding, title, zone, source, author } => {
-                s.findings.insert(finding, Finding { title, zone, source, author, level: Qualification::Individual });
+                // Déplacer une carte garde sa qualification : seul le groupe la change (FindingQualified).
+                let level = s.findings.get(&finding).map(|f| f.level).unwrap_or(Qualification::Individual);
+                s.findings.insert(finding, Finding { title, zone, source, author, level });
             }
             FacilityAct::FindingQualified { finding, level } => {
                 if let Some(f) = s.findings.get_mut(&finding) {
@@ -401,7 +405,7 @@ impl Reducer<FacilityAct> for FacilityReducer {
                 s.commitments.insert(commitment, (text, solution, thread, review, carriers));
             }
             FacilityAct::NodeSet { node, lane, kind, label, when } => {
-                s.nodes.insert(node, Node { lane, kind, label, when, thread: false });
+                s.nodes.insert(node, Node { lane, kind, label, when, thread: false, card: None });
             }
             FacilityAct::LinkSet { from, to, link } => {
                 s.links.retain(|(f, t, _)| !(f == &from && t == &to));

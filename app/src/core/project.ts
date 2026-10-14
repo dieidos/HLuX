@@ -27,7 +27,7 @@ export interface Invitation {
 
 /** Une invitation dont l'échéance (date ISO) est passée : le lien se repose. Les anciennes, en mots, n'expirent pas. */
 export const expired = (i: Invitation, now: Date) => /^\d{4}-\d{2}-\d{2}/.test(i.expires) && new Date(i.expires).getTime() < now.getTime();
-export interface PathNode { lane: string; kind: NodeKind; label: string; when: string; thread: boolean }
+export interface PathNode { lane: string; kind: NodeKind; label: string; when: string; thread: boolean; card?: Id | null }
 
 export interface ProjectState {
   cards: Record<Id, Card>;
@@ -126,7 +126,7 @@ function fold(s: ProjectState, e: Entry, a: ProjectAct): void {
       if (s.invitations[a.invitation]) Object.assign(s.invitations[a.invitation], { answered: true, leans: a.leans, word: a.word });
       break;
     case 'views_revealed': s.viewsRevealed = true; break;
-    case 'node_set': s.nodes[a.node] = { lane: a.lane, kind: a.kind, label: a.label, when: a.when, thread: a.thread }; break;
+    case 'node_set': s.nodes[a.node] = { lane: a.lane, kind: a.kind, label: a.label, when: a.when, thread: a.thread, card: a.card ?? null }; break;
     case 'link_set':
       s.links = s.links.filter((l) => !(l.from === a.from && l.to === a.to));
       s.links.push({ from: a.from, to: a.to, link: a.link });

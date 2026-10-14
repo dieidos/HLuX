@@ -19,6 +19,8 @@ export interface NewStep {
   link: { from: string; link: LinkKind } | null;
   /** L'étape en cours du fil (écran 06) : elle pulse sur le chemin. */
   thread: boolean;
+  /** La Carte dont l'étape est née (écran 06), s'il y en a une. */
+  card: string | null;
 }
 
 type LinkChoice = 'none' | 'chosen' | 'open' | 'condition' | 'dependency';
@@ -30,7 +32,7 @@ const LINKS: [LinkChoice, string, string][] = [
   ['dependency', 'attend…', 'ينتظر…'],
 ];
 
-export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false }: {
+export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false, cards = [] }: {
   columns: string[];
   lanes: string[];
   nodes: PNode[];
@@ -41,6 +43,8 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
   onRemove?: (id: string) => void;
   /** Proposer « l'étape en cours » (écran 06). */
   threadOption?: boolean;
+  /** Les Cartes de la personne, pour dire de laquelle l'étape est née (écran 06). */
+  cards?: { id: string; title: string }[];
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -53,6 +57,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
   const [link, setLink] = useState<LinkChoice>('none');
   const [words, setWords] = useState('');
   const [current, setCurrent] = useState(false);
+  const [card, setCard] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
 
   const add = () => {
@@ -61,8 +66,9 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
     const lk: LinkKind | null =
       link === 'none' || !from ? null : link === 'condition' || link === 'dependency' ? { kind: link, words: words.trim() } : { kind: link };
     if (lk && 'words' in lk && !lk.words) return; // une condition ou une attente s'écrit
-    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null, thread: current });
+    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null, thread: current, card });
     setCurrent(false);
+    setCard(null);
     setLabel('');
     setNewLane('');
     setFrom(null);
@@ -118,6 +124,12 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
           {(link === 'condition' || link === 'dependency') && (
             <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? t('si…', 'إذا…') : t('attend…', 'ينتظر…')} style={st.input} accessibilityLabel={link === 'condition' ? t('La condition', 'الشرط') : t("Ce qu'elle attend", 'ما تنتظره')} />
           )}
+        </>
+      )}
+      {cards.length > 0 && (
+        <>
+          <Text style={st.small}>{t('Née d’une de mes Cartes ?', 'وُلدت من إحدى بطاقاتي؟', 'Elle vient de quelle Carte ?')}</Text>
+          <View style={st.row}>{cards.map((c) => chip(card === c.id, c.title, () => setCard(card === c.id ? null : c.id), `card-${c.id}`))}</View>
         </>
       )}
       {threadOption && (
