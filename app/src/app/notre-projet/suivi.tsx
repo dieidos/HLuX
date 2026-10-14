@@ -184,8 +184,8 @@ const st = StyleSheet.create({
   btnTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   load: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, backgroundColor: C.surface2 },
   loadName: { fontFamily: F.bold, fontSize: 15, color: C.ink, minWidth: 200 },
-  chip: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
-  chipTo: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, borderWidth: 1, borderStyle: 'dashed', borderColor: C.violet },
+  chip: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
+  chipTo: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, borderWidth: 1, borderStyle: 'dashed', borderColor: C.violet },
   result: { fontFamily: F.bold, fontSize: 15, color: C.ink, padding: 10, borderRadius: 12, backgroundColor: C.pe.soft },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink },
 });

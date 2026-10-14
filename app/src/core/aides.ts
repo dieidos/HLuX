@@ -83,3 +83,28 @@ export async function askAide(req: AideRequest, fetcher: typeof fetch = fetch): 
   guard(proposal);
   return { proposal: p.restore(proposal), offline: false };
 }
+
+/**
+ * « …ou je choisis une image » (01) : l'IA **ordonne** les pictos d'après la phrase dite ; c'est la
+ * personne qui choisit. Route dieidos `POST /api/assist/sort` (décision du 2026-10-14). La réponse doit
+ * être une permutation exacte des clés envoyées, sinon on garde l'ordre habituel. Sans dieidos : l'ordre habituel.
+ */
+export async function sortPictos(text: string, keys: string[], fetcher: typeof fetch = fetch): Promise<string[]> {
+  const base = process.env.EXPO_PUBLIC_DIEIDOS_URL;
+  if (!base || !text.trim()) return keys;
+  guard(text);
+  const p = pseudonymize(text, NAMES);
+  try {
+    const r = await fetcher(`${base}/api/assist/sort`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: p.text, lang: 'fr', keys }),
+    });
+    if (!r.ok) return keys;
+    const { order } = (await r.json()) as { order: string[] };
+    const same = Array.isArray(order) && order.length === keys.length && [...order].sort().join() === [...keys].sort().join();
+    return same ? order : keys;
+  } catch {
+    return keys;
+  }
+}

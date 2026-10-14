@@ -13,12 +13,13 @@ import { QrReceive, QrSend } from '../components/QrCopy';
 import { BackupRefusal, importDossier, type BackupFile } from '../core/backup';
 import { pickTextFile } from '../core/openFile';
 import { needsBackup, readDossier } from '../core/profiles';
-import { useWords } from '../core/useAids';
+import { tNow, useT, useWords } from '../core/useAids';
 import { enterDemo, useMe, useProject, useTeam } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 
 export default function Home() {
   const w = useWords();
+  const t = useT();
   const me = useMe();
   const pro = useProject((s) => s.pro);
   const setup = useProject((s) => s.setup);
@@ -43,7 +44,7 @@ export default function Home() {
       setFile(await pickTextFile());
       setRestoreMsg('');
     } catch {
-      setRestoreMsg("Ce fichier ne s'ouvre pas.");
+      setRestoreMsg(tNow("Ce fichier ne s'ouvre pas.", 'هذا الملف لا يُفتح.'));
     }
   };
   const restore = () => {
@@ -55,7 +56,7 @@ export default function Home() {
       setRestorePhrase('');
       setRestoreMsg('');
     } catch (e) {
-      setRestoreMsg(e instanceof BackupRefusal ? e.message : "Ce fichier n'est pas un dossier HLuX.");
+      setRestoreMsg(e instanceof BackupRefusal ? e.message : tNow("Ce fichier n'est pas un dossier HLuX.", 'هذا الملف ليس ملفّاً من HLuX.'));
     }
   };
 
@@ -152,7 +153,7 @@ export default function Home() {
           <Pressable accessibilityRole="button" onPress={choose} style={st.btn}>
             <Text style={st.btnTxt}>📂 {w('chooseFile')}{file ? ' ✓' : ''}</Text>
           </Pressable>
-          {file ? <TextInput value={restorePhrase} onChangeText={setRestorePhrase} placeholder="Sa phrase de six mots ou plus" secureTextEntry style={st.input} accessibilityLabel="Phrase du dossier" /> : null}
+          {file ? <TextInput value={restorePhrase} onChangeText={setRestorePhrase} placeholder={t('Sa phrase de six mots ou plus', 'جملة الملف، من ستّ كلمات أو أكثر')} secureTextEntry style={st.input} accessibilityLabel={t('Phrase du dossier', 'جملة الملف')} /> : null}
           {file ? (
             <Pressable accessibilityRole="button" onPress={restore} style={[st.btn, st.primary]}>
               <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('openIt')}</Text>

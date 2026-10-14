@@ -35,9 +35,14 @@ export default function Constat() {
   const [reading, setReading] = useState('');
   const speaker = f.floor ?? (f.mandate || opener);
   const [mandating, setMandating] = useState(false);
+  const [live, setLive] = useState('');
+  const tell = (t: string) => {
+    say(t);
+    setLive(t);
+  };
   const giveMandate = (to: string) => {
     act('groupe', { act: 'mandate_set', to });
-    say(to ? `Le groupe confie l'animation à ${to}.` : "Le groupe reprend le mandat d'animation.");
+    tell(to ? `Le groupe confie l'animation à ${to}.` : "Le groupe reprend le mandat d'animation.");
     setMandating(false);
   };
   const session = f.attendance?.session ?? 'séance';
@@ -48,12 +53,12 @@ export default function Constat() {
     const fromA = fromAgenda.find((a) => a.item === id);
     const existing = f.findings[id];
     act(speaker, { act: 'finding_placed', finding: id, title: existing?.title ?? fromA?.title ?? id, zone, source: existing?.source ?? fromA?.source ?? 'team', author: existing?.author ?? (fromA ? 'Amina' : speaker) });
-    say(`${speaker} pose une carte.`);
+    tell(`${speaker} pose une carte.`);
   };
   const qualify = (id: string) => {
     const next = LADDER[(LADDER.indexOf(f.findings[id].level) + 1) % LADDER.length];
     act(speaker, { act: 'finding_qualified', finding: id, level: next });
-    say(`${f.findings[id].title} : ${QUALIF_WORDS[next]}.`);
+    tell(`${f.findings[id].title} : ${QUALIF_WORDS[next]}.`);
   };
   // La relecture : une phrase par zone, lue à voix haute ; le groupe corrige les cartes, pas la machine.
   const draft = ZONES.map(([z, label]) => {
@@ -88,7 +93,7 @@ export default function Constat() {
         <View style={st.row}>
           <Text style={st.floor}>🎙️ La parole est à {speaker}</Text>
           {PEOPLE.filter((p) => p !== speaker).map((p) => (
-            <Pressable key={p} onPress={() => { act(speaker, { act: 'floor_given', session, to: p }); say(`La parole est à ${p}.`); }} style={st.btn} accessibilityRole="button">
+            <Pressable key={p} onPress={() => { act(speaker, { act: 'floor_given', session, to: p }); tell(`La parole est à ${p}.`); }} style={st.btn} accessibilityRole="button">
               <Text style={st.btnTxt}>→ {p}</Text>
             </Pressable>
           ))}
@@ -131,6 +136,7 @@ export default function Constat() {
           ))}
           <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Poser</Text></Pressable>
         </View>
+        {live ? <Text style={st.live} accessibilityLiveRegion="polite">{live}</Text> : null}
         <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l’a dite.</Text>
         <View style={st.tray}>
           <Text style={st.cardTitle}>Relire le constat à voix haute</Text>
@@ -156,10 +162,11 @@ const st = StyleSheet.create({
   card: { padding: 10, borderRadius: 12, backgroundColor: C.surface, gap: 4, borderTopWidth: 4, borderTopColor: C.pe.value },
   cardTitle: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   cardWrap: { gap: 4 },
-  qual: { alignSelf: 'flex-start', minHeight: 32, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, backgroundColor: C.pe.soft },
+  qual: { alignSelf: 'flex-start', minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, backgroundColor: C.pe.soft },
   qualTxt: { fontFamily: F.bold, fontSize: 12, color: C.pe.ink },
   tray: { marginTop: 12, padding: 12, borderRadius: S.radius, backgroundColor: C.surface2, gap: 8 },
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
+  live: { fontFamily: F.bold, fontSize: 15, color: C.ink, padding: 10, borderRadius: S.radius, backgroundColor: C.surface },
   input: { flex: 1, minWidth: 220, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink },
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
   on: { backgroundColor: C.violetInk, borderColor: C.violetInk },

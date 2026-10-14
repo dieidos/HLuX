@@ -43,6 +43,8 @@ interface ProjectStore {
   dossier: () => Dossier | null;
   /** Une copie a été emportée : la date est notée (rappel doux). */
   markBackedUp: (now: Date) => void;
+  /** La langue et « Plus simple » de la personne ouverte, gardés dans son profil. */
+  setPrefs: (lang: 'fr' | 'ar', falc: boolean) => void;
   /**
    * Recevoir une copie par QR (même personne, autre appareil) : fusion en ajout seul.
    * Si les deux journaux ont divergé, la copie arrive à côté (un second profil) : c'est la personne qui compare.
@@ -115,6 +117,13 @@ export function makeProjectStore(kv: KV) {
       dossier: () => {
         const p = get().profiles.find((x) => x.id === get().person);
         return p ? { person: p.id, firstName: p.firstName, entries: get().entries } : null;
+      },
+      setPrefs: (lang, falc) => {
+        const id = get().person;
+        if (!id) return;
+        const profiles = get().profiles.map((p) => (p.id === id ? { ...p, lang, falc } : p));
+        writeProfiles(kv, profiles);
+        set({ profiles });
       },
       markBackedUp: (now) => {
         const id = get().person;

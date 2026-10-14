@@ -10,7 +10,15 @@
 
 import type { Entry } from './acts';
 
-export interface Profile { id: string; firstName: string; /** date ISO de la dernière copie emportée */ lastBackup?: string }
+export interface Profile {
+  id: string;
+  firstName: string;
+  /** date ISO de la dernière copie emportée */
+  lastBackup?: string;
+  /** la langue et le registre de la personne : retrouvés à chaque ouverture de son profil */
+  lang?: 'fr' | 'ar';
+  falc?: boolean;
+}
 
 export type KV = { getItem: (k: string) => string | null; setItem: (k: string, v: string) => void; removeItem: (k: string) => void; /** efface tout ce qui appartient à un profil, clé de chiffrement comprise */ purge?: (id: string) => void };
 

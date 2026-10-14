@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { askAide, AideRefusal, guard, offlineExample, pseudonymize } from './aides';
+import { askAide, AideRefusal, guard, offlineExample, pseudonymize, sortPictos } from './aides';
 
 afterEach(() => {
   delete process.env.EXPO_PUBLIC_DIEIDOS_URL;
@@ -37,4 +37,15 @@ describe('Aides IA', () => {
     expect(r).toEqual({ proposal: 'Amina a peur des lettres.', offline: false });
     expect(fetcher.mock.calls[0][0]).toBe('https://dieidos.test/api/assist/simplify');
   });
+
+  it('tri des pictos : une permutation des clés, sinon l’ordre habituel ; sans dieidos, l’ordre habituel', async () => {
+    const keys = ['famille', 'papiers', 'logement'];
+    expect(await sortPictos('Les lettres de la CAF', keys)).toEqual(keys);
+    process.env.EXPO_PUBLIC_DIEIDOS_URL = 'https://dieidos.test';
+    const ok = vi.fn(async () => new Response(JSON.stringify({ order: ['papiers', 'logement', 'famille'] }), { status: 200 }));
+    expect(await sortPictos('Les lettres de la CAF', keys, ok as unknown as typeof fetch)).toEqual(['papiers', 'logement', 'famille']);
+    const forged = vi.fn(async () => new Response(JSON.stringify({ order: ['papiers', 'arme'] }), { status: 200 }));
+    expect(await sortPictos('Les lettres de la CAF', keys, forged as unknown as typeof fetch)).toEqual(keys);
+  });
 });
+

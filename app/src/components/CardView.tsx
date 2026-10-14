@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Card } from '../core/project';
-import { useFamily, useRegister } from '../core/useAids';
+import { useFamily, useRegister, useT } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 import { PICTOS, type PictoKey } from '../design/pictos';
 import { Picto } from './Picto';
@@ -12,9 +12,10 @@ const STATE: Record<NonNullable<Card['feeling']>, string> = { fine: '😊', unsu
 export function CardView({ card, compact = false, brought = false }: { card: Card; compact?: boolean; brought?: boolean }) {
   const reg = useRegister();
   const bold = useFamily(true);
+  const t = useT();
   const title = reg === 'ar' && card.picto ? PICTOS[card.picto as PictoKey]?.ar ?? card.title : card.title;
   return (
-    <View style={[st.card, compact && st.compact, brought && st.brought]} accessibilityLabel={`${title}${card.feeling ? `, ${STATE[card.feeling]}` : ''}${brought ? ', apportée au collectif' : ''}`}>
+    <View style={[st.card, compact && st.compact, brought && st.brought]} accessibilityLabel={`${title}${card.feeling ? `, ${STATE[card.feeling]}` : ''}${brought ? t(', apportée au collectif', '، قُدّمت للمجموعة', ', donnée au groupe') : ''}`}>
       {card.picto ? <Picto name={card.picto} size={compact ? 44 : 64} label={false} /> : null}
       <View style={{ flexShrink: 1 }}>
         <Text style={[st.title, { fontFamily: bold }]}>{title}{card.feeling ? ` ${STATE[card.feeling]}` : ''}</Text>

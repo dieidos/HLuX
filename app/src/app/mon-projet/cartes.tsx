@@ -11,7 +11,7 @@ import { Picto } from '../../components/Picto';
 import { AideRefusal, askAide } from '../../core/aides';
 import { cardThread } from '../../core/thread';
 import { useFacilityState } from '../../core/useFacility';
-import { say, useWords } from '../../core/useAids';
+import { say, tNow, useT, useWords } from '../../core/useAids';
 import { usePending, useProject, useProjectState, useMe } from '../../core/useProject';
 import { PICTOS, type PictoKey } from '../../design/pictos';
 import { C, F, S } from '../../design/theme';
@@ -19,11 +19,16 @@ import { C, F, S } from '../../design/theme';
 /** La provenance d'une Carte : comment elle est née. */
 /** `lang="ar"` sur le web (react-native-web le transmet ; les types de React Native ne le connaissent pas). */
 const AR = { lang: 'ar' } as object;
-const ORIGIN = { spoken: '🗣️ dite', written: '✍️ écrite', picture: '🖼️ choisie en image' } as const;
+const ORIGIN = {
+  spoken: ['🗣️ dite', '🗣️ قيلت بالصوت'],
+  written: ['✍️ écrite', '✍️ كُتبت'],
+  picture: ['🖼️ choisie en image', '🖼️ اختيرت بصورة'],
+} as const;
 
 export default function Cartes() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
   const s = useProjectState();
   const f = useFacilityState();
   const act = useProject((x) => x.act);
@@ -47,9 +52,11 @@ export default function Cartes() {
       setAideMsg('…');
       const r = await askAide({ kind, text: c.verbatim || c.title, lang: kind === 'translate' ? 'ar' : 'fr', register: kind === 'simplify' ? 'falc' : 'plain' });
       act('hlux-ia', kind === 'simplify' ? { act: 'card_simpler', card, text: r.proposal } : { act: 'card_translated', card, lang: 'ar', text: r.proposal }, 'hypothesis');
-      setAideMsg(r.offline ? 'Exemple hors ligne (sans IA) — à valider.' : 'Proposition — à valider.');
+      setAideMsg(r.offline
+        ? tNow('Exemple hors ligne (sans IA) — à valider.', 'مثال دون اتصال (بلا ذكاء اصطناعي) — للتأكيد.', 'Un exemple. Tu dois dire oui ou non.')
+        : tNow('Proposition — à valider.', 'اقتراح — للتأكيد.', 'Une idée. Tu dois dire oui ou non.'));
     } catch (e) {
-      setAideMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu.");
+      setAideMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu.", 'لم تُجب المساعدة.'));
     }
   };
   const proposalsFor = (card: string) =>
@@ -62,7 +69,7 @@ export default function Cartes() {
       act: 'card_created', card: id, title: picto ? PICTOS[picto].fr : text.trim().split(' ').slice(0, 3).join(' '),
       picto, verbatim: text.trim(), lang: 'fr', origin: picto && !text.trim() ? 'picture' : spoken ? 'spoken' : 'written', said_with: pro, when: "aujourd'hui",
     });
-    say('Ta Carte est créée.');
+    say(tNow('Ta Carte est créée.', 'تمّ إنشاء بطاقتكِ.'));
     setAdding(false); setText(''); setPicto(null); setSpoken(false);
   };
 
@@ -87,34 +94,34 @@ export default function Cartes() {
             {big.picto && <Picto name={big.picto} size={96} />}
             <Text style={st.bigTitle}>{big.title}</Text>
             {big.verbatim ? <Text style={st.verbatim}>« {big.verbatim} »</Text> : null}
-            {big.simpler ? <Text style={st.simpler}>Plus simple : {big.simpler}</Text> : null}
+            {big.simpler ? <Text style={st.simpler}>{t('Plus simple : ', 'أبسط: ')}{big.simpler}</Text> : null}
             {big.translations.ar ? <Text style={[st.simpler, { writingDirection: "rtl" }]} {...AR}>🌐 {big.translations.ar}</Text> : null}
-            <Text style={st.chip}>{ORIGIN[big.origin]}{big.saidWith ? ` · avec ${big.saidWith}` : ''}{brought.has(open!) ? ' · 🟢 apportée au collectif' : ''}</Text>
+            <Text style={st.chip}>{t(ORIGIN[big.origin][0], ORIGIN[big.origin][1])}{big.saidWith ? t(` · avec ${big.saidWith}`, ` · مع ${big.saidWith}`) : ''}{brought.has(open!) ? t(' · 🟢 apportée au collectif', ' · 🟢 قُدّمت للمجموعة', ' · 🟢 donnée au groupe') : ''}</Text>
             {!big.feeling && <Text style={st.chip}>{w('notPlaced')}</Text>}
             <Text style={st.muted}>{w('keepsAll')}</Text>
-            <View style={st.thread} accessibilityLabel="Le fil de la Carte">
-              {cardThread(open!, s, f).map((t, i) => (
-                <View key={`${t.step}-${i}`} style={st.step}>
+            <View style={st.thread} accessibilityLabel={t('Le fil de la Carte', 'مسار البطاقة')}>
+              {cardThread(open!, s, f).map((x, i) => (
+                <View key={`${x.step}-${i}`} style={st.step}>
                   <View style={st.dot} />
-                  <Text style={st.stepTxt}><Text style={{ fontFamily: F.bold }}>{t.step}</Text> · {t.detail}</Text>
+                  <Text style={st.stepTxt}><Text style={{ fontFamily: F.bold }}>{x.step}</Text> · {x.detail}</Text>
                 </View>
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-              <Pressable accessibilityRole="button" onPress={() => aide(open!, 'simplify')} style={st.btn}><Text style={st.btnTxt}>💬 Version plus simple</Text></Pressable>
-              <Pressable accessibilityRole="button" onPress={() => aide(open!, 'translate')} style={st.btn}><Text style={st.btnTxt}>🌐 En arabe</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => aide(open!, 'simplify')} style={st.btn}><Text style={st.btnTxt}>{t('💬 Version plus simple', '💬 نسخة أبسط', '💬 Plus simple')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => aide(open!, 'translate')} style={st.btn}><Text style={st.btnTxt}>{t('🌐 En arabe', '🌐 بالعربية')}</Text></Pressable>
             </View>
             {aideMsg ? <Text style={st.muted} accessibilityLiveRegion="polite">{aideMsg}</Text> : null}
             {proposalsFor(open!).map((e) => (
               <View key={e.rank} style={st.proposal}>
-                <Text style={st.simpler}>Proposition : {e.act && 'text' in e.act ? e.act.text : ''}</Text>
+                <Text style={st.simpler}>{t('Proposition : ', 'اقتراح: ')}{e.act && 'text' in e.act ? e.act.text : ''}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, me.id); setAideMsg(`Validé par ${me.name}.`); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Je valide</Text></Pressable>
-                  <Pressable accessibilityRole="button" onPress={() => { undo(me.id, e.rank); setAideMsg('Écartée.'); }} style={st.btn}><Text style={st.btnTxt}>Non merci</Text></Pressable>
+                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, me.id); setAideMsg(tNow(`Validé par ${me.name}.`, `وافقت ${me.name}.`)); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Je valide', 'أوافق')}</Text></Pressable>
+                  <Pressable accessibilityRole="button" onPress={() => { undo(me.id, e.rank); setAideMsg(tNow('Écartée.', 'تمّ الإبعاد.', 'Enlevée.')); }} style={st.btn}><Text style={st.btnTxt}>{t('Non merci', 'لا، شكراً')}</Text></Pressable>
                 </View>
               </View>
             ))}
-            <Pressable accessibilityRole="button" onPress={() => setOpen(null)} style={st.btn}><Text style={st.btnTxt}>Fermer</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => setOpen(null)} style={st.btn}><Text style={st.btnTxt}>{t('Fermer', 'إغلاق')}</Text></Pressable>
           </View>
         </View>
       )}
@@ -123,9 +130,9 @@ export default function Cartes() {
         <View style={st.overlay}>
           <View style={st.bigCard}>
             <Text style={st.bigTitle}>{w('newCard')}</Text>
-            <TextInput value={text} onChangeText={setText} placeholder="J'écris ce que je veux dire…" style={st.input} multiline accessibilityLabel="J'écris" />
-            <DictateButton onText={(t) => { setText(t); setSpoken(true); }} />
-            <Text style={st.muted}>…ou je choisis une image</Text>
+            <TextInput value={text} onChangeText={setText} placeholder={t("J'écris ce que je veux dire…", 'أكتب ما أريد قوله…', "J'écris ici…")} style={st.input} multiline accessibilityLabel={t("J'écris", 'أكتب')} />
+            <DictateButton onText={(said) => { setText(said); setSpoken(true); }} />
+            <Text style={st.muted}>{t('…ou je choisis une image', '…أو أختار صورة')}</Text>
             <View style={st.pictos}>
               {(Object.keys(PICTOS) as PictoKey[]).map((k) => (
                 <Pressable accessibilityRole="button" key={k} onPress={() => setPicto(k)} style={[st.pick, picto === k && st.pickOn]} accessibilityLabel={PICTOS[k].fr}>
@@ -134,8 +141,8 @@ export default function Cartes() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Créer ma Carte</Text></Pressable>
-              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Créer ma Carte', 'إنشاء بطاقتي')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>{t('Annuler', 'إلغاء')}</Text></Pressable>
             </View>
           </View>
         </View>

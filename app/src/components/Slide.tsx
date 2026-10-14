@@ -9,6 +9,7 @@ import { Animated, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } f
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { placesFor } from '../core/views';
+import { reduceMotionNow } from '../design/motion';
 import { C, F, S } from '../design/theme';
 
 export function SlideChip({ children, step = 110, onShift }: { children: ReactNode; step?: number; onShift: (places: number) => void }) {
@@ -19,7 +20,8 @@ export function SlideChip({ children, step = 110, onShift }: { children: ReactNo
     .failOffsetY([-14, 14])
     .onUpdate((e) => x.setValue(e.translationX))
     .onEnd((e) => {
-      Animated.spring(x, { toValue: 0, useNativeDriver: false }).start();
+      if (reduceMotionNow()) x.setValue(0);
+      else Animated.spring(x, { toValue: 0, useNativeDriver: false }).start();
       const n = placesFor(e.translationX, step);
       if (n) onShift(n);
     });

@@ -48,3 +48,19 @@ export function useFamily(bold = false): string {
   if (r === 'ar') return 'NotoNaskhArabic';
   return bold ? 'SourceSans3Bold' : 'SourceSans3';
 }
+
+/**
+ * Un texte de l'écran dans ses trois registres, écrit sur place : `t('Fermer', 'إغلاق')` ou
+ * `t('Écarter (on ne peut pas revenir)', 'إبعاد (لا رجعة فيه)', 'Enlever pour toujours')`.
+ * L'arabe est obligatoire ; sans version FALC, « Plus simple » garde le français.
+ */
+export function useT() {
+  const r = useRegister();
+  return (fr: string, ar: string, falc?: string) => (r === 'ar' ? ar : r === 'falc' ? falc ?? fr : fr);
+}
+
+/** Même chose hors d'un composant (phrases dites à voix haute après un geste). */
+export function tNow(fr: string, ar: string, falc?: string) {
+  const { lang, simple } = useAids.getState();
+  return lang === 'ar' ? ar : simple ? falc ?? fr : fr;
+}

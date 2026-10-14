@@ -12,7 +12,7 @@ import { DictateButton } from '../../components/DictateButton';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import type { Feeling } from '../../core/acts';
 import { FEELING_WORDS } from '../../core/project';
-import { say, useAids, useWords } from '../../core/useAids';
+import { say, tNow, useAids, useT, useWords } from '../../core/useAids';
 import { parsePlacement } from '../../core/voicePlace';
 import { useMe, useProject, useProjectState } from '../../core/useProject';
 import { Picto } from '../../components/Picto';
@@ -23,6 +23,9 @@ import type { WordKey } from '../../i18n/words';
 /** La réserve de l'Atlas (écran 02) : dix cartes-pictos. */
 const RESERVE: PictoKey[] = ['famille', 'amis', 'travail', 'appel', 'fatigue', 'papiers', 'logement', 'allocations', 'sante', 'courage'];
 
+/** Les trois lieux en arabe, comme dans le catalogue (`fine`, `unsure`, `hard`), pour la phrase redite. */
+const FEELING_AR: Record<Feeling, string> = { fine: 'أنا بخير', unsure: 'لا أعرف', hard: 'صعب' };
+
 const ZONES: [Feeling, WordKey, string][] = [
   ['fine', 'fine', C.feeling.fine],
   ['unsure', 'unsure', C.feeling.unsure],
@@ -32,6 +35,7 @@ const ZONES: [Feeling, WordKey, string][] = [
 export default function Ressenti() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
   const lang = useAids().lang === 'ar' ? 'ar' : 'fr';
   const s = useProjectState();
   const act = useProject((x) => x.act);
@@ -50,7 +54,7 @@ export default function Ressenti() {
     }
     const title = id.startsWith('picto:') ? PICTOS[id.slice(6) as PictoKey].fr : s.cards[card].title;
     const e = act(me.id, { act: 'card_felt', card, feeling, when: "aujourd'hui" });
-    const text = `${title} va dans « ${FEELING_WORDS[feeling]} ».`;
+    const text = tNow(`${title} va dans « ${FEELING_WORDS[feeling]} ».`, `${title} تُوضع في « ${FEELING_AR[feeling]} ».`);
     setSaid({ text, rank: e.rank, card });
     say(text);
   };
@@ -60,9 +64,9 @@ export default function Ressenti() {
     const last = [...entries].reverse().find((e) => e.act?.act === 'card_felt' && e.act.card === card && !undone.has(e.rank));
     if (!last) return;
     undo(me.id, last.rank);
-    const t = `${s.cards[card]?.title ?? ''} revient dans la réserve.`;
+    const line = tNow(`${s.cards[card]?.title ?? ''} revient dans la réserve.`, `${s.cards[card]?.title ?? ''} تعود إلى علبة البطاقات.`);
     setSaid(null);
-    say(t);
+    say(line);
   };
 
   const tray = Object.entries(s.cards).filter(([, c]) => !c.feeling);
@@ -76,7 +80,11 @@ export default function Ressenti() {
     if (p) {
       setHeard('');
       place(p.card, p.feeling);
-    } else setHeard(`« ${text} » : je n’ai pas reconnu la Carte et l’endroit. Tu peux toucher la carte.`);
+    } else setHeard(tNow(
+      `« ${text} » : je n’ai pas reconnu la Carte et l’endroit. Tu peux toucher la carte.`,
+      `« ${text} »: لم أتعرّف على البطاقة ولا على المكان. يمكنكِ لمس البطاقة.`,
+      `« ${text} » : je n’ai pas compris. Touche la carte.`,
+    ));
   };
   return (
     <Screen side="pp" title="feeling" question={w('howFeel')}>
@@ -93,7 +101,7 @@ export default function Ressenti() {
             </Zone>
           ))}
         </View>
-        <Zone id="reserve" label="La réserve" accepts={(card) => !!s.cards[card]?.feeling} onDrop={back} style={st.tray}>
+        <Zone id="reserve" label={t('La réserve', 'علبة البطاقات')} accepts={(card) => !!s.cards[card]?.feeling} onDrop={back} style={st.tray}>
           {tray.map(([id, c]) => (
             <Draggable key={id} id={id} label={c.title}><CardView card={c} compact /></Draggable>
           ))}
@@ -102,11 +110,11 @@ export default function Ressenti() {
               <View style={st.picto}><Picto name={k} size={56} /></View>
             </Draggable>
           ))}
-          {tray.length === 0 && reserve.length === 0 ? <Text style={st.muted}>Toutes les cartes sont posées.</Text> : null}
+          {tray.length === 0 && reserve.length === 0 ? <Text style={st.muted}>{t('Toutes les cartes sont posées.', 'كلّ البطاقات موضوعة.')}</Text> : null}
         </Zone>
       </DragArea>
       <View style={st.voice}>
-        <DictateButton label="🎙 Je le dis" lang={lang} onText={spoken} />
+        <DictateButton label={t('🎙 Je le dis', '🎙 أقولها')} lang={lang} onText={spoken} />
         {heard ? <Text style={st.muted} accessibilityLiveRegion="polite">{heard}</Text> : null}
       </View>
       {said && (
@@ -119,7 +127,7 @@ export default function Ressenti() {
             </View>
           ) : null}
           <Pressable onPress={() => { undo(me.id, said.rank); setSaid(null); }} style={st.undo} accessibilityRole="button">
-            <Text style={st.undoTxt}>↶ Annuler</Text>
+            <Text style={st.undoTxt}>{t('↶ Annuler', '↶ إلغاء')}</Text>
           </Pressable>
         </View>
       )}

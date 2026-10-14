@@ -5,43 +5,45 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { Plan } from '../core/acts';
+import { useT } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 
 type Box = 'first' | 'waiting' | 'with_whom' | 'open';
 
 export function PlanEditor({ plan, titles, onChange }: { plan: Plan; titles: Record<Box, string>; onChange: (p: Plan) => void }) {
+  const t = useT();
   const [draft, setDraft] = useState<Record<Box, string>>({ first: '', waiting: '', with_whom: '', open: '' });
   const [waitFor, setWaitFor] = useState('');
 
   const add = (b: Box) => {
-    const t = draft[b].trim();
-    if (!t) return;
+    const text = draft[b].trim();
+    if (!text) return;
     if (b === 'waiting') {
       if (!waitFor.trim()) return;
-      onChange({ ...plan, waiting: [...plan.waiting, [t, waitFor.trim()]] });
+      onChange({ ...plan, waiting: [...plan.waiting, [text, waitFor.trim()]] });
       setWaitFor('');
-    } else onChange({ ...plan, [b]: [...plan[b], t] });
+    } else onChange({ ...plan, [b]: [...plan[b], text] });
     setDraft({ ...draft, [b]: '' });
   };
   const remove = (b: Box, i: number) => onChange({ ...plan, [b]: (plan[b] as unknown[]).filter((_, k) => k !== i) } as Plan);
 
-  const items = (b: Box): string[] => (b === 'waiting' ? plan.waiting.map(([a, w]) => `${a} · attend ${w}`) : plan[b]);
+  const items = (b: Box): string[] => (b === 'waiting' ? plan.waiting.map(([a, w]) => t(`${a} · attend ${w}`, `${a} · ينتظر ${w}`)) : plan[b]);
 
   return (
     <View style={st.grid}>
       {(['first', 'waiting', 'with_whom', 'open'] as Box[]).map((b) => (
         <View key={b} style={st.tile}>
           <Text style={st.title}>{titles[b]}</Text>
-          {items(b).map((t, i) => (
-            <View key={`${t}-${i}`} style={st.item}>
-              <Text style={st.itemTxt}>{t}</Text>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Retirer « ${t} »`} onPress={() => remove(b, i)} style={st.x}>
+          {items(b).map((item, i) => (
+            <View key={`${item}-${i}`} style={st.item}>
+              <Text style={st.itemTxt}>{item}</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel={t(`Retirer « ${item} »`, `إزالة « ${item} »`)} onPress={() => remove(b, i)} style={st.x}>
                 <Text style={st.xTxt}>✕</Text>
               </Pressable>
             </View>
           ))}
-          <TextInput value={draft[b]} onChangeText={(v) => setDraft({ ...draft, [b]: v })} placeholder="Ajouter, dans mes mots…" style={st.input} accessibilityLabel={`Ajouter à ${titles[b]}`} />
-          {b === 'waiting' && <TextInput value={waitFor} onChangeText={setWaitFor} placeholder="…ça attend quoi ?" style={st.input} accessibilityLabel="Ça attend quoi" />}
+          <TextInput value={draft[b]} onChangeText={(v) => setDraft({ ...draft, [b]: v })} placeholder={t('Ajouter, dans mes mots…', 'أضيف، بكلماتي…')} style={st.input} accessibilityLabel={t(`Ajouter à ${titles[b]}`, `إضافة إلى ${titles[b]}`)} />
+          {b === 'waiting' && <TextInput value={waitFor} onChangeText={setWaitFor} placeholder={t('…ça attend quoi ?', '…ينتظر ماذا؟')} style={st.input} accessibilityLabel={t('Ça attend quoi', 'ينتظر ماذا')} />}
           <Pressable accessibilityRole="button" onPress={() => add(b)} style={st.add}>
             <Text style={st.addTxt}>＋</Text>
           </Pressable>

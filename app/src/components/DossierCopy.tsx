@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { BackupRefusal, exportDossier, MIN_WORDS } from '../core/backup';
 import { saveFile } from '../core/saveFile';
+import { tNow, useT } from '../core/useAids';
 import { useProject } from '../core/useProject';
 import { C, F, S } from '../design/theme';
 
@@ -15,6 +16,7 @@ export function DossierCopy() {
   const markBackedUp = useProject((s) => s.markBackedUp);
   const [phrase, setPhrase] = useState('');
   const [msg, setMsg] = useState('');
+  const t = useT();
   const take = async () => {
     const d = dossier();
     if (!d) return;
@@ -22,21 +24,25 @@ export function DossierCopy() {
       const f = exportDossier(JSON.stringify(d), phrase);
       await saveFile(`dossier-${d.person}.hlux.json`, JSON.stringify(f));
       markBackedUp(new Date());
-      setMsg('Ton dossier chiffré est prêt.');
+      setMsg(tNow('Ton dossier chiffré est prêt.', 'ملفّكِ المشفّر جاهز.', 'Ta copie est prête.'));
       setPhrase('');
     } catch (e) {
-      setMsg(e instanceof BackupRefusal ? e.message : 'La copie a échoué.');
+      setMsg(e instanceof BackupRefusal ? e.message : tNow('La copie a échoué.', 'لم تنجح النسخة.', 'La copie ne marche pas.'));
     }
   };
   return (
     <View style={st.box}>
-      <Text style={st.title}>🔒 Emporter mon dossier</Text>
+      <Text style={st.title}>{t('🔒 Emporter mon dossier', '🔒 آخذ ملفّي معي')}</Text>
       <Text style={st.small}>
-        Une copie chiffrée, lisible seulement avec ta phrase ({MIN_WORDS} mots ou plus). Une phrase perdue, c’est un dossier perdu : personne ne peut la retrouver.
+        {t(
+          `Une copie chiffrée, lisible seulement avec ta phrase (${MIN_WORDS} mots ou plus). Une phrase perdue, c’est un dossier perdu : personne ne peut la retrouver.`,
+          `نسخة مشفّرة، لا تُقرأ إلا بجملتكِ (${MIN_WORDS} كلمات أو أكثر). إذا ضاعت الجملة ضاع الملفّ: لا أحد يستطيع استرجاعها.`,
+          `Ta copie s’ouvre seulement avec ta phrase. Si tu perds ta phrase, tu perds ton dossier.`,
+        )}
       </Text>
-      <TextInput value={phrase} onChangeText={setPhrase} placeholder="Ma phrase de six mots ou plus" secureTextEntry style={st.input} accessibilityLabel="Ma phrase" />
+      <TextInput value={phrase} onChangeText={setPhrase} placeholder={t('Ma phrase de six mots ou plus', 'جملتي من ستّ كلمات أو أكثر')} secureTextEntry style={st.input} accessibilityLabel={t('Ma phrase', 'جملتي')} />
       <Pressable onPress={take} style={st.btn} accessibilityRole="button">
-        <Text style={st.btnTxt}>Emporter</Text>
+        <Text style={st.btnTxt}>{t('Emporter', 'آخذ النسخة')}</Text>
       </Pressable>
       {msg ? <Text style={st.small} accessibilityLiveRegion="polite">{msg}</Text> : null}
     </View>

@@ -11,7 +11,7 @@ import type { Circle, Rank } from '../../core/acts';
 import { lineKey } from '../../core/project';
 import { shifted } from '../../core/views';
 import { SlideChip } from '../../components/Slide';
-import { say, useWords } from '../../core/useAids';
+import { say, tNow, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
@@ -25,6 +25,7 @@ const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
 export default function Priorites() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const [pane, setPane] = useState<'a' | 'b'>('a');
@@ -46,9 +47,12 @@ export default function Priorites() {
     if (!passed) return;
     act(me.id, { act: 'line_ordered', axis, author: me.id, order });
     const other = s.ideas[passed].title;
-    const t = places > 0 ? `« ${s.ideas[id].title} » passe devant ${other}.` : `« ${s.ideas[id].title} » se tient plus à gauche que ${other}.`;
-    setLive(t);
-    say(t);
+    const title = s.ideas[id].title;
+    const msg = places > 0
+      ? tNow(`« ${title} » passe devant ${other}.`, `« ${title} » تتقدّم على ${other}.`)
+      : tNow(`« ${title} » se tient plus à gauche que ${other}.`, `« ${title} » تبقى أقرب إلى «قليلاً» من ${other}.`, `« ${title} » est plus près de « peu » que ${other}.`);
+    setLive(msg);
+    say(msg);
   };
 
   return (
@@ -92,8 +96,8 @@ export default function Priorites() {
             const r = rankOf(axis);
             const folded = (r === 'less' || r === 'not_yet' || !r) && open !== axis;
             return (
-              <View key={axis} style={[st.line, idx === 0 && st.lineTop]}>
-                <Pressable onPress={() => setOpen(open === axis ? null : axis)} style={st.lineHead} accessibilityRole="button">
+              <View key={axis} style={[st.line, (r === 'first' || r === 'then' || (!r && idx === 0)) && st.lineTop]}>
+                <Pressable onPress={() => setOpen(open === axis ? null : axis)} style={st.lineHead} accessibilityRole="button" accessibilityState={{ expanded: !folded }} accessibilityLabel={w(k)}>
                   <Text style={st.rankLabel}>{r ? w(RANKS.find((x) => x[0] === r)![1]) : '—'}</Text>
                   <Text style={st.axisTxt}>{w(k)}</Text>
                   {folded ? <Text style={st.small}>▾</Text> : null}
@@ -105,9 +109,9 @@ export default function Priorites() {
                       {orderOn(axis).map((id, i, all) => (
                         <SlideChip key={id} onShift={(n) => move(axis, id, n)}>
                         <View style={st.idea}>
-                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, -1)} disabled={i === 0} accessibilityLabel={`${s.ideas[id].title} vers peu`} style={st.arrow}><Text style={st.arrowTxt}>◀</Text></Pressable>
+                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, -1)} disabled={i === 0} accessibilityLabel={t(`${s.ideas[id].title} vers peu`, `${s.ideas[id].title} نحو «قليلاً»`)} style={st.arrow}><Text style={st.arrowTxt}>◀</Text></Pressable>
                           <Text style={st.ideaTxt}>{s.ideas[id].title}</Text>
-                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, 1)} disabled={i === all.length - 1} accessibilityLabel={`${s.ideas[id].title} vers beaucoup`} style={st.arrow}><Text style={st.arrowTxt}>▶</Text></Pressable>
+                          <Pressable accessibilityRole="button" onPress={() => move(axis, id, 1)} disabled={i === all.length - 1} accessibilityLabel={t(`${s.ideas[id].title} vers beaucoup`, `${s.ideas[id].title} نحو «كثيراً»`)} style={st.arrow}><Text style={st.arrowTxt}>▶</Text></Pressable>
                         </View>
                         </SlideChip>
                       ))}

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AideRefusal, askAide, type AideKind } from '../core/aides';
+import { tNow } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 
 interface Props {
@@ -26,13 +27,17 @@ export function AideButton({ kind, label, text, who, onProposal, lang }: Props) 
       const r = await askAide({ kind, text, lang });
       // Hors ligne, une traduction ne s'invente pas : on la laisse écrire.
       if (r.offline && kind === 'translate') {
-        setMsg('Sans connexion, pas de traduction : écris-la toi-même.');
+        setMsg(tNow('Sans connexion, pas de traduction : écris-la toi-même.', 'بلا اتصال لا توجد ترجمة: اكتبيها بنفسكِ.', 'Pas d’Internet. Écris toi-même.'));
         return;
       }
       onProposal(r.proposal);
-      setMsg(`${r.offline ? 'Exemple hors ligne (sans IA)' : 'Proposition'}. ${who} relit, change si besoin, puis valide.`);
+      setMsg(tNow(
+        `${r.offline ? 'Exemple hors ligne (sans IA)' : 'Proposition'}. ${who} relit, change si besoin, puis valide.`,
+        `${r.offline ? 'مثال دون اتصال (بلا ذكاء اصطناعي)' : 'اقتراح'}. ${who}: مراجعة، وتعديل إن لزم، ثمّ موافقة.`,
+        `${r.offline ? 'Un exemple' : 'Une idée'}. ${who} relit, puis dit oui.`,
+      ));
     } catch (e) {
-      setMsg(e instanceof AideRefusal ? e.message : "L'aide n'a pas répondu. Rien n'a changé.");
+      setMsg(e instanceof AideRefusal ? e.message : tNow("L'aide n'a pas répondu. Rien n'a changé.", 'لم تُجب المساعدة. لم يتغيّر شيء.'));
     }
   };
   return (

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { LinkKind, NodeKind } from '../core/acts';
+import { useT } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 import type { PNode } from './PathView';
 
@@ -19,12 +20,12 @@ export interface NewStep {
 }
 
 type LinkChoice = 'none' | 'chosen' | 'open' | 'condition' | 'dependency';
-const LINKS: [LinkChoice, string][] = [
-  ['none', 'sans lien'],
-  ['chosen', '━ à la suite'],
-  ['open', '┅ autre chemin possible'],
-  ['condition', 'si…'],
-  ['dependency', 'attend…'],
+const LINKS: [LinkChoice, string, string][] = [
+  ['none', 'sans lien', 'بلا رابط'],
+  ['chosen', '━ à la suite', '━ بعدها مباشرة'],
+  ['open', '┅ autre chemin possible', '┅ طريق آخر ممكن'],
+  ['condition', 'si…', 'إذا…'],
+  ['dependency', 'attend…', 'ينتظر…'],
 ];
 
 export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
@@ -35,6 +36,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
   decisionLabel: string;
   onAdd: (s: NewStep) => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('');
   const [lane, setLane] = useState(lanes[0] ?? '');
@@ -63,7 +65,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
   if (!open) {
     return (
       <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={st.btn}>
-        <Text style={st.btnTxt}>＋ Une étape</Text>
+        <Text style={st.btnTxt}>{t('＋ Une étape', '＋ خطوة')}</Text>
       </Pressable>
     );
   }
@@ -74,35 +76,35 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd }: {
   );
   return (
     <View style={st.box}>
-      <TextInput value={label} onChangeText={setLabel} placeholder="L'étape, en quelques mots" style={st.input} accessibilityLabel="L'étape" />
-      <Text style={st.small}>Un événement ou une décision ?</Text>
+      <TextInput value={label} onChangeText={setLabel} placeholder={t("L'étape, en quelques mots", 'الخطوة، في بضع كلمات')} style={st.input} accessibilityLabel={t("L'étape", 'الخطوة')} />
+      <Text style={st.small}>{t('Un événement ou une décision ?', 'حدث أم قرار؟', 'Ça arrive, ou je choisis ?')}</Text>
       <View style={st.row}>
-        {chip(kind === 'event', '● ça arrive', () => setKind('event'), 'e')}
+        {chip(kind === 'event', t('● ça arrive', '● يحدث'), () => setKind('event'), 'e')}
         {chip(kind === 'decision', `◆ ${decisionLabel}`, () => setKind('decision'), 'd')}
       </View>
-      <Text style={st.small}>Dans quel couloir ?</Text>
+      <Text style={st.small}>{t('Dans quel couloir ?', 'في أيّ مسار؟')}</Text>
       <View style={st.row}>
         {lanes.map((l) => chip(lane === l && !newLane, l, () => { setLane(l); setNewLane(''); }, l))}
-        <TextInput value={newLane} onChangeText={setNewLane} placeholder="un autre couloir…" style={[st.input, st.small2]} accessibilityLabel="Un autre couloir" />
+        <TextInput value={newLane} onChangeText={setNewLane} placeholder={t('un autre couloir…', 'مسار آخر…')} style={[st.input, st.small2]} accessibilityLabel={t('Un autre couloir', 'مسار آخر')} />
       </View>
-      <Text style={st.small}>Quand ?</Text>
+      <Text style={st.small}>{t('Quand ?', 'متى؟')}</Text>
       <View style={st.row}>{columns.map((c) => chip(when === c, c, () => setWhen(c), c))}</View>
       {nodes.length > 0 && (
         <>
-          <Text style={st.small}>Relier à une étape déjà posée ?</Text>
-          <View style={st.row}>{LINKS.map(([k, t]) => chip(link === k, t, () => setLink(k), k))}</View>
+          <Text style={st.small}>{t('Relier à une étape déjà posée ?', 'ربطها بخطوة موضوعة من قبل؟', 'Avec une autre étape ?')}</Text>
+          <View style={st.row}>{LINKS.map(([k, fr, ar]) => chip(link === k, t(fr, ar), () => setLink(k), k))}</View>
           {link !== 'none' && <View style={st.row}>{nodes.map((n) => chip(from === n.id, n.label, () => setFrom(n.id), n.id))}</View>}
           {(link === 'condition' || link === 'dependency') && (
-            <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? 'si plus de 8 viennent…' : 'attend la convention…'} style={st.input} accessibilityLabel={link === 'condition' ? 'La condition' : "Ce qu'elle attend"} />
+            <TextInput value={words} onChangeText={setWords} placeholder={link === 'condition' ? t('si plus de 8 viennent…', 'إذا جاء أكثر من 8…') : t('attend la convention…', 'ينتظر الاتفاقية…')} style={st.input} accessibilityLabel={link === 'condition' ? t('La condition', 'الشرط') : t("Ce qu'elle attend", 'ما تنتظره')} />
           )}
         </>
       )}
       <View style={st.row}>
         <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.primary]}>
-          <Text style={[st.btnTxt, { color: C.onAccent }]}>Poser l’étape</Text>
+          <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Poser l’étape', 'وضع الخطوة')}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => setOpen(false)} style={st.btn}>
-          <Text style={st.btnTxt}>Annuler</Text>
+          <Text style={st.btnTxt}>{t('Annuler', 'إلغاء')}</Text>
         </Pressable>
       </View>
     </View>

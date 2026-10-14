@@ -7,6 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { Animated, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
+import { reduceMotionNow } from '../design/motion';
 import { C } from '../design/theme';
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -112,7 +113,8 @@ export function Draggable({ id, children, label }: { id: string; children: React
     .onEnd((e) => {
       d.drop(e.absoluteX, e.absoluteY);
       setTrail(null);
-      Animated.spring(pos, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
+      if (reduceMotionNow()) pos.setValue({ x: 0, y: 0 });
+      else Animated.spring(pos, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
     });
   const held = d.held === id;
   const len = trail ? Math.hypot(trail.dx, trail.dy) : 0;

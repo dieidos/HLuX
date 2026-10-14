@@ -47,7 +47,7 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const bold = useFamily(true);
   const { phone } = useLayout();
   return (
-    <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]}>
+    <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]} {...(rtl ? ({ lang: 'ar' } as object) : {})}>
       <View style={st.top}>
         <Link href="/" accessibilityLabel="Accueil" style={st.home}><Wordmark /></Link>
         <Text style={st.proj}>{w(side === 'pp' ? 'myProject' : 'ourProject')}</Text>

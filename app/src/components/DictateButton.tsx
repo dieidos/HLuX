@@ -6,9 +6,11 @@ import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { canDictateOnDevice, LOCALE } from '../core/dictation';
+import { tNow, useT } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 
-export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: { lang?: 'fr' | 'ar'; label?: string; onText: (text: string, final: boolean) => void }) {
+export function DictateButton({ lang = 'fr', label, onText }: { lang?: 'fr' | 'ar'; label?: string; onText: (text: string, final: boolean) => void }) {
+  const t = useT();
   const [listening, setListening] = useState(false);
   const [msg, setMsg] = useState('');
 
@@ -19,7 +21,7 @@ export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: 
   useSpeechRecognitionEvent('end', () => setListening(false));
   useSpeechRecognitionEvent('error', () => {
     setListening(false);
-    setMsg("La dictée s'est arrêtée. Tu peux écrire.");
+    setMsg(tNow("La dictée s'est arrêtée. Tu peux écrire.", 'توقّف الإملاء. يمكنكِ الكتابة.'));
   });
 
   const start = async () => {
@@ -40,7 +42,7 @@ export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: 
     }
     const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!perm.granted) {
-      setMsg('Le micro n’est pas autorisé. Tu peux écrire.');
+      setMsg(tNow('Le micro n’est pas autorisé. Tu peux écrire.', 'الميكروفون غير مسموح به. يمكنكِ الكتابة.'));
       return;
     }
     setMsg('');
@@ -52,7 +54,7 @@ export function DictateButton({ lang = 'fr', label = '🎙 Je parle', onText }: 
   return (
     <View style={st.wrap}>
       <Pressable accessibilityRole="button" accessibilityState={{ selected: listening }} onPress={start} style={[st.btn, listening && st.on]}>
-        <Text style={[st.txt, listening && { color: C.onAccent }]}>{listening ? '⏹ J’ai fini' : label}</Text>
+        <Text style={[st.txt, listening && { color: C.onAccent }]}>{listening ? t('⏹ J’ai fini', '⏹ انتهيت') : label ?? t('🎙 Je parle', '🎙 أتكلّم')}</Text>
       </Pressable>
       {msg ? <Text style={st.msg} accessibilityLiveRegion="polite">{msg}</Text> : null}
     </View>

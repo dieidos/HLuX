@@ -33,6 +33,7 @@ export default function Actions() {
   const [modality, setModality] = useState('');
   const [rhythm, setRhythm] = useState('');
   const [chosen, setChosen] = useState<string | null>(null);
+  const [live, setLive] = useState('');
   const solutions = Object.entries(f.solutions);
   const decision = Object.values(f.orientations).find((o) => o.decision)?.decision;
   const commitments = Object.entries(f.commitments);
@@ -46,7 +47,9 @@ export default function Actions() {
   };
   const lean = (sol: string, effect: boolean, l: Lean) => {
     act(who, { act: 'solution_lean', solution: sol, effect, by: who, lean: l });
-    say(`${who} : ${effect ? 'effet' : 'faisabilité'}, ${LEAN_WORDS[l]}.`);
+    const t = `${who} : ${effect ? 'effet' : 'faisabilité'}, ${LEAN_WORDS[l]}.`;
+    say(t);
+    setLive(t);
   };
   // Le fil de l'engagement : la parole consentie qui l'a fait naître, l'orientation décidée, la solution.
   const thread = (sol: string) => {
@@ -60,6 +63,7 @@ export default function Actions() {
     act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: chosen, thread: thread(chosen), review: review.trim() }, prov, conf);
     setAided(false);
     say('Carte-engagement validée.');
+    setLive('Carte-engagement validée.');
     setText('');
   };
 
@@ -88,6 +92,7 @@ export default function Actions() {
         </View>
         <View style={st.box}>
           <Text style={st.h}>Cartes-solutions</Text>
+          {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
           {solutions.map(([id, s]) => (
             <View key={id} style={st.sol}>
               <Text style={st.solTitle}>{s.title}</Text>
@@ -155,7 +160,7 @@ const st = StyleSheet.create({
   track: { flex: 1, minWidth: 200, height: 40, borderRadius: 10, backgroundColor: C.surface },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
   mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
-  pick: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, borderWidth: 1, borderColor: C.line, backgroundColor: C.surface },
+  pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, borderWidth: 1, borderColor: C.line, backgroundColor: C.surface },
   pickTxt: { fontFamily: F.body, fontSize: 13, color: C.ink },
   input: { flex: 1, minWidth: 240, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink },
   commit: { padding: 12, borderRadius: 12, backgroundColor: C.pe.soft, gap: 4 },

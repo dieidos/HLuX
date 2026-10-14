@@ -10,7 +10,7 @@ import { AideButton } from '../../components/AideButton';
 import { Screen } from '../../components/Chrome';
 import type { Channel, Circle, Lang, Lean, Rank } from '../../core/acts';
 import { expired, lineKey } from '../../core/project';
-import { say, useWords } from '../../core/useAids';
+import { say, tNow, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { band, leanOf } from '../../core/views';
 import { C, F, S } from '../../design/theme';
@@ -19,11 +19,13 @@ import type { WordKey } from '../../i18n/words';
 const AXES: [Circle, WordKey][] = [['living', 'living'], ['able', 'able'], ['love', 'love'], ['useful', 'useful']];
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
 
-const CHANNELS: Record<Channel, string> = { sms: '📱 SMS', mail: '✉️ mail', in_session: '🤝 en séance' };
+const CHANNEL_KEYS: Channel[] = ['sms', 'mail', 'in_session'];
 
 export default function Regards() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
+  const channels: Record<Channel, string> = { sms: '📱 SMS', mail: t('✉️ mail', '✉️ بريد'), in_session: t('🤝 en séance', '🤝 في الجلسة') };
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const [tab, setTab] = useState<string>('mine');
@@ -49,7 +51,7 @@ export default function Regards() {
     const id = `inv-${invitations.length + 1}`;
     const expires = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString().slice(0, 10);
     act(me.id, { act: 'invitation_sent', invitation: id, guest: guest.trim(), relation: relation.trim(), idea, axes: AXES.map((a) => a[0]), lang, expires, channel, idea_text: lang === 'ar' ? ideaText.trim() : null });
-    say(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`);
+    say(tNow(`${guest.trim()} est invitée sur « ${s.ideas[idea].title} ».`, `${guest.trim()} مدعوّة إلى فكرة « ${s.ideas[idea].title} ».`));
     setForm(false); setGuest(''); setRelation(''); setIdea(null); setIdeaText('');
   };
 
@@ -96,12 +98,12 @@ export default function Regards() {
           {invitations.map(([id, inv]) => (
             <View key={id} style={st.sat}>
               <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
-              <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? 'en arabe' : 'en français'}</Text>
+              <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? t('en arabe', 'بالعربية') : t('en français', 'بالفرنسية')}</Text>
               <Text style={[st.status, inv.answered && st.statusOk]}>
-                {inv.answered ? w('answered') : expired(inv, new Date()) ? 'expirée · le lien s’est reposé' : `${w('invited')} · ${w('notYetAnswered')}`}
-                {inv.channel ? ` · ${CHANNELS[inv.channel]}` : ''}
+                {inv.answered ? w('answered') : expired(inv, new Date()) ? t('expirée · le lien s’est reposé', 'انتهت · توقّف الرابط', 'fini · le lien ne marche plus') : `${w('invited')} · ${w('notYetAnswered')}`}
+                {inv.channel ? ` · ${channels[inv.channel]}` : ''}
               </Text>
-              {!inv.answered && !expired(inv, new Date()) && <Link href={`/invite/${id}`} style={st.link}>Ouvrir le lien invité</Link>}
+              {!inv.answered && !expired(inv, new Date()) && <Link href={`/invite/${id}`} style={st.link}>{t('Ouvrir le lien invité', 'فتح رابط الدعوة')}</Link>}
             </View>
           ))}
           <Pressable onPress={() => setForm(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('invite')}</Text></Pressable>
@@ -109,14 +111,14 @@ export default function Regards() {
         <Text style={st.small}>{w('onlyHerIdea')} {w('silenceOk')}</Text>
 
         {!s.viewsRevealed ? (
-          <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); say('Les regards se découvrent ensemble.'); }} style={[st.btn, st.primary]} accessibilityRole="button">
+          <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); say(tNow('Les regards se découvrent ensemble.', 'نكتشف النظرات معاً.', 'On regarde ensemble.')); }} style={[st.btn, st.primary]} accessibilityRole="button">
             <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('revealTogether')}</Text>
           </Pressable>
         ) : (
           <>
             <View style={st.tabs}>
-              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, `Le regard de ${i.guest}`]), ['together', w('together')], ['sarah', w('sarahOrder')]].map(([k, label]) => (
-                <Pressable key={k} onPress={() => setTab(k)} style={[st.tab, tab === k && st.tabOn]} accessibilityRole="tab">
+              {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, t(`Le regard de ${i.guest}`, `نظرة ${i.guest}`)]), ['together', w('together')], ['sarah', w('sarahOrder')]].map(([k, label]) => (
+                <Pressable key={k} onPress={() => setTab(k)} style={[st.tab, tab === k && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === k }}>
                   <Text style={[st.btnTxt, tab === k && { color: C.onAccent }]}>{label}</Text>
                 </Pressable>
               ))}
@@ -137,9 +139,9 @@ export default function Regards() {
         <View style={st.overlay}>
           <ScrollView style={st.sheetScroll} contentContainerStyle={st.sheet}>
             <Text style={st.sheetTitle}>{w('invite')}</Text>
-            <TextInput value={guest} onChangeText={setGuest} placeholder="Prénom (ex. Salma)" style={st.input} accessibilityLabel="Prénom" />
-            <TextInput value={relation} onChangeText={setRelation} placeholder="Lien (ex. ma sœur)" style={st.input} accessibilityLabel="Lien" />
-            <Text style={st.small}>Sur quelle idée ? (une seule)</Text>
+            <TextInput value={guest} onChangeText={setGuest} placeholder={t('Prénom (ex. Salma)', 'الاسم (مثلاً سلمى)')} style={st.input} accessibilityLabel={t('Prénom', 'الاسم')} />
+            <TextInput value={relation} onChangeText={setRelation} placeholder={t('Lien (ex. ma sœur)', 'الصلة (مثلاً أختي)')} style={st.input} accessibilityLabel={t('Lien', 'الصلة')} />
+            <Text style={st.small}>{t('Sur quelle idée ? (une seule)', 'على أيّ فكرة؟ (فكرة واحدة فقط)', 'Quelle idée ? Une seule.')}</Text>
             <View style={st.chips}>
               {ideas.map(([id, i]) => (
                 <Pressable accessibilityRole="button" key={id} onPress={() => setIdea(id)} style={[st.pick, idea === id && st.pickOn]}><Text style={st.btnTxt}>{i.title}</Text></Pressable>
@@ -147,29 +149,29 @@ export default function Regards() {
             </View>
             <View style={st.chips}>
               {(['fr', 'ar'] as Lang[]).map((l) => (
-                <Pressable accessibilityRole="button" key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? 'en français' : 'بالعربية'}</Text></Pressable>
+                <Pressable accessibilityRole="button" key={l} onPress={() => setLang(l)} style={[st.pick, lang === l && st.pickOn]}><Text style={st.btnTxt}>{l === 'fr' ? t('en français', 'بالفرنسية') : 'بالعربية'}</Text></Pressable>
               ))}
             </View>
             {lang === 'ar' && idea ? (
               <View style={{ gap: 6 }}>
-                <TextInput value={ideaText} onChangeText={setIdeaText} placeholder="L'idée, en arabe" style={[st.input, { writingDirection: 'rtl' }]} accessibilityLabel="L'idée en arabe" />
-                <AideButton kind="translate" lang="ar" label="Traduire l'idée" text={s.ideas[idea].title} who={me.name} onProposal={setIdeaText} />
+                <TextInput value={ideaText} onChangeText={setIdeaText} placeholder={t("L'idée, en arabe", 'الفكرة، بالعربية')} style={[st.input, { writingDirection: 'rtl' }]} accessibilityLabel={t("L'idée en arabe", 'الفكرة بالعربية')} />
+                <AideButton kind="translate" lang="ar" label={t("Traduire l'idée", 'ترجمة الفكرة')} text={s.ideas[idea].title} who={me.name} onProposal={setIdeaText} />
               </View>
             ) : null}
             <View style={st.chips}>
-              {(Object.keys(CHANNELS) as Channel[]).map((c) => (
-                <Pressable accessibilityRole="radio" accessibilityState={{ checked: channel === c }} key={c} onPress={() => setChannel(c)} style={[st.pick, channel === c && st.pickOn]}><Text style={st.btnTxt}>{CHANNELS[c]}</Text></Pressable>
+              {CHANNEL_KEYS.map((c) => (
+                <Pressable accessibilityRole="radio" accessibilityState={{ checked: channel === c }} key={c} onPress={() => setChannel(c)} style={[st.pick, channel === c && st.pickOn]}><Text style={st.btnTxt}>{channels[c]}</Text></Pressable>
               ))}
             </View>
             <View style={st.chips}>
               {[3, 7, 14].map((d) => (
-                <Pressable accessibilityRole="radio" accessibilityState={{ checked: days === d }} key={d} onPress={() => setDays(d)} style={[st.pick, days === d && st.pickOn]}><Text style={st.btnTxt}>{d} jours</Text></Pressable>
+                <Pressable accessibilityRole="radio" accessibilityState={{ checked: days === d }} key={d} onPress={() => setDays(d)} style={[st.pick, days === d && st.pickOn]}><Text style={st.btnTxt}>{t(`${d} jours`, d > 10 ? `${d} يوماً` : `${d} أيام`)}</Text></Pressable>
               ))}
             </View>
-            <Text style={st.small}>Lien temporaire, sans compte : passé ce délai, il se repose. Rien d’autre que cette idée n’est montré.</Text>
+            <Text style={st.small}>{t('Lien temporaire, sans compte : passé ce délai, il se repose. Rien d’autre que cette idée n’est montré.', 'رابط مؤقّت، بلا حساب: بعد هذه المدّة يتوقّف. لا يظهر شيء غير هذه الفكرة.', 'Le lien marche quelques jours. On voit seulement cette idée.')}</Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Inviter</Text></Pressable>
-              <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Inviter', 'دعوة')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>{t('Annuler', 'إلغاء')}</Text></Pressable>
             </View>
           </ScrollView>
         </View>
@@ -183,6 +185,7 @@ function SarahOrder() {
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const w = useWords();
+  const t = useT();
   const current = Object.fromEntries(s.companionOrder?.ranks ?? []) as Partial<Record<Circle, Rank>>;
   const cycle = (axis: Circle) => {
     const next = ORDER[(ORDER.indexOf(current[axis] ?? 'not_yet') + 1) % ORDER.length];
@@ -192,8 +195,8 @@ function SarahOrder() {
   return (
     <View style={st.chips}>
       {AXES.map(([a, k]) => (
-        <Pressable accessibilityRole="button" key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={`Rang de Sarah pour ${w(k)}`}>
-          <Text style={st.btnTxt}>{w(k)} · {current[a] ? { first: "D'abord", then: 'Ensuite', also: 'Aussi', less: 'Moins', not_yet: '?' }[current[a]!] : '?'}</Text>
+        <Pressable accessibilityRole="button" key={a} onPress={() => cycle(a)} style={st.pick} accessibilityLabel={t(`Rang de Sarah pour ${w(k)}`, `ترتيب سارة لـ ${w(k)}`)}>
+          <Text style={st.btnTxt}>{w(k)} · {current[a] ? { first: t("D'abord", 'أوّلاً'), then: t('Ensuite', 'ثمّ'), also: t('Aussi', 'أيضاً'), less: t('Moins', 'أقلّ'), not_yet: '?' }[current[a]!] : '?'}</Text>
         </Pressable>
       ))}
     </View>

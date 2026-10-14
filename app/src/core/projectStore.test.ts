@@ -134,5 +134,14 @@ describe('Profils et séance', () => {
     tablet.getState().act('amina', { act: 'card_felt', card: 'papiers', feeling: 'hard', when: 'hier' });
     expect(phone.getState().receiveCopy(tablet.getState().dossier()!)).toEqual({ id: 'amina-2', diverged: true });
   });
+
+  it('la langue et « Plus simple » restent dans le profil de la personne', () => {
+    const s = makeProjectStore(memory());
+    s.getState().openSession('Sarah');
+    s.getState().open('amina');
+    s.getState().setPrefs('ar', true);
+    s.getState().close();
+    expect(s.getState().profiles.find((p) => p.id === 'amina')).toMatchObject({ lang: 'ar', falc: true });
+  });
 });
 

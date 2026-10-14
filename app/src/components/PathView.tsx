@@ -2,11 +2,13 @@
 // à droite, ◆ une décision, ● un événement ; lien choisi, alternative ouverte (jamais grise),
 // condition écrite sur sa branche, dépendance tracée. Au repos, seul le chemin choisi se montre.
 
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 
 import type { LinkKind, NodeKind } from '../core/acts';
+import { useT } from '../core/useAids';
+import { useReducedMotion } from '../design/motion';
 import { C, F } from '../design/theme';
 
 export interface PNode { id: string; lane: string; kind: NodeKind; label: string; when: string; thread?: boolean }
@@ -18,6 +20,7 @@ const HEAD_W = 110;
 export function PathView({ columns, lanes, nodes, links, showOthers, dashed = false }: {
   columns: string[]; lanes: string[]; nodes: PNode[]; links: PLink[]; showOthers: boolean; dashed?: boolean;
 }) {
+  const t = useT();
   const [width, setWidth] = useState(800);
   const colW = (width - HEAD_W) / columns.length;
   const shown = new Set<string>();
@@ -70,15 +73,21 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
       {visible.map((n) => {
         const p = pos.get(n.id)!;
         return (
-          <View key={n.id} style={[st.node, { left: p.x - 12, top: p.y - 12 }]} accessibilityLabel={`${n.kind === 'decision' ? 'Décision' : 'Événement'} : ${n.label}, ${n.when}`}>
-            <Text style={[st.glyph, n.kind === 'decision' ? st.diamond : st.dot, n.thread && st.thread]}>{n.kind === 'decision' ? '◆' : '●'}</Text>
+          <View key={n.id} style={[st.node, { left: p.x - 12, top: p.y - 12 }]} accessibilityLabel={n.kind === 'decision' ? t(`Décision : ${n.label}, ${n.when}`, `قرار: ${n.label}، ${n.when}`) : t(`Événement : ${n.label}, ${n.when}`, `حدث: ${n.label}، ${n.when}`)}>
+            {n.thread ? (
+              <Pulse>
+                <Text style={[st.glyph, n.kind === 'decision' ? st.diamond : st.dot, st.thread]}>{n.kind === 'decision' ? '◆' : '●'}</Text>
+              </Pulse>
+            ) : (
+              <Text style={[st.glyph, n.kind === 'decision' ? st.diamond : st.dot]}>{n.kind === 'decision' ? '◆' : '●'}</Text>
+            )}
             <Text style={st.label} numberOfLines={2}>{n.label}</Text>
           </View>
         );
       })}
       {showOthers && (
         <View style={st.legend}>
-          <Text style={st.legendTxt}>━ chemin choisi · <Text style={{ color: C.blue.line }}>━ alternative ouverte</Text> · <Text style={{ color: C.amber.ink }}>┅ condition</Text> · ⋯ dépend de · ◆ décision · ● événement</Text>
+          <Text style={st.legendTxt}>{t('━ chemin choisi', '━ الطريق المختار')} · <Text style={{ color: C.blue.line }}>{t('━ alternative ouverte', '━ بديل مفتوح')}</Text> · <Text style={{ color: C.amber.ink }}>{t('┅ condition', '┅ شرط')}</Text> · {t('⋯ dépend de', '⋯ يعتمد على')} · {t('◆ décision', '◆ قرار')} · {t('● événement', '● حدث')}</Text>
         </View>
       )}
     </View>
@@ -100,3 +109,21 @@ const st = StyleSheet.create({
   legend: { position: 'absolute', bottom: 6, left: 12, right: 12 },
   legendTxt: { fontFamily: F.body, fontSize: 12, color: C.slate },
 });
+
+/** L'étape du fil qui pulse doucement ; immobile si le système demande moins de mouvement. */
+function Pulse({ children }: { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  const [scale] = useState(() => new Animated.Value(1));
+  useEffect(() => {
+    if (reduced) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scale, { toValue: 1.25, duration: 700, useNativeDriver: false }),
+        Animated.timing(scale, { toValue: 1, duration: 700, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [reduced, scale]);
+  return <Animated.View style={{ transform: [{ scale }] }}>{children}</Animated.View>;
+}

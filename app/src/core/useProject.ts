@@ -8,6 +8,7 @@ import { currentMode, type Mode } from './mode';
 import { makeProjectStore } from './projectStore';
 import { pending, standing, type ProjectState } from './project';
 import { localStorageAdapter, rawStorage } from './storage';
+import { useAids } from './useAids';
 import { FACILITY_KEY, useFacility } from './useFacility';
 
 export const useProject = makeProjectStore(localStorageAdapter);
@@ -52,3 +53,19 @@ export async function leaveDemo() {
   clearDemo(rawStorage);
   await rereadAll();
 }
+
+// La langue et « Plus simple » suivent la personne : à l'ouverture de son profil, on les retrouve ;
+// quand elle les change, son profil les garde. Hors profil (écrans de l'équipe), le français.
+let lastPerson: string | null = null;
+useProject.subscribe((s) => {
+  if (s.person === lastPerson) return;
+  lastPerson = s.person;
+  const p = s.profiles.find((x) => x.id === s.person);
+  useAids.setState({ lang: p?.lang ?? 'fr', simple: p?.falc ?? false });
+});
+useAids.subscribe((a, before) => {
+  const s = useProject.getState();
+  if (!s.person || (a.lang === before.lang && a.simple === before.simple)) return;
+  s.setPrefs(a.lang, a.simple);
+});
+

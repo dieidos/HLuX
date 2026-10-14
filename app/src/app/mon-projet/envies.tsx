@@ -9,7 +9,7 @@ import { Screen } from '../../components/Chrome';
 import { DragArea, Draggable, Zone } from '../../components/Drag';
 import { Ikigai } from '../../components/Ikigai';
 import type { Spot } from '../../core/acts';
-import { say, useWords } from '../../core/useAids';
+import { say, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
@@ -17,6 +17,7 @@ import type { WordKey } from '../../i18n/words';
 export default function Envies() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const [adding, setAdding] = useState(false);
@@ -25,8 +26,8 @@ export default function Envies() {
 
   const place = (idea: string, spot: Spot, words: string) => {
     act(me.id, { act: 'idea_placed', idea, spot });
-    const t = `${s.ideas[idea].title} : ${words}.`;
-    say(t);
+    const line = `${s.ideas[idea].title} : ${words}.`;
+    say(line);
   };
   const create = () => {
     if (!title.trim()) return;
@@ -62,7 +63,7 @@ export default function Envies() {
             <Text style={st.small}>{w('tray')}</Text>
             <View style={st.chips}>{at({ at: 'tray' }).map(([id]) => chip(id))}</View>
           </Zone>
-          <Zone id="discard" label={w('discard')} onDrop={(id) => place(id, { at: 'discarded' }, 'écartée, pour toujours')} style={st.discard}>
+          <Zone id="discard" label={w('discard')} onDrop={(id) => place(id, { at: 'discarded' }, t('écartée, pour toujours', 'أُبعدت نهائياً', 'enlevée pour toujours'))} style={st.discard}>
             <Text style={st.small}>🗑️ {w('discard')}</Text>
           </Zone>
           <Pressable onPress={() => setAdding(true)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('newIdea')}</Text></Pressable>
@@ -73,7 +74,7 @@ export default function Envies() {
         <View style={st.overlay}>
           <View style={st.sheet}>
             <Text style={st.sheetTitle}>{w('newIdea')}</Text>
-            <TextInput value={title} onChangeText={setTitle} placeholder="Mon idée…" style={st.input} accessibilityLabel="Mon idée" />
+            <TextInput value={title} onChangeText={setTitle} placeholder={t('Mon idée…', 'فكرتي…')} style={st.input} accessibilityLabel={t('Mon idée', 'فكرتي')} />
             <Text style={st.small}>{w('bornOf')} :</Text>
             <View style={st.chips}>
               {Object.entries(s.cards).map(([id, c]) => (
@@ -83,8 +84,8 @@ export default function Envies() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Créer</Text></Pressable>
-              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Créer', 'إنشاء')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>{t('Annuler', 'إلغاء')}</Text></Pressable>
             </View>
           </View>
         </View>

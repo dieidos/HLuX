@@ -11,7 +11,7 @@ import { DossierCopy } from '../../components/DossierCopy';
 import { PathEditor } from '../../components/PathEditor';
 import { PathView } from '../../components/PathView';
 import { PlanEditor } from '../../components/PlanEditor';
-import { say, useWords } from '../../core/useAids';
+import { say, tNow, useT, useWords } from '../../core/useAids';
 import { useFacilityState } from '../../core/useFacility';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
@@ -22,6 +22,7 @@ const LANES = ['démarches', 'formation', 'activité', 'permis'];
 export default function Chemin() {
   const me = useMe();
   const w = useWords();
+  const t = useT();
   const s = useProjectState();
   const act = useProject((x) => x.act);
   const [others, setOthers] = useState(false);
@@ -48,7 +49,9 @@ export default function Chemin() {
     const sim = `sim-${Object.keys(s.whatIfs).length + 1}`;
     act(me.id, { act: 'what_if', sim, question, moves: moved ? [[moved.node, moved.when]] : [], story: story.trim() || null });
     act(me.id, { act: 'what_if_closed', sim, kept });
-    say(kept ? "L'idée est gardée. Ton vrai chemin n'a pas bougé." : "C'est refermé. Ton vrai chemin n'a pas bougé.");
+    say(kept
+      ? tNow("L'idée est gardée. Ton vrai chemin n'a pas bougé.", 'احتفظتِ بالفكرة. طريقكِ الحقيقي لم يتغيّر.', "Tu gardes l'idée. Ton chemin ne change pas.")
+      : tNow("C'est refermé. Ton vrai chemin n'a pas bougé.", 'أُغلقت النسخة. طريقكِ الحقيقي لم يتغيّر.', "C'est fermé. Ton chemin ne change pas."));
     setWhatIf(false);
     setMoved(null);
     setStory('');
@@ -62,35 +65,35 @@ export default function Chemin() {
             {nodes.length ? (
               <PathView columns={SEASONS} lanes={lanes} nodes={nodes} links={s.links} showOthers={others} />
             ) : (
-              <Text style={st.small}>Ton chemin commence ici : pose une première étape, avec la personne qui t’accompagne. C’est toi qui écris.</Text>
+              <Text style={st.small}>{t('Ton chemin commence ici : pose une première étape, avec la personne qui t’accompagne. C’est toi qui écris.', 'طريقكِ يبدأ هنا: ضعي خطوة أولى، مع الشخص الذي يرافقكِ. أنتِ من تكتبين.', 'Ton chemin commence ici. Tu poses une première étape.')}</Text>
             )}
             <PathEditor
               columns={SEASONS}
               lanes={lanes}
               nodes={nodes}
-              decisionLabel="je choisis"
+              decisionLabel={t('je choisis', 'أنا أختار')}
               onAdd={(n) => {
                 const id = `etape-${nodes.length + 1}`;
                 act(me.id, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when, thread: false });
                 if (n.link) act(me.id, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
-                say(`${n.label} : posée sur ton chemin, ${n.when}.`);
+                say(tNow(`${n.label} : posée sur ton chemin, ${n.when}.`, `${n.label}: وُضعت على طريقكِ، ${n.when}.`));
               }}
             />
           </>
         ) : (
           <View style={{ gap: 8 }}>
             <Text style={st.copy}>{w('copyNote')}</Text>
-            <TextInput value={question} onChangeText={setQuestion} placeholder="Et si… ?" style={st.input} accessibilityLabel="Ma question Et si" />
+            <TextInput value={question} onChangeText={setQuestion} placeholder={t('Et si… ?', 'ماذا لو…؟')} style={st.input} accessibilityLabel={t('Ma question Et si', 'سؤالي: ماذا لو')} />
             <View style={st.chips}>
               {movable.map((n) => (
                 <Pressable accessibilityRole="button" key={n.id} onPress={() => setMoved({ node: n.id, when: SEASONS[(SEASONS.indexOf((moved?.node === n.id ? moved.when : n.when)) + 1) % SEASONS.length] })} style={[st.pick, moved?.node === n.id && st.pickOn]}>
-                  <Text style={st.btnTxt}>{n.label} → plus tard</Text>
+                  <Text style={st.btnTxt}>{n.label} → {t('plus tard', 'لاحقاً')}</Text>
                 </Pressable>
               ))}
             </View>
             <PathView columns={SEASONS} lanes={lanes} nodes={copy} links={s.links} showOthers dashed />
-            <AideButton kind="narrate" label="Raconter ce qui s'ouvre, ce qui se ferme" text={facts} who={me.name} onProposal={setStory} />
-            {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel="Récit de la copie" /> : null}
+            <AideButton kind="narrate" label={t("Raconter ce qui s'ouvre, ce qui se ferme", 'أحكي ما يُفتح وما يُغلق', 'Raconter')} text={facts} who={me.name} onProposal={setStory} />
+            {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel={t('Récit de la copie', 'حكاية النسخة')} /> : null}
             <View style={st.chips}>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{w('keepIdea')}</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(false)} style={st.btn}><Text style={st.btnTxt}>{w('closeIt')}</Text></Pressable>
@@ -100,16 +103,16 @@ export default function Chemin() {
 
         {proposals.map(([id, text]) => (
           <View key={id} style={st.inset}>
-            <Text style={st.tileTitle}>{place} propose : {text}.</Text>
-            <Text style={st.small}>Le collectif ne lit jamais ton chemin. C’est toi qui y fais entrer ce qu’il propose.</Text>
+            <Text style={st.tileTitle}>{t(`${place} propose : ${text}.`, `اقتراح من ${place}: ${text}.`)}</Text>
+            <Text style={st.small}>{t('Le collectif ne lit jamais ton chemin. C’est toi qui y fais entrer ce qu’il propose.', 'المجموعة لا تقرأ طريقكِ أبداً. أنتِ من تُدخلين فيه ما تقترحه.', 'Le collectif ne voit pas ton chemin. C’est toi qui choisis.')}</Text>
             <Pressable
               onPress={() => {
                 act(me.id, { act: 'node_set', node: `propose-${id}`, lane: 'démarches', kind: 'event', label: text, when: 'hiver', thread: false });
                 act(me.id, { act: 'proposal_linked', proposal: id, node: `propose-${id}` });
-                say('Relié à ton chemin.');
+                say(tNow('Relié à ton chemin.', 'رُبط بطريقكِ.'));
               }}
               style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
-              <Text style={[st.btnTxt, { color: C.onAccent }]}>Je le relie à mon chemin</Text>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Je le relie à mon chemin', 'أربطه بطريقي')}</Text>
             </Pressable>
           </View>
         ))}
@@ -130,8 +133,8 @@ export default function Chemin() {
               onChange={(plan) => act(me.id, { act: 'plan_set', plan })}
             />
             <View style={{ flexBasis: '100%', gap: 6 }}>
-              <AideButton kind="narrate" label="Dire mon plan en quelques phrases" text={planFacts} who={me.name} onProposal={setPlanWords} />
-              {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel="Mon plan dans mes mots" /> : null}
+              <AideButton kind="narrate" label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={setPlanWords} />
+              {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel={t('Mon plan dans mes mots', 'خطّتي بكلماتي')} /> : null}
             </View>
           </View>
         )}
