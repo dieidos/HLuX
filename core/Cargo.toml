@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["hlux-core", "hlux-ffi"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "UNLICENSED"
+publish = false
+
+# Le protocole ab-ante : le dépôt distant vaut pour la CI et un clone froid.
+# En local, `.cargo/config.toml` (non commité) lit l'exemplaire frère, comme dieidos-lms.
+[workspace.dependencies]
+ab-ante-core = { git = "https://github.com/Houngan/ad-hoc-ab-ante", branch = "main" }
+ab-ante-mcp = { git = "https://github.com/Houngan/ad-hoc-ab-ante", branch = "main" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+thiserror = "2"

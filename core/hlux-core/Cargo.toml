@@ -1,0 +1,16 @@
+[package]
+name = "hlux-core"
+description = "Cœur métier d'HLuX : Projet Personnalisé et Projet d'Établissement sur le journal ab-ante."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ab-ante-core.workspace = true
+ab-ante-mcp.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+thiserror.workspace = true
+

@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "HLuX",
+    "slug": "hlux",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "io.dieidos.hlux"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "io.dieidos.hlux"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "static",
+      "bundler": "metro"
+    },
+    "scheme": "hlux",
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

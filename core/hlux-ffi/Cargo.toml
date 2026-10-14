@@ -1,0 +1,14 @@
+[package]
+name = "hlux-ffi"
+description = "Pont UniFFI d'HLuX vers React Native (uniffi-bindgen-react-native)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[dependencies]
+hlux-core = { path = "../hlux-core" }
+serde_json.workspace = true
