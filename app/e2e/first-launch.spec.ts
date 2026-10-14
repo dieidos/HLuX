@@ -4,8 +4,10 @@ import { expect, test } from '@playwright/test';
 
 test('une tablette neuve est vide : on la met en place, puis une personne entre avec un prénom et une phrase', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Mettre en place la tablette')).toBeVisible();
+  await expect(page.getByText('Cet appareil, c’est…')).toBeVisible();
   await expect(page.getByText('Amina')).toHaveCount(0);
+  await page.getByRole('radio', { name: /La tablette d’un établissement/ }).click();
+  await expect(page.getByText('Mettre en place la tablette')).toBeVisible();
   await page.getByLabel("Le nom de l'établissement").fill('CHRS du Port');
   await page.getByLabel("Les prénoms de l'équipe, séparés par des virgules").fill('Inès, Marc');
   await page.getByRole('button', { name: 'Commencer' }).click();
@@ -23,6 +25,7 @@ test('une tablette neuve est vide : on la met en place, puis une personne entre 
 
 test('la démonstration se tient à part, et la vraie vie reprend telle quelle en la quittant', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('radio', { name: /La tablette d’un établissement/ }).click();
   await page.getByLabel("Le nom de l'établissement").fill('CHRS du Port');
   await page.getByLabel("Les prénoms de l'équipe, séparés par des virgules").fill('Inès');
   await page.getByRole('button', { name: 'Commencer' }).click();

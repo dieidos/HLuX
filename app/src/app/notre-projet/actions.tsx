@@ -7,6 +7,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
+import { GroupPending } from '../../components/GroupPending';
 import type { Lean } from '../../core/acts';
 import { say } from '../../core/useAids';
 import { provenanceOf } from '../../core/facility';
@@ -84,6 +85,7 @@ export default function Actions() {
   return (
     <Screen side="pe" title="actions" question="Comment allons-nous agir ? Plusieurs solutions avant un engagement.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
+        <GroupPending />
         {decision && <Text style={st.decision}>Notre décision : {decision.words}</Text>}
         <View style={st.row}>
           <Text style={st.small}>Qui se positionne :</Text>

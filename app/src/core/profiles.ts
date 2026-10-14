@@ -59,7 +59,7 @@ export function writeJournal(kv: KV, id: string, entries: Entry[]): void {
 }
 
 /** Un prénom et une phrase : le profil naît avec sa première Carte, dite avec la professionnelle. */
-export function firstEntries(id: string, sentence: string, saidWith: string): Entry[] {
+export function firstEntries(id: string, sentence: string, saidWith: string | null): Entry[] {
   const verbatim = sentence.trim();
   if (!verbatim) return [];
   return [{

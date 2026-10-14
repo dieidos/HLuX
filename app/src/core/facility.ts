@@ -105,8 +105,15 @@ function fold(s: FacilityState, a: FacilityAct): void {
 export function facilityStanding(entries: FEntry[]): FacilityState {
   const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
   const s = emptyFacility();
-  for (const e of entries) if (e.act && !undone.has(e.rank)) fold(s, e.act);
+  // Une proposition de la machine (« hypothesis ») ne compte pas : elle attend la validation du groupe.
+  for (const e of entries) if (e.act && !undone.has(e.rank) && e.provenance !== 'hypothesis') fold(s, e.act);
   return s;
+}
+
+/** Les propositions de la machine qui attendent que l'animatrice les valide pour le groupe. */
+export function facilityPending(entries: FEntry[]): FEntry[] {
+  const undone = new Set(entries.filter((e) => e.undone !== undefined).map((e) => e.undone!));
+  return entries.filter((e) => e.provenance === 'hypothesis' && !undone.has(e.rank));
 }
 
 export const SOURCE_WORDS: Record<Source, string> = { consented_word: '🗣️ parole consentie', team: '👥 équipe', cvs: '🏛️ CVS' };
@@ -115,7 +122,9 @@ export const QUALIF_WORDS: Record<Qualification, string> = {
 };
 
 /** Qui a écrit le texte validé : l'IA (validée par le groupe) quand l'aide a servi, sinon le groupe à la main. */
-export function provenanceOf(aided: boolean, validated: boolean, by: string): [string, FEntry['provenance'], string | undefined] {
+export function provenanceOf(aided: boolean, _validated: boolean, by: string): [string, FEntry['provenance'], string | undefined] {
+  // Écrit à la main : le geste du groupe. Proposé par l'IA : « à valider » — l'animatrice le validera
+  // pour le groupe, une fois que tout le monde a dit oui (décision du 2026-10-14).
   if (!aided) return [by, 'by_hand', undefined];
-  return validated ? ['hlux-ia', 'generated', by] : ['hlux-ia', 'hypothesis', undefined];
+  return ['hlux-ia', 'hypothesis', undefined];
 }

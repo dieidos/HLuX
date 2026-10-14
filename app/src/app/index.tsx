@@ -5,7 +5,7 @@
 // 3. « Bonjour Amina », puis Mon projet ou Notre projet. Hors séance, les profils restent fermés.
 import { refusalAr } from '../i18n/refusals';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AidsBar, Wordmark } from '../components/Chrome';
@@ -28,6 +28,10 @@ export default function Home() {
   const [place, setPlace] = useState('');
   const [names, setNames] = useState('');
   const [askDemo, setAskDemo] = useState(false);
+  const [device, setDevice] = useState<'facility' | 'personal' | null>(null);
+  const [myName, setMyName] = useState('');
+  const [mySentence, setMySentence] = useState('');
+  const personal = setup?.kind === 'personal';
   const profiles = useProject((s) => s.profiles);
   const backedUpNow = useProject((s) => s.backedUpNow);
   const { openSession, closeSession, open, close, createProfile, restoreProfile, purge } = useProject.getState();
@@ -40,6 +44,10 @@ export default function Home() {
   const [qr, setQr] = useState<'send' | 'receive' | null>(null);
   const profile = profiles.find((p) => p.id === me.id);
 
+  // Sur son téléphone, la personne entre directement dans son profil.
+  useEffect(() => {
+    if (personal && !me.id && profiles[0]) open(profiles[0].id);
+  }, [personal, me.id, profiles, open]);
   const choose = async () => {
     try {
       setFile(await pickTextFile());
@@ -87,20 +95,57 @@ export default function Home() {
     return (
       <ScrollView contentContainerStyle={st.page}>
         {logo}
-        <Text style={st.hello}>{w('setupTitle')}</Text>
-        <View style={st.newBox}>
-          <TextInput value={place} onChangeText={setPlace} placeholder={w('setupPlace')} style={st.input} accessibilityLabel={w('setupPlace')} />
-          <TextInput value={names} onChangeText={setNames} placeholder={w('setupTeam')} multiline style={st.input} accessibilityLabel={w('setupTeam')} />
-          <Pressable accessibilityRole="button" onPress={() => useProject.getState().configure(place, names.split(/[,;\n]/))} style={[st.btn, st.primary]}>
-            <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('begin')}</Text>
+        <Text style={st.hello}>{t('Cet appareil, c’est…', 'هذا الجهاز هو…', 'Cet appareil, c’est…')}</Text>
+        <View style={st.row}>
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: device === 'facility' }} onPress={() => setDevice('facility')} style={[st.door, device === 'facility' && st.doorOn]}>
+            <Text style={st.doorTxt}>🏛️ {t('La tablette d’un établissement', 'الجهاز اللوحي لمؤسسة')}</Text>
           </Pressable>
-          <Text style={st.note}>{w('setupNote')}</Text>
+          <Pressable accessibilityRole="radio" accessibilityState={{ checked: device === 'personal' }} onPress={() => setDevice('personal')} style={[st.door, device === 'personal' && st.doorOn]}>
+            <Text style={st.doorTxt}>📱 {t('Mon téléphone', 'هاتفي')}</Text>
+          </Pressable>
         </View>
+        {device === 'facility' && (
+          <View style={st.newBox}>
+            <Text style={st.doorTxt}>{w('setupTitle')}</Text>
+            <TextInput value={place} onChangeText={setPlace} placeholder={w('setupPlace')} style={st.input} accessibilityLabel={w('setupPlace')} />
+            <TextInput value={names} onChangeText={setNames} placeholder={w('setupTeam')} multiline style={st.input} accessibilityLabel={w('setupTeam')} />
+            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configure(place, names.split(/[,;\n]/))} style={[st.btn, st.primary]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('begin')}</Text>
+            </Pressable>
+            <Text style={st.note}>{w('setupNote')}</Text>
+          </View>
+        )}
+        {device === 'personal' && (
+          <View style={st.newBox}>
+            <Text style={st.note}>{t('Ton projet reste sur ce téléphone. Personne d’autre n’y entre : le verrou du téléphone suffit.', 'مشروعكِ يبقى على هذا الهاتف. لا يدخله أحد غيركِ: قفل الهاتف يكفي.', 'Ton projet reste sur ton téléphone.')}</Text>
+            <TextInput value={myName} onChangeText={setMyName} placeholder={t('Mon prénom', 'اسمي')} style={st.input} accessibilityLabel={t('Mon prénom', 'اسمي')} />
+            <TextInput value={mySentence} onChangeText={setMySentence} placeholder={w('oneSentence')} multiline style={st.input} accessibilityLabel={w('oneSentence')} />
+            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configurePersonal(myName, mySentence || ' ')} style={[st.btn, st.primary]}>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('enter')}</Text>
+            </Pressable>
+            <Text style={st.note}>{t('Ou, si ton dossier est déjà sur la tablette de l’établissement :', 'أو، إذا كان ملفّكِ موجوداً على الجهاز اللوحي للمؤسسة:', 'Ou ton dossier de la tablette :')}</Text>
+            <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'receive' ? null : 'receive')} style={st.btn}>
+              <Text style={st.btnTxt}>{w('receiveCopy')}</Text>
+            </Pressable>
+            {qr === 'receive' ? (
+              <QrReceive before={(firstName) => useProject.getState().configurePersonal(firstName, '')} onDone={(m) => { setQr(null); setRestoreMsg(m); }} />
+            ) : null}
+          </View>
+        )}
       </ScrollView>
     );
   }
 
-  if (!pro) {
+  if (personal && !me.id) {
+    return (
+      <View style={st.page}>
+        {logo}
+        <Text style={st.note}>{restoreMsg}</Text>
+      </View>
+    );
+  }
+
+  if (!pro && !personal) {
     return (
       <View style={st.page}>
         {logo}
@@ -186,23 +231,29 @@ export default function Home() {
         <Link href="/mon-projet/cartes" style={[st.door, { borderTopColor: C.pp.value }]}>
           <Text style={st.doorTxt}>👤 {w('myProject')}</Text>
         </Link>
-        <Link href="/notre-projet/sujets" style={[st.door, { borderTopColor: C.pe.value }]}>
+        {!personal && <Link href="/notre-projet/sujets" style={[st.door, { borderTopColor: C.pe.value }]}>
           <Text style={st.doorTxt}>🏛️ {w('ourProject')}</Text>
-        </Link>
+        </Link>}
       </View>
       <View style={st.row}>
-        <Pressable accessibilityRole="button" onPress={close} style={st.btn}>
-          <Text style={st.btnTxt}>{w('changePerson')}</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
-          <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
-        </Pressable>
+        {!personal && (
+          <Pressable accessibilityRole="button" onPress={close} style={st.btn}>
+            <Text style={st.btnTxt}>{w('changePerson')}</Text>
+          </Pressable>
+        )}
+        {!personal && (
+          <Pressable accessibilityRole="button" onPress={closeSession} style={st.btn}>
+            <Text style={st.btnTxt}>{w('closeSession')} · {pro}</Text>
+          </Pressable>
+        )}
         <Pressable accessibilityRole="button" onPress={() => setQr(qr === 'send' ? null : 'send')} style={st.btn} accessibilityState={{ expanded: qr === 'send' }}>
           <Text style={st.btnTxt}>{w('copyToDevice')}</Text>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={() => setLeaving(!leaving)} style={st.btn} accessibilityState={{ expanded: leaving }}>
-          <Text style={st.btnTxt}>🧳 {w('leaving')}</Text>
-        </Pressable>
+        {!personal && (
+          <Pressable accessibilityRole="button" onPress={() => setLeaving(!leaving)} style={st.btn} accessibilityState={{ expanded: leaving }}>
+            <Text style={st.btnTxt}>🧳 {w('leaving')}</Text>
+          </Pressable>
+        )}
       </View>
       {qr === 'send' ? <QrSend /> : null}
       {leaving ? (
@@ -234,6 +285,7 @@ const st = StyleSheet.create({
   nameTxt: { fontFamily: F.display, fontSize: 24, color: C.ink },
   newBox: { width: '100%', maxWidth: 420, gap: 10, padding: 16, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 6, borderTopColor: C.pp.value },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },
+  doorOn: { borderColor: C.violet, borderWidth: 3 },
   door: { minWidth: 260, padding: 28, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 8 },
   doorTxt: { fontFamily: F.bold, fontSize: 22, color: C.ink },
   note: { fontFamily: F.body, fontSize: 14, color: C.muted, textAlign: 'center', maxWidth: 420 },

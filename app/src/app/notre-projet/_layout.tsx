@@ -9,6 +9,8 @@ export default function NotreProjet() {
   const pro = useProject((s) => s.pro);
   const person = useProject((s) => s.person);
   const path = usePathname();
-  if (!pro || (path.endsWith('/sujets') && !person)) return <Redirect href="/" />;
+  const personal = useProject((s) => s.setup?.kind === 'personal');
+  // « Notre projet » est réservé aux membres de l'établissement : jamais sur le téléphone de la personne.
+  if (personal || !pro || (path.endsWith('/sujets') && !person)) return <Redirect href="/" />;
   return <Stack screenOptions={{ headerShown: false, animation: reduced ? 'none' : 'fade' }} />;
 }

@@ -6,7 +6,7 @@ import { useProject } from '../../core/useProject';
 
 export default function MonProjet() {
   const reduced = useReducedMotion();
-  const open = useProject((s) => !!s.pro && !!s.person);
+  const open = useProject((s) => (!!s.pro || s.setup?.kind === 'personal') && !!s.person);
   if (!open) return <Redirect href="/" />;
   return <Stack screenOptions={{ headerShown: false, animation: reduced ? 'none' : 'fade' }} />;
 }

@@ -8,14 +8,19 @@ import type { Entry, ProjectAct, Provenance } from './acts';
 import { firstEntries, journalKey, profileId, readJournal, readProfiles, writeJournal, writeProfiles, type Dossier, type KV, type Profile } from './profiles';
 import { merge } from './qrCopy';
 
-/** L'établissement de la tablette : son nom et les prénoms de l'équipe (en attendant la connexion dieidos). */
-export interface Setup { name: string; team: string[] }
+/**
+ * L'appareil : soit la tablette d'un établissement (son nom, les prénoms de l'équipe, en attendant la
+ * connexion dieidos), soit le téléphone de la personne, où elle entre directement — le verrou de
+ * l'appareil suffit (CDC, « Données locales ») ; pas d'équipe, pas de séance, seulement « Mon projet ».
+ */
+export interface Setup { name: string; team: string[]; kind?: 'facility' | 'personal' }
 export const SETUP_KEY = 'hlux.setup';
 
 export function readSetup(kv: KV): Setup | null {
   try {
     const s = JSON.parse(kv.getItem(SETUP_KEY) ?? 'null') as Setup | null;
-    return s && s.name && Array.isArray(s.team) && s.team.length ? s : null;
+    if (!s || !s.name || !Array.isArray(s.team)) return null;
+    return s.kind === 'personal' || s.team.length ? s : null;
   } catch {
     return null;
   }
@@ -26,6 +31,10 @@ interface ProjectStore {
   setup: Setup | null;
   /** Premier lancement : le nom de l'établissement et les prénoms de l'équipe. */
   configure: (name: string, team: string[]) => boolean;
+  /** Mon téléphone : la personne entre avec son prénom (et une phrase, si elle veut). */
+  configurePersonal: (firstName: string, sentence: string) => string;
+  /** Le téléphone de la personne : pas de séance, elle entre directement. */
+  personal: () => boolean;
   /** Relire le stockage (après un changement d'espace : vraie vie ↔ démonstration). Ferme la séance. */
   reload: () => void;
   profiles: Profile[];
@@ -87,6 +96,14 @@ export function makeProjectStore(kv: KV) {
         set({ setup });
         return true;
       },
+      configurePersonal: (firstName, sentence) => {
+        if (!firstName.trim()) return '';
+        const setup: Setup = { name: firstName.trim(), team: [], kind: 'personal' };
+        kv.setItem(SETUP_KEY, JSON.stringify(setup));
+        set({ setup });
+        return sentence.trim() ? get().createProfile(firstName, sentence) : '';
+      },
+      personal: () => get().setup?.kind === 'personal',
       reload: () => set({ setup: readSetup(kv), profiles: readProfiles(kv), pro: null, person: null, entries: [], backedUpNow: false }),
       profiles: readProfiles(kv),
       pro: null,
@@ -99,13 +116,14 @@ export function makeProjectStore(kv: KV) {
       },
       closeSession: () => set({ pro: null, person: null, entries: [], backedUpNow: false }),
       open: (id) => {
-        if (!get().pro || !get().profiles.some((p) => p.id === id)) return; // le profil s'ouvre par la séance
+        // Sur une tablette, le profil s'ouvre par la séance ; sur son téléphone, la personne entre directement.
+        if ((!get().pro && !get().personal()) || !get().profiles.some((p) => p.id === id)) return;
         set({ person: id, entries: readJournal(kv, id), backedUpNow: false });
       },
       close: () => set({ person: null, entries: [], backedUpNow: false }),
       createProfile: (firstName, sentence) => {
         const pro = get().pro;
-        if (!pro || !firstName.trim()) return '';
+        if ((!pro && !get().personal()) || !firstName.trim()) return '';
         const id = profileId(firstName.trim(), get().profiles.map((p) => p.id));
         const profiles = [...get().profiles, { id, firstName: firstName.trim() }];
         writeProfiles(kv, profiles);
@@ -133,7 +151,7 @@ export function makeProjectStore(kv: KV) {
         set({ profiles, backedUpNow: true });
       },
       receiveCopy: (d) => {
-        if (!get().pro) return { id: '', diverged: false };
+        if (!get().pro && !get().personal()) return { id: '', diverged: false };
         const here = get().profiles.find((p) => p.id === d.person);
         if (!here) return { id: get().restoreProfile(d), diverged: false };
         const { entries, diverged } = merge(readJournal(kv, here.id), d.entries);
@@ -143,7 +161,7 @@ export function makeProjectStore(kv: KV) {
         return { id: here.id, diverged: false };
       },
       restoreProfile: (d) => {
-        if (!get().pro) return '';
+        if (!get().pro && !get().personal()) return '';
         const id = profileId(d.firstName, get().profiles.map((p) => p.id));
         const profiles = [...get().profiles, { id, firstName: d.firstName }];
         writeProfiles(kv, profiles);

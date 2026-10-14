@@ -1,7 +1,7 @@
 // Parité avec `core/hlux-core/tests/atlas.rs` (écrans 09 et 10).
 import { describe, expect, it } from 'vitest';
 
-import { facilityStanding, provenanceOf, type FacilityAct, type FEntry } from './facility';
+import { facilityPending, facilityStanding, provenanceOf, type FacilityAct, type FEntry } from './facility';
 
 const run = (acts: FacilityAct[]): FEntry[] => acts.map((act, rank) => ({ rank, author: 'x', provenance: 'by_hand', act }));
 
@@ -40,8 +40,16 @@ describe("Provenance d'un texte de groupe", () => {
   it("écrit à la main : le groupe en est l'auteur", () => {
     expect(provenanceOf(false, true, 'groupe')).toEqual(['groupe', 'by_hand', undefined]);
   });
-  it("proposé par l'IA puis validé : généré, confirmé par le groupe", () => {
-    expect(provenanceOf(true, true, 'groupe')).toEqual(['hlux-ia', 'generated', 'groupe']);
+  it("proposé par l'IA : à valider, même si le bouton dit « validé » — c'est l'animatrice qui valide", () => {
+    expect(provenanceOf(true, true, 'groupe')).toEqual(['hlux-ia', 'hypothesis', undefined]);
+  });
+  it('une proposition à valider ne compte pas ; validée par l’animatrice, elle compte', () => {
+    const e: FEntry[] = [{ rank: 0, author: 'hlux-ia', provenance: 'hypothesis', act: { act: 'result', text: 'Trois personnes lisent seules.', back_to_finding: false } }];
+    expect(facilityStanding(e).results).toEqual([]);
+    expect(facilityPending(e)).toHaveLength(1);
+    const ok: FEntry[] = [...e, { rank: 1, author: 'hlux-ia', provenance: 'generated', confirmedBy: 'Aïcha', act: e[0].act }, { rank: 2, author: 'Aïcha', provenance: 'by_hand', undone: 0 }];
+    expect(facilityStanding(ok).results).toHaveLength(1);
+    expect(facilityPending(ok)).toHaveLength(0);
   });
   it("proposé par l'IA, pas encore validé : en attente", () => {
     expect(provenanceOf(true, false, 'Aïcha')).toEqual(['hlux-ia', 'hypothesis', undefined]);

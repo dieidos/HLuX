@@ -44,10 +44,9 @@ export function QrSend() {
 }
 
 /** L'appareil qui reçoit : la caméra lit les codes, dans n'importe quel ordre. */
-export function QrReceive({ onDone }: { onDone: (msg: string) => void }) {
+export function QrReceive({ onDone, before }: { onDone: (msg: string) => void; /** sur un téléphone neuf : se mettre en place avec le prénom du dossier reçu */ before?: (firstName: string) => void }) {
   const [permission, requestPermission] = useCameraPermissions();
   const t = useT();
-  const receiveCopy = useProject((s) => s.receiveCopy);
   const [collector] = useState(() => new Collector());
   const [progress, setProgress] = useState(collector.progress());
   const [msg, setMsg] = useState('');
@@ -70,7 +69,9 @@ export function QrReceive({ onDone }: { onDone: (msg: string) => void }) {
       if (collector.add(data)) setProgress(collector.progress());
       if (collector.done()) {
         setFinished(true);
-        const r = receiveCopy(collector.open());
+        const d = collector.open();
+        before?.(d.firstName);
+        const r = useProject.getState().receiveCopy(d);
         onDone(r.diverged
           ? tNow(
             'La copie est arrivée à côté du dossier déjà présent : les deux ont changé chacun de leur côté. Compare-les.',

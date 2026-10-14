@@ -354,6 +354,9 @@ test.describe('09 Cap', () => {
     await tap(page, '✨ Mettre en mots ce que le groupe a dit');
     await expect(page.getByLabel('Changement attendu', { exact: true })).toHaveValue('Chaque personne trouve un créneau de laverie.');
     await tap(page, 'Validé par le groupe');
+    // Proposé par l'IA : à valider ; l'animatrice valide pour le groupe, une fois que tout le monde a dit oui.
+    await expect(page.getByText('À valider pour le groupe')).toBeVisible();
+    await tap(page, 'Validé par le groupe · Aïcha');
     await expect(page.getByText('✓ validé : Chaque personne trouve un créneau de laverie.')).toBeVisible();
   });
 });
@@ -404,6 +407,7 @@ test.describe('10 Choix', () => {
     await fill(page, 'Décision dictée', 'on fait un atelier courriers le mardi');
     await tap(page, '✨ Reformuler la phrase dictée');
     await tap(page, 'Validée par le groupe · vers les actions');
+    await tap(page, 'Validé par le groupe · Aïcha');
     await expect(page.getByText('✓ On fait un atelier courriers le mardi.')).toBeVisible();
   });
 });
@@ -503,6 +507,7 @@ test.describe('12 Suivi', () => {
     // Le résultat ne suffit pas : on revient au constat, puis le suivi le garde, en mots.
     await expect(page).toHaveURL(/notre-projet\/constat/);
     await link(page, /Suivi/).click();
+    await tap(page, 'Validé par le groupe · Aïcha');
     await expect(page.getByText('📊 Au printemps trois personnes comprennent seules leurs courriers. → retour au constat 🔁').filter({ visible: true })).toBeVisible();
   });
 });

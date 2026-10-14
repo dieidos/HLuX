@@ -314,7 +314,12 @@ impl Reducer<FacilityAct> for FacilityReducer {
         FacilityState::default()
     }
 
-    fn fold(&self, s: &mut FacilityState, _e: &Entry<FacilityAct>, act: &FacilityAct) {
+    fn fold(&self, s: &mut FacilityState, e: &Entry<FacilityAct>, act: &FacilityAct) {
+        // Une proposition de la machine attend que l'animatrice la valide pour le groupe :
+        // elle ne compte pas tant qu'elle n'est pas ré-écrite en « generated », confirmée.
+        if e.provenance == Provenance::Hypothesis {
+            return;
+        }
         match act.clone() {
             FacilityAct::AgendaItem { item, title, source, session } => s.agenda.push((item, title, source, session)),
             FacilityAct::Attendance { session, present, absent, facilitator } => {

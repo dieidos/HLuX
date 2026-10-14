@@ -8,6 +8,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { AideButton } from '../../components/AideButton';
 
 import { Screen } from '../../components/Chrome';
+import { GroupPending } from '../../components/GroupPending';
 import { PathView } from '../../components/PathView';
 import { router } from 'expo-router';
 
@@ -83,6 +84,7 @@ export default function Suivi() {
   return (
     <Screen side="pe" title="follow" question="Qui fait quoi, et quand ? Et ce qui en résulte.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
+        <GroupPending />
         {nodes.length > 0 ? (
           <PathView columns={months} lanes={lanes} nodes={nodes} links={f.links} showOthers={others} />
         ) : (

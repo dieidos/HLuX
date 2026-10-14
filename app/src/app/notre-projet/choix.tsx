@@ -11,6 +11,7 @@ import { VoicesCircle } from '../../components/VoicesCircle';
 import { Link } from 'expo-router';
 
 import { Screen } from '../../components/Chrome';
+import { GroupPending } from '../../components/GroupPending';
 import type { Lean, Rank } from '../../core/acts';
 import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
@@ -99,6 +100,7 @@ export default function Choix() {
   return (
     <Screen side="pe" title="choice" question="Que choisissons-nous ? Chacun seul, puis ensemble.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
+        <GroupPending />
         <View style={st.box}>
           <Text style={st.h}>Le groupe range les six critères</Text>
           {ranked.map(([c, label]) => (
@@ -215,6 +217,7 @@ export default function Choix() {
                       if (!dictated.trim()) return;
                       const [author, prov, conf] = provenanceOf(aided && !!words.trim(), true, 'groupe');
                       act(author, { act: 'decision', orientation: current!, dictated: dictated.trim(), words: (words || dictated).trim() }, prov, conf);
+                      setAided(false);
                     }} style={[st.btn, st.on]}>
                       <Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe · vers les actions</Text>
                     </Pressable>

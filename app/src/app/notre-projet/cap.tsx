@@ -8,6 +8,7 @@ import { AideButton } from '../../components/AideButton';
 
 import {DragArea, Draggable, Zone } from '../../components/Drag';
 import { Screen } from '../../components/Chrome';
+import { GroupPending } from '../../components/GroupPending';
 import { Ikigai } from '../../components/Ikigai';
 import type { Circle, Crossing, Spot } from '../../core/acts';
 import { say } from '../../core/useAids';
@@ -39,6 +40,7 @@ export default function Cap() {
     if (!change.trim()) return;
     const [author, prov, conf] = provenanceOf(aided, validated, by);
     act(author, { act: 'expected_change', cap: capFor ?? caps[0]?.[0] ?? '', text: change.trim(), validated }, prov, conf);
+    setAided(false);
   };
 
   const caps = Object.entries(f.caps);
@@ -59,6 +61,7 @@ export default function Cap() {
   return (
     <Screen side="pe" title="course" question="Que voulons-nous améliorer ? Le constat devient un cap, et un changement observable.">
       <ScrollView contentContainerStyle={{ gap: 12 }}>
+        <GroupPending />
         <View style={st.row}>
           <Pressable accessibilityRole="radio" accessibilityState={{ checked: hands === null }} onPress={() => setHands(null)} style={[st.btn, hands === null && st.on]}>
             <Text style={[st.btnTxt, hands === null && { color: C.onAccent }]}>À tour de rôle</Text>
