@@ -13,7 +13,7 @@ import { say } from '../../core/useAids';
 import { provenanceOf } from '../../core/facility';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import { useParticipants, useProject } from '../../core/useProject';
-import { band, LEANS } from '../../core/views';
+import { LEANS, band, readingOf } from '../../core/views';
 import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
 
@@ -104,6 +104,10 @@ export default function Actions() {
             <View key={id} style={st.sol}>
               <Text style={st.solTitle}>{s.title}</Text>
               <Text style={st.small}>{[s.modality, s.rhythm].filter(Boolean).join(' · ')}</Text>
+              {([true, false] as const).flatMap((effect) => {
+                const r = readingOf(s.leans.filter((l) => l.effect === effect), effect ? "l'effet pour les personnes" : "la faisabilité pour l'équipe");
+                return r ? [<Text key={`r-${effect}`} style={r.converge ? st.conv : st.diff}>{r.converge ? 'CONVERGENCES' : 'À DISCUTER'} · {r.phrase}</Text>] : [];
+              })}
               {([true, false] as const).map((effect) => (
                 <View key={String(effect)} style={st.lineRow}>
                   <Text style={[st.small, { width: phone ? '100%' : 210 }]}>REGARDS RÉUNIS · {effect ? 'effet pour les personnes' : "faisabilité pour l'équipe"}</Text>
@@ -177,6 +181,8 @@ export default function Actions() {
 }
 
 const st = StyleSheet.create({
+  conv: { fontFamily: F.bold, fontSize: 14, color: C.green.ink, padding: 8, borderRadius: 10, backgroundColor: C.pe.soft },
+  diff: { fontFamily: F.bold, fontSize: 14, color: C.warn.ink, padding: 8, borderRadius: 10, backgroundColor: C.warn.soft },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
   box: { padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 10 },
   h: { fontFamily: F.bold, fontSize: 17, color: C.ink },

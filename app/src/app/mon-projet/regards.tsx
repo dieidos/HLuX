@@ -91,6 +91,11 @@ export default function Regards() {
         </View>
       ))}
       {who === 'together' && <Text style={st.small}>{w('narrow')} · {w('wide')}</Text>}
+      {invitations
+        .filter(([, inv]) => inv.answered && inv.word && (who === 'together' || who === inv.guest))
+        .map(([id, inv]) => (
+          <Text key={id} style={st.word}>💬 {inv.guest} : « {inv.word} »</Text>
+        ))}
     </View>
   );
 
@@ -225,6 +230,7 @@ const st = StyleSheet.create({
   small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   status: { fontFamily: F.bold, fontSize: 13, color: C.slate },
   statusOk: { color: C.pe.ink },
+  word: { fontFamily: F.body, fontSize: 15, color: C.text, padding: 10, borderRadius: 12, backgroundColor: C.surface },
   link: { fontFamily: F.bold, fontSize: 15, color: C.violetInk, textDecorationLine: 'underline', minHeight: S.touch, paddingVertical: 12 },
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 16, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, alignSelf: 'flex-start' },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
