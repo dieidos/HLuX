@@ -1,9 +1,8 @@
-# Projet d'amendement — ad-hoc-ab-ante, A190 (à verser par le propriétaire)
+# Amendement — ad-hoc-ab-ante, A190 (versé)
 
-> Brouillon préparé dans le dépôt `hlux`. **Rien n'est écrit dans `ad-hoc-ab-ante`** tant que le
-> propriétaire ne l'a pas versé (A189 : l'enregistrement précède la première ligne du consommateur).
-> Le code `hlux-core` existe déjà en local, non publié : cet amendement doit être versé **avant** le
-> premier push du dépôt `hlux`.
+> **Versé le 2026-10-14** dans `ad-hoc-ab-ante` (commit `c92306a`) : ligne `hlux.` de `spec/04-spaces.md` et
+> entrée A190 du registre. Le texte versé fait foi ; il dit en plus, honnêtement, que l'enregistrement
+> vient **après** le premier push de ce dépôt (A189 demandait l'inverse).
 
 ## 1. Ligne à ajouter au tableau « Registered prefixes » de `spec/04-spaces.md`
 

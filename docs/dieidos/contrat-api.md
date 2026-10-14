@@ -2,7 +2,7 @@
 
 > À transmettre à la session dieidos. **Vocabulaire neutre** : les gardes `verify:atlas-lexicon` de
 > dieidos-technology refusent les mots propres au produit. Ce document n'en contient aucun.
-> Décision de rattachement : `docs/gouvernance/decision-hlux-autonome.md` (déc. 810 proposée).
+> Décision de rattachement : `docs/gouvernance/decision-hlux-autonome.md` (déc. 811, versée le 2026-10-14).
 
 L'application cliente n'a **aucun serveur propre**. dieidos-technology est son seul serveur. Les données
 personnelles des personnes accompagnées n'y sont **jamais stockées**.

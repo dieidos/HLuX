@@ -1,15 +1,14 @@
-# Projet de décision — dieidos-technology (à verser par le propriétaire)
+# Décision — dieidos-technology : déc. 811 (versée)
 
-> Brouillon préparé dans le dépôt `hlux`, au format de `gouvernance/DECISIONS.md`. Rien n'est écrit
-> dans `dieidos-technology` tant que le propriétaire ne l'a pas versé. Vocabulaire neutre : les
-> gardes `verify:atlas-lexicon` refusent les mots propres au produit dans ce dépôt.
+> **Versée le 2026-10-14** dans `dieidos-technology/gouvernance/DECISIONS.md`, commit `0f4ffe6`, sous le
+> n° 811 (le 810 avait été pris entre-temps). Le texte versé fait foi ; celui-ci en est la copie.
 
-### déc. 810 — HLuX redevient un produit autonome, client des services dieidos
+### déc. 811 — HLuX redevient un produit autonome, client des services dieidos
 
-_Tranché par le propriétaire le 2026-10-14 (source : `CDC - HLuX.md`, arbitrages du 2026-10-14) ; à verser._
+_Tranché par le propriétaire le 2026-10-14 (source : `CDC - HLuX.md`, arbitrages du 2026-10-14) ; versée par Claude le 2026-10-14._
 
 - HLuX (Harmonia LuX) sort du gel prononcé par la déc. 589 **pour lui seul** : produit autonome, dépôt
-  propre `dieidos/hlux` (GitHub), sans back-end propre
+  propre `dieidos/HLuX` (GitHub), sans back-end propre
 - dieidos-technology est **son seul serveur** : authentification des professionnels
   (`/api/auth/native/exchange`), un tenant par établissement, tableau partagé trinity-mcp, aides IA
 - La déc. 711 (liste fermée de mots) **reste en vigueur dans ce dépôt** : les mots du produit vivent
