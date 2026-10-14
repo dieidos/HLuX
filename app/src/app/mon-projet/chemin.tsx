@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../../components/Chrome';
+import { BackupRefusal, exportDossier, MIN_WORDS } from '../../core/backup';
+import { saveFile } from '../../core/saveFile';
 import { PathView } from '../../components/PathView';
 import { say, useWords } from '../../core/useAids';
 import { useProject, useProjectState } from '../../core/useProject';
@@ -24,6 +26,9 @@ export default function Chemin() {
   const [question, setQuestion] = useState('Et si le rendez-vous à la CAF était repoussé ?');
   const [moved, setMoved] = useState<{ node: string; when: string } | null>(null);
   const [plan, setPlan] = useState(false);
+  const [phrase, setPhrase] = useState('');
+  const [saved, setSaved] = useState('');
+  const entries = useProject((x) => x.entries);
 
   const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n }));
   const copy = nodes.map((n) => (moved && n.id === moved.node ? { ...n, when: moved.when } : n));
@@ -68,6 +73,27 @@ export default function Chemin() {
           <Pressable onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: '#fff' }]}>{w('myPlan')}</Text></Pressable>
         </View>
 
+        <View style={st.export}>
+          <Text style={st.tileTitle}>🔒 Emporter mon dossier</Text>
+          <Text style={st.small}>Une copie chiffrée, lisible seulement avec ta phrase ({MIN_WORDS} mots ou plus). Une phrase perdue, c'est un dossier perdu : personne ne peut la retrouver.</Text>
+          <TextInput value={phrase} onChangeText={setPhrase} placeholder="Ma phrase de six mots ou plus" secureTextEntry style={st.input} accessibilityLabel="Ma phrase" />
+          <Pressable
+            onPress={async () => {
+              try {
+                const f = exportDossier(JSON.stringify({ person: 'amina', entries }), phrase);
+                await saveFile('dossier-amina.hlux.json', JSON.stringify(f));
+                setSaved('Ton dossier chiffré est prêt.');
+                setPhrase('');
+              } catch (e) {
+                setSaved(e instanceof BackupRefusal ? e.message : 'La copie a échoué.');
+              }
+            }}
+            style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
+            <Text style={[st.btnTxt, { color: '#fff' }]}>Emporter</Text>
+          </Pressable>
+          {saved ? <Text style={st.small} accessibilityLiveRegion="polite">{saved}</Text> : null}
+        </View>
+
         {plan && (
           <View style={st.plan}>
             {([['planFirst', s.plan.first], ['planWaiting', s.plan.waiting.map(([a, b]) => `${a} · ${b}`)], ['planWith', s.plan.with_whom], ['planOpen', s.plan.open]] as [WordKey, string[]][]).map(([k, items]) => (
@@ -96,5 +122,7 @@ const st = StyleSheet.create({
   plan: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tile: { flexGrow: 1, flexBasis: 200, padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 4 },
   tileTitle: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  export: { padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 8 },
+  small: { fontFamily: F.body, fontSize: 13, color: C.muted },
   tileItem: { fontFamily: F.body, fontSize: 15, color: C.text },
 });
