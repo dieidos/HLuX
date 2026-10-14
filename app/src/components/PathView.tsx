@@ -9,9 +9,10 @@ import Svg, { Line } from 'react-native-svg';
 import type { LinkKind, NodeKind } from '../core/acts';
 import {useRegister, useT } from '../core/useAids';
 import { useReducedMotion } from '../design/motion';
+import { Picto } from './Picto';
 import { C, F } from '../design/theme';
 
-export interface PNode { id: string; lane: string; kind: NodeKind; label: string; when: string; thread?: boolean }
+export interface PNode { id: string; lane: string; kind: NodeKind; label: string; when: string; thread?: boolean; /** l'image de la Carte dont l'étape est née */ picto?: string | null }
 export interface PLink { from: string; to: string; link: LinkKind }
 
 const LANE_H = 86;
@@ -95,6 +96,7 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
             ) : (
               <Text style={[st.glyph, n.kind === 'decision' ? st.diamond : st.dot]}>{n.kind === 'decision' ? '◆' : '●'}</Text>
             )}
+            {n.picto ? <Picto name={n.picto} size={18} label={false} /> : null}
             <Text style={st.label} numberOfLines={2}>{n.label}</Text>
           </View>
         );

@@ -65,7 +65,7 @@ export default function Sujets() {
     }
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
     actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
-    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session });
+    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session, picto: card.picto });
     tell(tNow("Oui, j'apporte. Le sujet entre à l'ordre du jour.", 'نعم، أقدّمه. يدخل الموضوع جدول الأعمال.', "Oui. Le sujet va au groupe."), pathname);
   };
   // « Pas maintenant » : rien ne passe, et la Carte le garde dans son parcours.
@@ -185,7 +185,10 @@ export default function Sujets() {
           {f.agenda.filter((a) => !session || a.session === session).length === 0 && <Text style={st.small}>Rien pour l’instant.</Text>}
           {f.agenda.filter((a) => !session || a.session === session).map((a) => (
             <View key={a.item} style={[st.item, a.item === subjectId && st.itemNew]}>
-              <Text style={st.itemTitle}>{a.title}</Text>
+              <View style={st.kickRow}>
+                {a.picto ? <Picto name={a.picto} size={24} label={false} /> : null}
+                <Text style={st.itemTitle}>{a.title}</Text>
+              </View>
               <Text style={st.small}>{SOURCE_WORDS[a.source]}</Text>
             </View>
           ))}

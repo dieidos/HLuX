@@ -3,6 +3,7 @@
 // en mots : situation individuelle → signal à vérifier → difficulté répétée → enjeu confirmé.
 // Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat.
 
+import { Picto } from '../../components/Picto';
 import { More } from '../../components/More';
 import { freshId } from '../../core/ids';
 import { useState } from 'react';
@@ -57,7 +58,7 @@ export default function Constat() {
   const place = (id: string, zone: Feeling) => {
     const fromA = fromAgenda.find((a) => a.item === id);
     const existing = f.findings[id];
-    act(speaker, { act: 'finding_placed', finding: id, title: existing?.title ?? fromA?.title ?? id, zone, source: existing?.source ?? fromA?.source ?? 'team', author: existing?.author ?? (fromA ? '' : speaker) });
+    act(speaker, { act: 'finding_placed', finding: id, title: existing?.title ?? fromA?.title ?? id, zone, source: existing?.source ?? fromA?.source ?? 'team', author: existing?.author ?? (fromA ? '' : speaker), picto: existing?.picto ?? fromA?.picto ?? null });
     tell(`${speaker} pose une carte.`);
   };
   const qualify = (id: string) => {
@@ -105,6 +106,7 @@ export default function Constat() {
                   <View key={id} style={st.cardWrap}>
                     <Draggable id={id} label={c.title}>
                       <View style={st.card}>
+                        {c.picto ? <Picto name={c.picto} size={28} label={false} /> : null}
                         <Text style={st.cardTitle}>{c.title}</Text>
                         <Text style={st.small}>{SOURCE_WORDS[c.source]}{c.author ? ` · ${c.author}` : ''}</Text>
                       </View>
@@ -121,7 +123,7 @@ export default function Constat() {
             <View style={st.tray}>
               <Text style={st.small}>Venu de l’ordre du jour, à placer :</Text>
               {fromAgenda.map((a) => (
-                <Draggable key={a.item} id={a.item} label={a.title}><View style={st.card}><Text style={st.cardTitle}>{a.title}</Text><Text style={st.small}>{SOURCE_WORDS[a.source]}</Text></View></Draggable>
+                <Draggable key={a.item} id={a.item} label={a.title}><View style={st.card}>{a.picto ? <Picto name={a.picto} size={28} label={false} /> : null}<Text style={st.cardTitle}>{a.title}</Text><Text style={st.small}>{SOURCE_WORDS[a.source]}</Text></View></Draggable>
               ))}
             </View>
           )}

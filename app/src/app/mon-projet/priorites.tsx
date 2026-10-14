@@ -12,6 +12,7 @@ import type { Circle, Rank } from '../../core/acts';
 import { lineKey } from '../../core/project';
 import { shifted } from '../../core/views';
 import { SlideChip } from '../../components/Slide';
+import { Picto } from '../../components/Picto';
 import {tNow, tell, useT, useWords } from '../../core/useAids';
 import { useProject, useProjectState, useMe } from '../../core/useProject';
 import { C, F, S } from '../../design/theme';
@@ -29,6 +30,8 @@ export default function Priorites() {
   const w = useWords();
   const t = useT();
   const s = useProjectState();
+  // L'idée née d'une Carte en porte l'image : le fil se voit jusque sur les lignes.
+  const pictoOf = (idea: string) => { const c = s.ideas[idea]?.fromCard; return c ? s.cards[c]?.picto ?? null : null; };
   const act = useProject((x) => x.act);
   const [pane, setPane] = useState<'a' | 'b'>('a');
   const [open, setOpen] = useState<Circle | null>(null);
@@ -115,6 +118,7 @@ export default function Priorites() {
                         <SlideChip key={id} onShift={(n) => move(axis, id, n)}>
                         <View style={st.idea}>
                           <Pressable accessibilityRole="button" onPress={() => move(axis, id, -1)} disabled={i === 0} accessibilityLabel={t(`${s.ideas[id].title} vers peu`, `${s.ideas[id].title} نحو «قليلاً»`)} style={st.arrow}><Text style={st.arrowTxt}>◀</Text></Pressable>
+                          {pictoOf(id) ? <Picto name={pictoOf(id)!} size={20} label={false} /> : null}
                           <Text style={st.ideaTxt}>{s.ideas[id].title}</Text>
                           <Pressable accessibilityRole="button" onPress={() => move(axis, id, 1)} disabled={i === all.length - 1} accessibilityLabel={t(`${s.ideas[id].title} vers beaucoup`, `${s.ideas[id].title} نحو «كثيراً»`)} style={st.arrow}><Text style={st.arrowTxt}>▶</Text></Pressable>
                         </View>

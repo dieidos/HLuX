@@ -26,9 +26,9 @@ export function seedAmina(): Entry[] {
 function pathAmina(from: number): Entry[] {
   const acts: ProjectAct[] = [
     { act: 'node_set', node: 'choisis', lane: 'démarches', kind: 'decision', label: 'je choisis', when: 'automne', thread: false },
-    { act: 'node_set', node: 'rdv-caf', lane: 'démarches', kind: 'event', label: 'rendez-vous CAF demandé', when: 'automne', thread: false },
-    { act: 'node_set', node: 'atelier', lane: 'démarches', kind: 'event', label: 'atelier courriers avec Sarah', when: 'hiver', thread: true },
-    { act: 'node_set', node: 'caf-ok', lane: 'démarches', kind: 'event', label: 'dossier CAF à jour', when: 'printemps', thread: false },
+    { act: 'node_set', node: 'rdv-caf', lane: 'démarches', kind: 'event', label: 'rendez-vous CAF demandé', when: 'automne', thread: false, card: 'papiers' },
+    { act: 'node_set', node: 'atelier', lane: 'démarches', kind: 'event', label: 'atelier courriers avec Sarah', when: 'hiver', thread: true, card: 'papiers' },
+    { act: 'node_set', node: 'caf-ok', lane: 'démarches', kind: 'event', label: 'dossier CAF à jour', when: 'printemps', thread: false, card: 'papiers' },
     { act: 'node_set', node: 'choix-formation', lane: 'formation', kind: 'decision', label: 'je choisis la formation', when: 'hiver', thread: false },
     { act: 'node_set', node: 'dossier', lane: 'formation', kind: 'event', label: 'dossier déposé', when: 'printemps', thread: false },
     { act: 'node_set', node: 'creer', lane: 'activité', kind: 'event', label: 'créer une activité — ouverte', when: 'printemps', thread: false },

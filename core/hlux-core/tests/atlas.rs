@@ -66,13 +66,15 @@ fn ecran_03_ecarter_par_le_bord_est_irreversible() {
 #[test]
 fn le_collectif_valide_ce_que_l_aide_propose_et_deplacer_garde_la_qualification() {
     let mut e = amina();
-    let placed = FacilityAct::FindingPlaced { finding: "c1".into(), title: "Les courriers".into(), zone: Feeling::Unsure, source: Source::Team, author: "Bruno".into() };
+    let placed = FacilityAct::FindingPlaced { finding: "c1".into(), title: "Les courriers".into(), zone: Feeling::Unsure, source: Source::Team, author: "Bruno".into(), picto: Some("papiers".into()) };
     e.act_facility(&Who::hand("bruno"), placed).unwrap();
     e.act_facility(&Who::hand("bruno"), FacilityAct::FindingQualified { finding: "c1".into(), level: Qualification::Confirmed }).unwrap();
-    e.act_facility(&Who::hand("bruno"), FacilityAct::FindingPlaced { finding: "c1".into(), title: "Les courriers".into(), zone: Feeling::Hard, source: Source::Team, author: "Bruno".into() }).unwrap();
+    e.act_facility(&Who::hand("bruno"), FacilityAct::FindingPlaced { finding: "c1".into(), title: "Les courriers".into(), zone: Feeling::Hard, source: Source::Team, author: "Bruno".into(), picto: None }).unwrap();
     assert_eq!(e.facility_state().findings["c1"].level, Qualification::Confirmed);
+    // L'image venue de la Carte reste sur la carte déplacée.
+    assert_eq!(e.facility_state().findings["c1"].picto.as_deref(), Some("papiers"));
 
-    let p = e.act_facility(&Who::machine(), FacilityAct::FindingPlaced { finding: "c2".into(), title: "Proposé".into(), zone: Feeling::Unsure, source: Source::Team, author: "".into() }).unwrap();
+    let p = e.act_facility(&Who::machine(), FacilityAct::FindingPlaced { finding: "c2".into(), title: "Proposé".into(), zone: Feeling::Unsure, source: Source::Team, author: "".into(), picto: None }).unwrap();
     assert_eq!(e.pending_facility().len(), 1, "la proposition attend l'animateur");
     assert!(!e.facility_state().findings.contains_key("c2"));
     e.confirm_facility(p.rank.0, "Bruno").unwrap();

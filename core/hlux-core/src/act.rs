@@ -111,7 +111,15 @@ pub enum ProjectAct {
 pub enum FacilityAct {
     // ── 07 Sujets ──
     /// Un sujet consenti entre à l'ordre du jour.
-    AgendaItem { item: Id, title: String, source: Source, session: String },
+    AgendaItem {
+        item: Id,
+        title: String,
+        source: Source,
+        session: String,
+        /// L'image de la Carte d'où vient le sujet (un picto générique, rien de personnel).
+        #[serde(default)]
+        picto: Option<String>,
+    },
     /// Présents et absents (« absente, c'est normal »).
     Attendance { session: String, present: Vec<String>, absent: Vec<String>, facilitator: String },
 
@@ -119,7 +127,16 @@ pub enum FacilityAct {
     /// Tour de parole : la tablette circule.
     FloorGiven { session: String, to: String },
     /// Une carte posée sur la table au pluriel.
-    FindingPlaced { finding: Id, title: String, zone: Feeling, source: Source, author: String },
+    FindingPlaced {
+        finding: Id,
+        title: String,
+        zone: Feeling,
+        source: Source,
+        author: String,
+        /// L'image venue de l'ordre du jour, s'il y en a une.
+        #[serde(default)]
+        picto: Option<String>,
+    },
     /// Qualification décidée par le groupe.
     FindingQualified { finding: Id, level: Qualification },
     /// Le mandat d'animation se retire et se redonne.

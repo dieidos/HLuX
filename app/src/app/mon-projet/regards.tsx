@@ -2,6 +2,7 @@
 // dans sa langue. On voit qui a répondu, jamais le contenu, jusqu'à « découvrir ensemble ».
 // Puis quatre lectures : Mon regard · Le regard de… · Nos regards réunis · Avec l'ordre de la professionnelle.
 
+import { Picto } from '../../components/Picto';
 import { freshId } from '../../core/ids';
 import {Link, usePathname } from 'expo-router';
 import { useState } from 'react';
@@ -111,6 +112,7 @@ export default function Regards() {
               ...invitations.map(([id, inv]) => (
                 <View key={id} style={st.sat}>
                   <Text style={st.name}>{inv.guest}{inv.relation ? `, ${inv.relation}` : ''}</Text>
+                  {(() => { const c = s.ideas[inv.idea]?.fromCard; const pic = c ? s.cards[c]?.picto : null; return pic ? <Picto name={pic} size={22} label={false} /> : null; })()}
                   <Text style={st.small}>« {s.ideas[inv.idea]?.title} » · {inv.lang === 'ar' ? t('en arabe', 'بالعربية') : t('en français', 'بالفرنسية')}</Text>
                   <Text style={[st.status, inv.answered && st.statusOk]}>
                     {inv.answered ? w('answered') : expired(inv, new Date()) ? t('expirée · le lien s’est reposé', 'انتهت · توقّف الرابط', 'fini · le lien ne marche plus') : `${w('invited')} · ${w('notYetAnswered')}`}

@@ -8,10 +8,10 @@ export type Qualification = 'individual' | 'signal' | 'repeated' | 'confirmed';
 export type Criterion = 'effect' | 'rights' | 'feasibility' | 'urgency' | 'cooperation' | 'resources';
 
 export type FacilityAct =
-  | { act: 'agenda_item'; item: Id; title: string; source: Source; session: string }
+  | { act: 'agenda_item'; item: Id; title: string; source: Source; session: string; /** l'image de la Carte d'où vient le sujet */ picto?: string | null }
   | { act: 'attendance'; session: string; present: string[]; absent: string[]; facilitator: string }
   | { act: 'floor_given'; session: string; to: string }
-  | { act: 'finding_placed'; finding: Id; title: string; zone: Feeling; source: Source; author: string }
+  | { act: 'finding_placed'; finding: Id; title: string; zone: Feeling; source: Source; author: string; picto?: string | null }
   | { act: 'finding_qualified'; finding: Id; level: Qualification }
   | { act: 'mandate_set'; to: string }
   | { act: 'cap_placed'; cap: Id; title: string; by: string; spot: Spot }
@@ -34,11 +34,11 @@ export type FacilityAct =
 export interface FEntry { rank: number; author: string; provenance: 'by_hand' | 'dictated' | 'hypothesis' | 'generated'; confirmedBy?: string; undone?: number; act?: FacilityAct }
 
 export interface FacilityState {
-  agenda: { item: Id; title: string; source: Source; session: string }[];
+  agenda: { item: Id; title: string; source: Source; session: string; picto: string | null }[];
   attendance: { session: string; present: string[]; absent: string[]; facilitator: string } | null;
   floor: string | null;
   mandate: string | null;
-  findings: Record<Id, { title: string; zone: Feeling; source: Source; author: string; level: Qualification }>;
+  findings: Record<Id, { title: string; zone: Feeling; source: Source; author: string; level: Qualification; picto: string | null }>;
   caps: Record<Id, { title: string; placements: { by: string; spot: Spot }[] }>;
   expectedChange: { cap: Id; text: string; validated: boolean } | null;
   criteria: Partial<Record<Criterion, Rank>>;
@@ -62,11 +62,11 @@ const orientation = (s: FacilityState, id: Id) =>
 
 function fold(s: FacilityState, a: FacilityAct): void {
   switch (a.act) {
-    case 'agenda_item': s.agenda.push({ item: a.item, title: a.title, source: a.source, session: a.session }); break;
+    case 'agenda_item': s.agenda.push({ item: a.item, title: a.title, source: a.source, session: a.session, picto: a.picto ?? null }); break;
     case 'attendance': s.attendance = { session: a.session, present: a.present, absent: a.absent, facilitator: a.facilitator }; break;
     case 'floor_given': s.floor = a.to; break;
     // Déplacer une carte garde sa qualification : seul le groupe la change (finding_qualified).
-    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: s.findings[a.finding]?.level ?? 'individual' }; break;
+    case 'finding_placed': s.findings[a.finding] = { title: a.title, zone: a.zone, source: a.source, author: a.author, level: s.findings[a.finding]?.level ?? 'individual', picto: a.picto ?? s.findings[a.finding]?.picto ?? null }; break;
     case 'finding_qualified': if (s.findings[a.finding]) s.findings[a.finding].level = a.level; break;
     case 'mandate_set': s.mandate = a.to; break;
     case 'cap_placed': {

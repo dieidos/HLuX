@@ -46,7 +46,8 @@ export default function Chemin() {
   const place = useProject((x) => x.setup?.name ?? '');
   const proposals = Object.entries(facility.proposals).filter(([id]) => !s.linkedProposals.some((l) => l.proposal === id));
 
-  const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n }));
+  // Une étape née d'une Carte en porte l'image : on voit le fil passer sur le chemin (comme l'Atlas).
+  const nodes = Object.entries(s.nodes).map(([id, n]) => ({ id, ...n, picto: n.card ? s.cards[n.card]?.picto ?? null : null }));
   // Les couloirs de l'Atlas, plus ceux que la personne a nommés.
   const lanes = [...new Set([...LANES, ...nodes.map((n) => n.lane)])];
   const copy = nodes.map((n) => (moved && n.id === moved.node ? { ...n, when: moved.when } : n));

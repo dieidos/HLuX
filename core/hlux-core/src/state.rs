@@ -282,6 +282,7 @@ pub struct Finding {
     pub source: Source,
     pub author: String,
     pub level: Qualification,
+    pub picto: Option<String>,
 }
 
 /// Une orientation et ses placements.
@@ -306,6 +307,8 @@ pub type CommitmentRow = (String, Id, Vec<String>, String, Vec<String>);
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FacilityState {
     pub agenda: Vec<(Id, String, Source, String)>,
+    /// point de l'ordre du jour → l'image de la Carte d'où il vient.
+    pub agenda_pictos: BTreeMap<Id, String>,
     pub attendance: Option<(String, Vec<String>, Vec<String>, String)>,
     pub floor: Option<String>,
     pub mandate: Option<String>,
@@ -342,15 +345,21 @@ impl Reducer<FacilityAct> for FacilityReducer {
             return;
         }
         match act.clone() {
-            FacilityAct::AgendaItem { item, title, source, session } => s.agenda.push((item, title, source, session)),
+            FacilityAct::AgendaItem { item, title, source, session, picto } => {
+                if let Some(p) = picto {
+                    s.agenda_pictos.insert(item.clone(), p);
+                }
+                s.agenda.push((item, title, source, session));
+            }
             FacilityAct::Attendance { session, present, absent, facilitator } => {
                 s.attendance = Some((session, present, absent, facilitator));
             }
             FacilityAct::FloorGiven { to, .. } => s.floor = Some(to),
-            FacilityAct::FindingPlaced { finding, title, zone, source, author } => {
+            FacilityAct::FindingPlaced { finding, title, zone, source, author, picto } => {
                 // Déplacer une carte garde sa qualification : seul le groupe la change (FindingQualified).
                 let level = s.findings.get(&finding).map(|f| f.level).unwrap_or(Qualification::Individual);
-                s.findings.insert(finding, Finding { title, zone, source, author, level });
+                let picto = picto.or_else(|| s.findings.get(&finding).and_then(|f| f.picto.clone()));
+                s.findings.insert(finding, Finding { title, zone, source, author, level, picto });
             }
             FacilityAct::FindingQualified { finding, level } => {
                 if let Some(f) = s.findings.get_mut(&finding) {
