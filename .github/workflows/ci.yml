@@ -13,7 +13,7 @@ jobs:
     name: Cœur Rust (ab-ante)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Repris de dieidos-lms (gardes.yml) : refuser d'abord, et dire le geste exact.
       - name: Accès au protocole
@@ -49,13 +49,13 @@ jobs:
     name: Application (Expo)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: app/package-lock.json
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Jetons de design à jour et contrastes AA
