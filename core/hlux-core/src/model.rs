@@ -219,4 +219,7 @@ pub struct Plan {
     pub with_whom: Vec<String>,
     /// 🌱 Reste ouvert
     pub open: Vec<String>,
+    /// Le plan, dit dans ses mots (gardé quand la personne le veut).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub words: Option<String>,
 }

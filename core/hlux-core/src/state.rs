@@ -297,6 +297,9 @@ pub struct OrientationView {
     sealed: Vec<(Criterion, String, Lean)>,
 }
 
+/// Un engagement : texte, solution, fil (d'où il vient), quand en reparler, qui le porte.
+pub type CommitmentRow = (String, Id, Vec<String>, String, Vec<String>);
+
 /// L'état du Projet d'Établissement.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FacilityState {
@@ -311,11 +314,11 @@ pub struct FacilityState {
     pub criteria: BTreeMap<Criterion, Rank>,
     pub orientations: BTreeMap<Id, OrientationView>,
     pub solutions: BTreeMap<Id, SolutionView>,
-    pub commitments: BTreeMap<Id, (String, Id, Vec<String>, String)>,
+    pub commitments: BTreeMap<Id, CommitmentRow>,
     pub nodes: BTreeMap<Id, Node>,
     pub links: Vec<(Id, Id, LinkKind)>,
     pub loads: BTreeMap<Id, (String, Vec<String>, String)>,
-    pub results: Vec<(String, bool)>,
+    pub results: Vec<(String, bool, String)>,
     pub proposals: BTreeMap<Id, String>,
 }
 
@@ -394,8 +397,8 @@ impl Reducer<FacilityAct> for FacilityReducer {
                     x.3.push((effect, by, lean));
                 }
             }
-            FacilityAct::Commitment { commitment, text, solution, thread, review } => {
-                s.commitments.insert(commitment, (text, solution, thread, review));
+            FacilityAct::Commitment { commitment, text, solution, thread, review, carriers } => {
+                s.commitments.insert(commitment, (text, solution, thread, review, carriers));
             }
             FacilityAct::NodeSet { node, lane, kind, label, when } => {
                 s.nodes.insert(node, Node { lane, kind, label, when, thread: false });
@@ -407,7 +410,7 @@ impl Reducer<FacilityAct> for FacilityReducer {
             FacilityAct::Load { load, name, carriers, rhythm } => {
                 s.loads.insert(load, (name, carriers, rhythm));
             }
-            FacilityAct::Result { text, back_to_finding } => s.results.push((text, back_to_finding)),
+            FacilityAct::Result { text, back_to_finding, when } => s.results.push((text, back_to_finding, when)),
             FacilityAct::Proposal { proposal, text } => {
                 s.proposals.insert(proposal, text);
             }

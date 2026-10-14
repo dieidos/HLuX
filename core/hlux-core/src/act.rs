@@ -141,7 +141,16 @@ pub enum FacilityAct {
     /// Regards réunis sur effet ou faisabilité.
     SolutionLean { solution: Id, effect: bool, by: String, lean: Lean },
     /// La carte-engagement, avec son fil.
-    Commitment { commitment: Id, text: String, solution: Id, thread: Vec<String>, review: String },
+    Commitment {
+        commitment: Id,
+        text: String,
+        solution: Id,
+        thread: Vec<String>,
+        review: String,
+        /// Qui le porte (prénoms) ; absent des journaux d'avant le 2026-10-14.
+        #[serde(default)]
+        carriers: Vec<String>,
+    },
 
     // ── 12 Suivi ──
     /// Chemin collectif : même grammaire que le chemin d'Amina.
@@ -151,7 +160,13 @@ pub enum FacilityAct {
     /// Ce que nous portons : prénoms et rythme, jamais de total.
     Load { load: Id, name: String, carriers: Vec<String>, rhythm: String },
     /// Le résultat, en mots ; peut renvoyer au constat.
-    Result { text: String, back_to_finding: bool },
+    Result {
+        text: String,
+        back_to_finding: bool,
+        /// Le jour, en mots ; absent des journaux d'avant le 2026-10-14.
+        #[serde(default)]
+        when: String,
+    },
     /// Ce que le CHRS propose, visible depuis l'espace de la personne.
     Proposal { proposal: Id, text: String },
 }
