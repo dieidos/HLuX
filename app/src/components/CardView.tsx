@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Card } from '../core/project';
-import { useRegister } from '../core/useAids';
+import { useFamily, useRegister } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 import { PICTOS, type PictoKey } from '../design/pictos';
 import { Picto } from './Picto';
@@ -9,12 +9,13 @@ import { Picto } from './Picto';
 /** Une Carte : picto, titre, et son dernier moment. */
 export function CardView({ card, compact = false }: { card: Card; compact?: boolean }) {
   const reg = useRegister();
+  const bold = useFamily(true);
   const title = reg === 'ar' && card.picto ? PICTOS[card.picto as PictoKey]?.ar ?? card.title : card.title;
   return (
     <View style={[st.card, compact && st.compact]}>
       {card.picto ? <Picto name={card.picto} size={compact ? 44 : 64} label={false} /> : null}
       <View style={{ flexShrink: 1 }}>
-        <Text style={st.title}>{title}</Text>
+        <Text style={[st.title, { fontFamily: bold }]}>{title}</Text>
         {!compact && <Text style={st.moment}>{card.moments[card.moments.length - 1]}</Text>}
       </View>
     </View>

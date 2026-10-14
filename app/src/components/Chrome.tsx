@@ -5,7 +5,7 @@ import { Link, usePathname } from 'expo-router';
 import type { ReactNode } from 'react';
 import { I18nManager, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { say, useAids, useRegister, useWords } from '../core/useAids';
+import { say, useAids, useFamily, useRegister, useWords } from '../core/useAids';
 import { C, F, S } from '../design/theme';
 import type { WordKey } from '../i18n/words';
 
@@ -35,6 +35,8 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
   const steps = side === 'pp' ? PP : PE;
   const reg = useRegister();
   const rtl = side === 'pp' && reg === 'ar';
+  const body = useFamily();
+  const bold = useFamily(true);
   return (
     <View style={[st.page, { direction: rtl ? 'rtl' : 'ltr' }]}>
       <View style={st.top}>
@@ -45,7 +47,7 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
             const on = path === href;
             return (
               <Link key={href} href={href as never} style={[st.step, on && { backgroundColor: side === 'pp' ? C.pp.value : C.pe.value }]}>
-                <Text style={[st.stepTxt, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
+                <Text style={[st.stepTxt, { fontFamily: bold }, on && { color: C.ink }]} numberOfLines={1}>{w(k)}</Text>
               </Link>
             );
           })}
@@ -53,7 +55,7 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
       </View>
       <View style={st.head}>
         <Text style={st.title}>{w(title)}</Text>
-        <Text style={st.question} onPress={() => say(question)}>{question}</Text>
+        <Text style={[st.question, { fontFamily: body }]} onPress={() => say(question)}>{question}</Text>
       </View>
       <View style={st.body}>{children}</View>
       <AidsBar side={side} />
@@ -63,21 +65,22 @@ export function Screen({ side, title, question, children }: { side: 'pp' | 'pe';
 
 export function AidsBar({ side }: { side: 'pp' | 'pe' }) {
   const w = useWords();
+  const bold = useFamily(true);
   const { listen, simple, lang, toggle, switchLang } = useAids();
   return (
     <View style={st.aids}>
-      <Aid on={listen} label={w('listen')} onPress={() => toggle('listen')} />
-      <Aid on={simple} label={w('simpler')} onPress={() => toggle('simple')} />
-      {side === 'pp' && <Aid on={lang === 'ar'} label={w('language')} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
+      <Aid on={listen} label={w('listen')} font={bold} onPress={() => toggle('listen')} />
+      <Aid on={simple} label={w('simpler')} font={bold} onPress={() => toggle('simple')} />
+      {side === 'pp' && <Aid on={lang === 'ar'} label={w('language')} font={bold} onPress={() => { switchLang(); I18nManager.allowRTL(true); }} />}
       <Text style={st.who}>{side === 'pp' ? `Amina · ${w('withSarah')}` : 'CHRS Les Lilas'}</Text>
     </View>
   );
 }
 
-function Aid({ on, label, onPress }: { on: boolean; label: string; onPress: () => void }) {
+function Aid({ on, label, onPress, font }: { on: boolean; label: string; onPress: () => void; font: string }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="switch" accessibilityState={{ checked: on }} style={[st.aid, on && st.aidOn]}>
-      <Text style={[st.aidTxt, on && { color: '#fff' }]}>{label}</Text>
+      <Text style={[st.aidTxt, { fontFamily: font }, on && { color: '#fff' }]}>{label}</Text>
     </Pressable>
   );
 }

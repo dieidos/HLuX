@@ -1,0 +1,68 @@
+# CI de l'application HLuX. L'Atlas (racine) est servi par GitHub Pages, hors de cette CI.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', 'core/**', 'tokens/**', 'tools/**', '.github/workflows/ci.yml']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core:
+    name: Cœur Rust (ab-ante)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Repris de dieidos-lms (gardes.yml) : refuser d'abord, et dire le geste exact.
+      - name: Accès au protocole
+        env:
+          T: ${{ secrets.AB_ANTE_READ_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then
+            echo "core : REFUSÉ — le secret AB_ANTE_READ_TOKEN n'est pas posé."
+            echo "  Le cœur dépend de Houngan/ad-hoc-ab-ante, un dépôt privé."
+            echo "  Le geste, côté propriétaire :"
+            echo "    1. un jeton à portée fine, lecture du contenu de Houngan/ad-hoc-ab-ante, rien d'autre ;"
+            echo "    2. Settings > Secrets and variables > Actions > New secret, nommé AB_ANTE_READ_TOKEN."
+            exit 1
+          fi
+          U=https://github.com/Houngan/ad-hoc-ab-ante
+          git config --global url."https://x-access-token:$T@github.com/Houngan/ad-hoc-ab-ante".insteadOf "$U"
+          git clone --depth 1 "$U" "$RUNNER_TEMP/ad-hoc-ab-ante"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Le cœur compile, sans avertissement, et ses tests passent
+        working-directory: core
+        env:
+          CARGO_NET_GIT_FETCH_WITH_CLI: 'true'
+          HLUX_ABANTE_VECTORS: ${{ runner.temp }}/ad-hoc-ab-ante/conformity/vectors.txt
+        run: |
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+
+  app:
+    name: Application (Expo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Jetons de design à jour et contrastes AA
+        run: python tools/derive_tokens.py --check
+      - name: Typecheck et tests
+        working-directory: app
+        run: |
+          npm ci --no-audit --no-fund
+          npx tsc --noEmit
+          npx vitest run

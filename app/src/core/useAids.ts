@@ -41,3 +41,10 @@ export function say(text: string) {
   Speech.stop();
   Speech.speak(text, { language: lang === 'ar' ? 'ar' : 'fr-FR', rate: 0.95 });
 }
+
+/** La famille de police selon le registre : Noto Naskh pour l'arabe. */
+export function useFamily(bold = false): string {
+  const r = useRegister();
+  if (r === 'ar') return 'NotoNaskhArabic';
+  return bold ? 'SourceSans3Bold' : 'SourceSans3';
+}
