@@ -97,14 +97,11 @@ B (débloque toutes les aides du client) → A (pilote) → C (invitations et QR
 - Une donnée de santé.
 - Le texte des aides au-delà du temps de l'appel.
 
-## 5. Questions ouvertes pour la session dieidos
+## 5. Points tranchés par le propriétaire (2026-10-14)
 
-1. Le module `features/assist` peut-il réutiliser un graphe `langgraph` existant, ou faut-il un appel
-   direct via `rig` (plus simple, sans état) ? *Reco : appel direct, sans état.*
-2. La page invité statique : la servir depuis `dieidos-apps/` (Caddy) ou depuis l'API ? *Reco : Caddy,
-   même domaine.*
-3. Faut-il une décision de gouvernance par lot, ou la déc. 811 suffit-elle ? *Reco : 811 suffit ;
-   une ligne de suivi par lot.*
+1. `features/assist` fait un **appel direct via `rig`, sans état** (aucun graphe `langgraph`).
+2. La page invité statique est servie par **Caddy (`dieidos-apps/`), sur le même domaine**.
+3. **La déc. 811 suffit** ; une ligne de suivi par lot livré, pas de nouvelle décision.
 
 ## 6. Côté client, déjà prêt
 

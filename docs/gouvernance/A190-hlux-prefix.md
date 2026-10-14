@@ -41,3 +41,8 @@ as the reread, or give `Entry` a checked constructor.*
 
 📌 The genres are English (rule of 2 September); the words the person reads (*Ressenti*, *Envies*,
 *Chemin*…) live in the product's catalogue and never on the wire.
+
+## 3. Tranché le 2026-10-14 : relire, c'est rejouer
+
+Le propriétaire a retenu la documentation du rejeu (ab-ante, commit `9ba98c0` : registre A190 et
+`spec/02-core.md`). `Entry` ne reçoit pas de constructeur public ; le store d'HLuX garde son approche.
