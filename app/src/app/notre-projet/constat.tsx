@@ -66,15 +66,17 @@ export default function Constat() {
               <Zone key={z} id={z} label={label} onDrop={(id) => place(id, z)} style={{ ...st.zone, backgroundColor: bg }}>
                 <Text style={st.zoneTitle}>{label}</Text>
                 {Object.entries(f.findings).filter(([, c]) => c.zone === z).map(([id, c]) => (
-                  <Draggable key={id} id={id} label={c.title}>
-                    <View style={st.card}>
-                      <Text style={st.cardTitle}>{c.title}</Text>
-                      <Text style={st.small}>{SOURCE_WORDS[c.source]} · {c.author}</Text>
-                      <Pressable onPress={() => qualify(id)} style={st.qual} accessibilityRole="button" accessibilityLabel={`Qualification : ${QUALIF_WORDS[c.level]}. Toucher pour changer.`}>
-                        <Text style={st.qualTxt}>{QUALIF_WORDS[c.level]}</Text>
-                      </Pressable>
-                    </View>
-                  </Draggable>
+                  <View key={id} style={st.cardWrap}>
+                    <Draggable id={id} label={c.title}>
+                      <View style={st.card}>
+                        <Text style={st.cardTitle}>{c.title}</Text>
+                        <Text style={st.small}>{SOURCE_WORDS[c.source]} · {c.author}</Text>
+                      </View>
+                    </Draggable>
+                    <Pressable onPress={() => qualify(id)} style={st.qual} accessibilityRole="button" accessibilityLabel={`Qualification de « ${c.title} » : ${QUALIF_WORDS[c.level]}. Toucher pour changer.`}>
+                      <Text style={st.qualTxt}>{QUALIF_WORDS[c.level]}</Text>
+                    </Pressable>
+                  </View>
                 ))}
               </Zone>
             ))}
@@ -110,6 +112,7 @@ const st = StyleSheet.create({
   zoneTitle: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   card: { padding: 10, borderRadius: 12, backgroundColor: C.surface, gap: 4, borderTopWidth: 4, borderTopColor: C.pe.value },
   cardTitle: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  cardWrap: { gap: 4 },
   qual: { alignSelf: 'flex-start', minHeight: 32, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, backgroundColor: C.pe.soft },
   qualTxt: { fontFamily: F.bold, fontSize: 12, color: C.pe.ink },
   tray: { marginTop: 12, padding: 12, borderRadius: S.radius, backgroundColor: C.surface2, gap: 8 },
