@@ -1,0 +1,11 @@
+# ⛳ Copier en `config.toml` (non commité) pour lire l'exemplaire LOCAL du protocole.
+# Le manifeste déclare le dépôt distant : c'est lui qui vaut pour la CI.
+# ⚠️ Un dépôt `file://` lit l'état COMMITÉ du frère, pas son arbre de travail.
+[source.ab-ante-distant]
+git = "https://github.com/Houngan/ad-hoc-ab-ante"
+branch = "main"
+replace-with = "ab-ante-local"
+
+[source.ab-ante-local]
+git = "file:///C:/Users/alexj/projects/ad-hoc-ab-ante"
+branch = "main"

@@ -1,0 +1,13 @@
+# Rust
+core/target/
+core/.cargo/config.toml
+# Node / Expo
+node_modules/
+app/.expo/
+app/dist/
+app/ios/
+app/android/
+*.log
+# Bases locales de dev
+*.db
+*.sqlite
