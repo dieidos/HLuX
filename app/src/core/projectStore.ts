@@ -13,7 +13,7 @@ import { merge } from './qrCopy';
  * connexion dieidos), soit le téléphone de la personne, où elle entre directement — le verrou de
  * l'appareil suffit (CDC, « Données locales ») ; pas d'équipe, pas de séance, seulement « Mon projet ».
  */
-export interface Setup { name: string; team: string[]; kind?: 'facility' | 'personal' }
+export interface Setup { name: string; team: string[]; kind?: 'facility' | 'personal'; /** la période du projet d'établissement (ex. 2027–2031) */ period?: string }
 export const SETUP_KEY = 'hlux.setup';
 
 export function readSetup(kv: KV): Setup | null {
@@ -30,7 +30,7 @@ interface ProjectStore {
   /** null tant que l'établissement n'est pas mis en place (premier lancement). */
   setup: Setup | null;
   /** Premier lancement : le nom de l'établissement et les prénoms de l'équipe. */
-  configure: (name: string, team: string[]) => boolean;
+  configure: (name: string, team: string[], period?: string) => boolean;
   /** Mon téléphone : la personne entre avec son prénom (et une phrase, si elle veut). */
   configurePersonal: (firstName: string, sentence: string) => string;
   /** Le téléphone de la personne : pas de séance, elle entre directement. */
@@ -88,10 +88,10 @@ export function makeProjectStore(kv: KV) {
     };
     return {
       setup: readSetup(kv),
-      configure: (name, team) => {
+      configure: (name, team, period) => {
         const clean = [...new Set(team.map((t) => t.trim()).filter(Boolean))];
         if (!name.trim() || !clean.length) return false;
-        const setup = { name: name.trim(), team: clean };
+        const setup: Setup = { name: name.trim(), team: clean, kind: 'facility', ...(period?.trim() ? { period: period.trim() } : {}) };
         kv.setItem(SETUP_KEY, JSON.stringify(setup));
         set({ setup });
         return true;

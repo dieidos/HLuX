@@ -508,6 +508,6 @@ test.describe('12 Suivi', () => {
     await expect(page).toHaveURL(/notre-projet\/constat/);
     await link(page, /Suivi/).click();
     await tap(page, 'Validé par le groupe · Aïcha');
-    await expect(page.getByText('📊 Au printemps trois personnes comprennent seules leurs courriers. → retour au constat 🔁').filter({ visible: true })).toBeVisible();
+    await expect(page.getByText(/📊 .*Au printemps trois personnes comprennent seules leurs courriers. → retour au constat 🔁/).filter({ visible: true })).toBeVisible();
   });
 });

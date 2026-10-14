@@ -28,6 +28,8 @@ export interface Plan {
   waiting: [string, string][];
   with_whom: string[];
   open: string[];
+  /** Le plan, dit dans ses mots (gardé quand la personne le veut). */
+  words?: string;
 }
 
 export type ProjectAct =

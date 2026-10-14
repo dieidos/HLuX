@@ -24,11 +24,11 @@ export type FacilityAct =
   | { act: 'decision'; orientation: Id; dictated: string; words: string }
   | { act: 'solution'; solution: Id; title: string; modality: string; rhythm: string }
   | { act: 'solution_lean'; solution: Id; effect: boolean; by: string; lean: Lean }
-  | { act: 'commitment'; commitment: Id; text: string; solution: Id; thread: string[]; review: string }
+  | { act: 'commitment'; commitment: Id; text: string; solution: Id; thread: string[]; review: string; carriers?: string[] }
   | { act: 'node_set'; node: Id; lane: string; kind: NodeKind; label: string; when: string }
   | { act: 'link_set'; from: Id; to: Id; link: LinkKind }
   | { act: 'load'; load: Id; name: string; carriers: string[]; rhythm: string }
-  | { act: 'result'; text: string; back_to_finding: boolean }
+  | { act: 'result'; text: string; back_to_finding: boolean; when?: string }
   | { act: 'proposal'; proposal: Id; text: string };
 
 export interface FEntry { rank: number; author: string; provenance: 'by_hand' | 'dictated' | 'hypothesis' | 'generated'; confirmedBy?: string; undone?: number; act?: FacilityAct }
@@ -44,11 +44,11 @@ export interface FacilityState {
   criteria: Partial<Record<Criterion, Rank>>;
   orientations: Record<Id, { title: string; placedBy: string[]; placements: { criterion: Criterion; by: string; lean: Lean }[]; revealed: boolean; readings: { converge: boolean; people: string[]; criterion: Criterion; phrase: string }[]; decision: { dictated: string; words: string } | null; sealed: { criterion: Criterion; by: string; lean: Lean }[] }>;
   solutions: Record<Id, { title: string; modality: string; rhythm: string; leans: { effect: boolean; by: string; lean: Lean }[] }>;
-  commitments: Record<Id, { text: string; solution: Id; thread: string[]; review: string }>;
+  commitments: Record<Id, { text: string; solution: Id; thread: string[]; review: string; carriers: string[] }>;
   nodes: Record<Id, { lane: string; kind: NodeKind; label: string; when: string }>;
   links: { from: Id; to: Id; link: LinkKind }[];
   loads: Record<Id, { name: string; carriers: string[]; rhythm: string }>;
-  results: { text: string; backToFinding: boolean }[];
+  results: { text: string; backToFinding: boolean; when: string }[];
   proposals: Record<Id, string>;
 }
 
@@ -92,11 +92,11 @@ function fold(s: FacilityState, a: FacilityAct): void {
       if (x) x.leans = [...x.leans.filter((l) => !(l.effect === a.effect && l.by === a.by)), { effect: a.effect, by: a.by, lean: a.lean }];
       break;
     }
-    case 'commitment': s.commitments[a.commitment] = { text: a.text, solution: a.solution, thread: a.thread, review: a.review }; break;
+    case 'commitment': s.commitments[a.commitment] = { text: a.text, solution: a.solution, thread: a.thread, review: a.review, carriers: a.carriers ?? [] }; break;
     case 'node_set': s.nodes[a.node] = { lane: a.lane, kind: a.kind, label: a.label, when: a.when }; break;
     case 'link_set': s.links = [...s.links.filter((l) => !(l.from === a.from && l.to === a.to)), { from: a.from, to: a.to, link: a.link }]; break;
     case 'load': s.loads[a.load] = { name: a.name, carriers: a.carriers, rhythm: a.rhythm }; break;
-    case 'result': s.results.push({ text: a.text, backToFinding: a.back_to_finding }); break;
+    case 'result': s.results.push({ text: a.text, backToFinding: a.back_to_finding, when: a.when ?? '' }); break;
     case 'proposal': s.proposals[a.proposal] = a.text; break;
   }
 }

@@ -3,6 +3,7 @@
 // Le résultat se dit en mots ; s'il ne suffit pas, on revient au constat 🔁.
 // Un seul sens : le collectif ne lit jamais le chemin d'Amina ; il lui propose, et c'est elle qui relie.
 
+import { dayInWords } from '../../core/dates';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
@@ -44,7 +45,7 @@ export default function Suivi() {
   const noteResult = (back: boolean) => {
     if (!result.trim()) return;
     const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
-    act(author, { act: 'result', text: result.trim(), back_to_finding: back }, prov, conf);
+    act(author, { act: 'result', text: result.trim(), back_to_finding: back, when: dayInWords() }, prov, conf);
     setResult('');
     setAided(false);
     setLive(aided ? 'Résultat proposé : à valider pour le groupe.' : 'Résultat noté.');
@@ -159,7 +160,7 @@ export default function Suivi() {
 
         <View style={st.box}>
           <Text style={st.h}>Ce qui en résulte</Text>
-          {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
+          {f.results.map((r, i) => <Text key={i} style={st.result}>📊 {r.when ? `${r.when} · ` : ''}{r.text}{r.backToFinding ? ' → retour au constat 🔁' : ''}</Text>)}
           <TextInput value={result} onChangeText={setResult} multiline placeholder="Ce qui en résulte, en mots : ce qui va mieux, ce qui reste dur" style={st.input} accessibilityLabel="Résultat" />
           <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
           <View style={st.row}>

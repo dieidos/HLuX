@@ -36,6 +36,7 @@ export default function Actions() {
   const [chosen, setChosen] = useState<string | null>(null);
   const [live, setLive] = useState('');
   const [from, setFrom] = useState<string[]>([]);
+  const [carriers, setCarriers] = useState<string[]>([]);
   const solutions = Object.entries(f.solutions);
   const decision = Object.values(f.orientations).find((o) => o.decision)?.decision;
   const commitments = Object.entries(f.commitments);
@@ -63,7 +64,8 @@ export default function Actions() {
   const commit = () => {
     if (!text.trim() || !chosen) return;
     const [author, prov, conf] = provenanceOf(aided, true, 'groupe');
-    act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: chosen, thread: thread(chosen), review: review.trim() }, prov, conf);
+    act(author, { act: 'commitment', commitment: `e-${commitments.length + 1}`, text: text.trim(), solution: chosen, thread: thread(chosen), review: review.trim(), carriers }, prov, conf);
+    setCarriers([]);
     setAided(false);
     setFrom([]);
     say('Carte-engagement validée.');
@@ -129,7 +131,7 @@ export default function Actions() {
           {commitments.map(([id, c]) => (
             <View key={id} style={st.commit}>
               <Text style={st.solTitle}>✓ {c.text}</Text>
-              <Text style={st.small}>fil : {c.thread.join(' → ')} · on en reparle {c.review}</Text>
+              <Text style={st.small}>fil : {c.thread.join(' → ')}{c.carriers.length ? ` · porté par ${c.carriers.join(', ')}` : ''}{c.review ? ` · on en reparle ${c.review}` : ''}</Text>
             </View>
           ))}
           <TextInput value={text} onChangeText={setText} multiline placeholder="Ce que nous nous engageons à faire, avec qui, à quel rythme" style={st.input} accessibilityLabel="Texte de l'engagement" />
@@ -154,6 +156,17 @@ export default function Actions() {
                 <Text style={[st.btnTxt, chosen === id && { color: C.onAccent }]}>{x.title}</Text>
               </Pressable>
             ))}
+          </View>
+          <View style={st.row}>
+            <Text style={st.small}>Qui le porte ?</Text>
+            {PEOPLE.map((p) => {
+              const on = carriers.includes(p);
+              return (
+                <Pressable key={p} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => setCarriers(on ? carriers.filter((x) => x !== p) : [...carriers, p])} style={[st.btn, on && st.on]}>
+                  <Text style={[st.btnTxt, on && { color: C.onAccent }]}>{p}</Text>
+                </Pressable>
+              );
+            })}
           </View>
           <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler (au printemps, avec les personnes…)" style={st.input} accessibilityLabel="Date pour en reparler" />
           <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe</Text></Pressable>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { band, leanOf, placesFor, shifted } from './views';
+import { band, leanOf, placesFor, readingOf, shifted } from './views';
 
 describe('Regards réunis', () => {
   it("situe une idée sur la ligne d'Amina, en mots", () => {
@@ -28,6 +28,14 @@ describe('Le geste sur une ligne', () => {
     expect(shifted(['a', 'b', 'c'], 'a', 2)).toEqual({ order: ['b', 'c', 'a'], passed: 'c' });
     expect(shifted(['a', 'b', 'c'], 'c', -9)).toEqual({ order: ['c', 'a', 'b'], passed: 'a' });
     expect(shifted(['a', 'b', 'c'], 'a', -1).passed).toBeNull();
+  });
+});
+
+describe('Convergences et À discuter', () => {
+  it('des prénoms et des mots, jamais un chiffre', () => {
+    expect(readingOf([{ by: 'Aïcha', lean: 'much' }, { by: 'Bruno', lean: 'much' }], "l'effet")?.phrase).toBe("Aïcha et Bruno se rejoignent sur l'effet.");
+    expect(readingOf([{ by: 'Aïcha', lean: 'little' }, { by: 'Karim', lean: 'much' }], 'la faisabilité')?.phrase).toBe('Aïcha et Karim voient la faisabilité très différemment.');
+    expect(readingOf([{ by: 'Aïcha', lean: 'much' }], 'x')).toBeNull();
   });
 });
 

@@ -18,7 +18,7 @@ import { provenanceOf, type Criterion } from '../../core/facility';
 import { say } from '../../core/useAids';
 import { useFacility, useFacilityState } from '../../core/useFacility';
 import {useParticipants } from '../../core/useProject';
-import { band, LEANS } from '../../core/views';
+import { LEANS, band, readingOf } from '../../core/views';
 import { useLayout } from '../../design/layout';
 import { C, F, S } from '../../design/theme';
 
@@ -81,23 +81,18 @@ export default function Choix() {
   const reveal = () => {
     if (!current || !o) return;
     act('groupe', { act: 'revealed', orientation: current });
+    // Convergences / À discuter : calculées sur les positions révélées, sans chiffre, et gardées au journal.
+    for (const [c] of CRITERIA) {
+      const r = readingOf(o.sealed.filter((p) => p.criterion === c), SAID[c]);
+      if (r) act('groupe', { act: 'reading', orientation: current, converge: r.converge, people: r.people, criterion: c, phrase: r.phrase });
+    }
     say('Tout se révèle.');
     setLive('Tout se révèle, en même temps.');
   };
 
   // Les phrases de lecture, sans chiffre : qui se rejoint, qui voit très différemment.
-  const readings = o?.revealed
-    ? CRITERIA.flatMap(([c]) => {
-        const marks = o.placements.filter((p) => p.criterion === c);
-        if (marks.length < 2) return [];
-        const b = band(marks.map((m) => m.lean))!;
-        const names = marks.map((m) => m.by);
-        if (b.narrow) return [{ converge: true, text: `${names.join(' et ')} se rejoignent sur ${SAID[c]}.` }];
-        const lo = marks.filter((m) => m.lean === b.from).map((m) => m.by);
-        const hi = marks.filter((m) => m.lean === b.to).map((m) => m.by);
-        return [{ converge: false, text: `${lo.join(' et ')} et ${hi.join(' et ')} voient ${SAID[c]} très différemment.` }];
-      })
-    : [];
+  // Les phrases de lecture, écrites au journal au moment de la révélation (geste `reading`).
+  const readings = o?.revealed ? o.readings.map((r) => ({ converge: r.converge, text: r.phrase })) : [];
 
   return (
     <Screen side="pe" title="choice" question="Que choisissons-nous ? Chacun seul, puis ensemble.">

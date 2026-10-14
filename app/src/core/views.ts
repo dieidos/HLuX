@@ -38,3 +38,17 @@ export function shifted(order: string[], id: string, n: number): { order: string
   return { order: next, passed: order[j] };
 }
 
+/**
+ * Convergences / À discuter (écrans 10, 11) : des prénoms et des mots, jamais un chiffre ni une moyenne.
+ * Bande étroite → « A et B se rejoignent sur … » ; large → « A et B voient … très différemment ».
+ */
+export function readingOf(marks: { by: string; lean: Lean }[], about: string): { converge: boolean; people: string[]; phrase: string } | null {
+  if (marks.length < 2) return null;
+  const b = band(marks.map((m) => m.lean))!;
+  const names = marks.map((m) => m.by);
+  if (b.narrow) return { converge: true, people: names, phrase: `${names.join(' et ')} se rejoignent sur ${about}.` };
+  const lo = marks.filter((m) => m.lean === b.from).map((m) => m.by);
+  const hi = marks.filter((m) => m.lean === b.to).map((m) => m.by);
+  return { converge: false, people: [...lo, ...hi], phrase: `${lo.join(' et ')} et ${hi.join(' et ')} voient ${about} très différemment.` };
+}
+

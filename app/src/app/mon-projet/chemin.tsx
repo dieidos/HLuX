@@ -166,7 +166,13 @@ export default function Chemin() {
             />
             <View style={{ flexBasis: '100%', gap: 6 }}>
               <AideButton kind="narrate" lang={useAids.getState().lang} label={t('Dire mon plan en quelques phrases', 'أقول خطّتي في بضع جمل', 'Dire mon plan')} text={planFacts} who={me.name} onProposal={setPlanWords} />
+              {s.plan.words && !planWords ? <Text style={st.tileItem}>« {s.plan.words} »</Text> : null}
               {planWords ? <TextInput value={planWords} onChangeText={setPlanWords} multiline style={st.input} accessibilityLabel={t('Mon plan dans mes mots', 'خطّتي بكلماتي')} /> : null}
+              {planWords ? (
+                <Pressable accessibilityRole="button" onPress={() => { act(me.id, { act: 'plan_set', plan: { ...s.plan, words: planWords.trim() } }); setPlanWords(''); tell(tNow('Ton plan, dans tes mots, est gardé.', 'خطّتكِ بكلماتكِ محفوظة.'), pathname); }} style={[st.btn, st.primary, { alignSelf: 'flex-start' }]}>
+                  <Text style={[st.btnTxt, { color: C.onAccent }]}>{t('Je garde ces mots', 'أحتفظ بهذه الكلمات')}</Text>
+                </Pressable>
+              ) : null}
             </View>
           </View>
         )}

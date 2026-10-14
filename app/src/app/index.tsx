@@ -29,6 +29,7 @@ export default function Home() {
   const [names, setNames] = useState('');
   const [askDemo, setAskDemo] = useState(false);
   const [confirmErase, setConfirmErase] = useState(false);
+  const [period, setPeriod] = useState('');
   const arabicHome = useAids((a) => a.lang) === 'ar';
   const [device, setDevice] = useState<'facility' | 'personal' | null>(null);
   const [myName, setMyName] = useState('');
@@ -111,7 +112,8 @@ export default function Home() {
             <Text style={st.doorTxt}>{w('setupTitle')}</Text>
             <TextInput value={place} onChangeText={setPlace} placeholder={w('setupPlace')} style={st.input} accessibilityLabel={w('setupPlace')} />
             <TextInput value={names} onChangeText={setNames} placeholder={w('setupTeam')} multiline style={st.input} accessibilityLabel={w('setupTeam')} />
-            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configure(place, names.split(/[,;\n]/))} style={[st.btn, st.primary]}>
+            <TextInput value={period} onChangeText={setPeriod} placeholder="La période du projet d'établissement (ex. 2027–2031)" style={st.input} accessibilityLabel="Période du projet" />
+            <Pressable accessibilityRole="button" onPress={() => useProject.getState().configure(place, names.split(/[,;\n]/), period)} style={[st.btn, st.primary]}>
               <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('begin')}</Text>
             </Pressable>
             <Text style={st.note}>{w('setupNote')}</Text>

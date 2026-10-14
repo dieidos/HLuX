@@ -21,7 +21,7 @@ describe('Le fil de la Carte', () => {
 
   it("rejoint l'engagement du collectif quand son fil part de cette Carte", () => {
     const f = emptyFacility();
-    f.commitments['e-1'] = { text: 'Atelier courriers, le jeudi', solution: 's', thread: ['Papiers', '…', 'engagement'], review: 'en mars' };
+    f.commitments['e-1'] = { text: 'Atelier courriers, le jeudi', solution: 's', thread: ['Papiers', '…', 'engagement'], review: 'en mars', carriers: [] };
     const t = cardThread('papiers', standing(seedAmina()), f);
     expect(t.map((s) => s.step)).toContain('Un engagement du collectif');
     expect(cardThread('inconnue', standing(seedAmina()), f)).toEqual([]);

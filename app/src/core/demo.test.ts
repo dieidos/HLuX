@@ -17,7 +17,7 @@ describe('Vraie vie et démonstration', () => {
     s.getState().openSession('Sarah');
     expect(s.getState().pro).toBeNull(); // personne n'est de l'équipe tant qu'il n'y a pas d'équipe
     expect(s.getState().configure('CHRS du Port', ['Inès', ' Marc ', ''])).toBe(true);
-    expect(s.getState().setup).toEqual({ name: 'CHRS du Port', team: ['Inès', 'Marc'] });
+    expect(s.getState().setup).toEqual({ name: 'CHRS du Port', team: ['Inès', 'Marc'], kind: 'facility' });
     s.getState().openSession('Inès');
     expect(s.getState().pro).toBe('Inès');
   });
