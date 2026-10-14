@@ -55,7 +55,7 @@ export default function Invite() {
       <Pressable
         onPress={() => act(inv.guest, { act: 'invitation_answered', invitation: id, leans: Object.entries(leans) as [Circle, Lean][], word: word.trim() || null })}
         style={[st.pick, st.send]} accessibilityRole="button">
-        <Text style={[st.pickTxt, { color: '#fff' }]}>{ar ? 'أرسل رأيي' : 'Envoyer mon avis'}</Text>
+        <Text style={[st.pickTxt, { color: C.onAccent }]}>{ar ? 'أرسل رأيي' : 'Envoyer mon avis'}</Text>
       </Pressable>
     </View>
   );
@@ -70,7 +70,7 @@ const st = StyleSheet.create({
   axis: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   row: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
-  pickOn: { borderColor: C.violet, backgroundColor: '#f6effb' },
+  pickOn: { borderColor: C.violet, backgroundColor: C.violetSoft },
   pickTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 16, color: C.ink, backgroundColor: C.surface },
   send: { backgroundColor: C.violetInk, borderColor: C.violetInk, alignSelf: 'flex-start' },

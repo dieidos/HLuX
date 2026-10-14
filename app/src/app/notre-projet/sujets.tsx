@@ -73,7 +73,7 @@ export default function Sujets() {
           <View style={st.ask}>
             <Text style={st.question}>{me.name} · C’est bien ce que tu veux dire au CHRS ? Ton dossier reste chez toi.</Text>
             <View style={st.row}>
-              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Oui, j’apporte</Text></Pressable>
+              <Pressable onPress={bring} style={[st.btn, st.primary]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Oui, j’apporte</Text></Pressable>
               <Pressable onPress={() => { setNotNow(true); say('Pas maintenant. Rien ne passe.'); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Pas maintenant</Text></Pressable>
             </View>
             {notNow && <Text style={st.small}>Rien ne passe. Tu pourras le proposer plus tard, si tu veux.</Text>}

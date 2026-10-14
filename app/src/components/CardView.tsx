@@ -23,7 +23,7 @@ export function CardView({ card, compact = false }: { card: Card; compact?: bool
 }
 
 const st = StyleSheet.create({
-  card: { flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 6, borderTopColor: C.pp.value, minWidth: 160, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  card: { flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, borderRadius: S.radius, backgroundColor: C.surface, borderTopWidth: 6, borderTopColor: C.pp.value, minWidth: 160, shadowColor: C.shadow, shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   compact: { minWidth: 0, padding: 8 },
   title: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   moment: { fontFamily: F.body, fontSize: 13, color: C.muted },

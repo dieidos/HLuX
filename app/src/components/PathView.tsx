@@ -56,7 +56,7 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
           const k = l.link.kind;
           return (
             <Line key={`${l.from}>${l.to}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-              stroke={k === 'chosen' ? C.violet : k === 'open' ? '#8faadc' : k === 'condition' ? '#e0a84f' : C.slate}
+              stroke={k === 'chosen' ? C.violet : k === 'open' ? C.blue.value : k === 'condition' ? C.amber.value : C.slate}
               strokeWidth={k === 'dependency' ? 2 : 4} strokeDasharray={k === 'condition' ? '8 6' : k === 'dependency' ? '2 6' : undefined} strokeLinecap="round" />
           );
         })}
@@ -78,7 +78,7 @@ export function PathView({ columns, lanes, nodes, links, showOthers, dashed = fa
       })}
       {showOthers && (
         <View style={st.legend}>
-          <Text style={st.legendTxt}>━ chemin choisi · <Text style={{ color: '#5f78a8' }}>━ alternative ouverte</Text> · <Text style={{ color: '#b07a1f' }}>┅ condition</Text> · ⋯ dépend de · ◆ décision · ● événement</Text>
+          <Text style={st.legendTxt}>━ chemin choisi · <Text style={{ color: C.blue.line }}>━ alternative ouverte</Text> · <Text style={{ color: C.amber.ink }}>┅ condition</Text> · ⋯ dépend de · ◆ décision · ● événement</Text>
         </View>
       )}
     </View>
@@ -93,10 +93,10 @@ const st = StyleSheet.create({
   node: { position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: 190 },
   glyph: { fontSize: 22, lineHeight: 24 },
   diamond: { color: C.violetInk },
-  dot: { color: '#3f5a90' },
-  thread: { textShadowColor: '#ffd966', textShadowRadius: 8 },
-  label: { fontFamily: F.bold, fontSize: 12, color: C.ink, backgroundColor: 'rgba(255,255,255,.85)', paddingHorizontal: 4, borderRadius: 4, flexShrink: 1 },
-  callout: { position: 'absolute', width: 160, fontFamily: F.body, fontSize: 11, color: '#7a5418', backgroundColor: '#fff6e0', padding: 4, borderRadius: 6, textAlign: 'center' },
+  dot: { color: C.blue.ink },
+  thread: { textShadowColor: C.yellow.value, textShadowRadius: 8 },
+  label: { fontFamily: F.bold, fontSize: 12, color: C.ink, backgroundColor: C.veil.strong, paddingHorizontal: 4, borderRadius: 4, flexShrink: 1 },
+  callout: { position: 'absolute', width: 160, fontFamily: F.body, fontSize: 11, color: C.warn.ink, backgroundColor: C.warn.soft, padding: 4, borderRadius: 6, textAlign: 'center' },
   legend: { position: 'absolute', bottom: 6, left: 12, right: 12 },
   legendTxt: { fontFamily: F.body, fontSize: 12, color: C.slate },
 });

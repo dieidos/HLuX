@@ -58,7 +58,7 @@ export default function Actions() {
     const b = band(marks.map((m) => m.lean));
     return (
       <View style={st.track}>
-        {b && <View style={[st.band, { left: `${(LEANS.indexOf(b.from) * 100) / 3}%`, width: `${((LEANS.indexOf(b.to) - LEANS.indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? '#a9d18e88' : '#f08a7e66' }]} />}
+        {b && <View style={[st.band, { left: `${(LEANS.indexOf(b.from) * 100) / 3}%`, width: `${((LEANS.indexOf(b.to) - LEANS.indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? C.band.near : C.band.far }]} />}
         {marks.map((m, i) => <Text key={m.by} style={[st.mark, { left: `${(LEANS.indexOf(m.lean) * 100) / 3 + 2}%`, top: 2 + (i % 2) * 18 }]}>{m.by}</Text>)}
       </View>
     );
@@ -72,7 +72,7 @@ export default function Actions() {
           <Text style={st.small}>Qui se positionne :</Text>
           {PEOPLE.map((p) => (
             <Pressable key={p} onPress={() => setWho(p)} style={[st.btn, who === p && st.on]} accessibilityRole="radio" accessibilityState={{ checked: who === p }}>
-              <Text style={[st.btnTxt, who === p && { color: '#fff' }]}>{p}</Text>
+              <Text style={[st.btnTxt, who === p && { color: C.onAccent }]}>{p}</Text>
             </Pressable>
           ))}
         </View>
@@ -104,7 +104,7 @@ export default function Actions() {
           )}
           <View style={st.row}>
             <TextInput value={title} onChangeText={setTitle} placeholder="Une autre solution…" style={st.input} accessibilityLabel="Nouvelle solution" />
-            <Pressable onPress={() => addSolution(title)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Ajouter</Text></Pressable>
+            <Pressable onPress={() => addSolution(title)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
           </View>
         </View>
 
@@ -119,7 +119,7 @@ export default function Actions() {
           <TextInput value={text} onChangeText={setText} multiline placeholder="« Un atelier courriers chaque mardi, animé par un binôme, ouvert à toutes les personnes accompagnées. »" style={st.input} accessibilityLabel="Texte de l'engagement" />
           <AideButton kind="phrase" label="Mettre en mots l'engagement" text={text} who="Le groupe" onProposal={(p) => { setText(p); setAided(true); }} />
           <TextInput value={review} onChangeText={setReview} placeholder="Quand en reparler" style={st.input} accessibilityLabel="Date pour en reparler" />
-          <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>Validée par le groupe</Text></Pressable>
+          <Pressable onPress={commit} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe</Text></Pressable>
         </View>
       </ScrollView>
     </Screen>
@@ -140,7 +140,7 @@ const st = StyleSheet.create({
   lineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
   track: { flex: 1, minWidth: 200, height: 40, borderRadius: 10, backgroundColor: C.surface },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
-  mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: '#fff', fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
+  mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
   pick: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 10, borderRadius: S.radiusPill, borderWidth: 1, borderColor: C.line, backgroundColor: C.surface },
   pickTxt: { fontFamily: F.body, fontSize: 13, color: C.ink },
   input: { flex: 1, minWidth: 240, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink },

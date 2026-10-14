@@ -63,7 +63,7 @@ export default function Regards() {
                 <Text style={st.ideaName}>{i.title}</Text>
                 <View style={st.track}>
                   {b && (
-                    <View style={[st.band, { left: `${(['little', 'middle', 'much'].indexOf(b.from) * 100) / 3}%`, width: `${((['little', 'middle', 'much'].indexOf(b.to) - ['little', 'middle', 'much'].indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? '#a9d18e88' : '#f08a7e66' }]} />
+                    <View style={[st.band, { left: `${(['little', 'middle', 'much'].indexOf(b.from) * 100) / 3}%`, width: `${((['little', 'middle', 'much'].indexOf(b.to) - ['little', 'middle', 'much'].indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? C.band.near : C.band.far }]} />
                   )}
                   {marks.map(([name, l]) => (
                     <Text key={name} style={[st.mark, { left: `${(['little', 'middle', 'much'].indexOf(l) * 100) / 3 + 4}%` }, name !== me.name && st.markOther]}>{name}</Text>
@@ -98,14 +98,14 @@ export default function Regards() {
 
         {!s.viewsRevealed ? (
           <Pressable onPress={() => { act(me.id, { act: 'views_revealed' }); say('Les regards se découvrent ensemble.'); }} style={[st.btn, st.primary]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: '#fff' }]}>{w('revealTogether')}</Text>
+            <Text style={[st.btnTxt, { color: C.onAccent }]}>{w('revealTogether')}</Text>
           </Pressable>
         ) : (
           <>
             <View style={st.tabs}>
               {[['mine', w('myView')], ...invitations.filter(([, i]) => i.answered).map(([, i]) => [i.guest, `Le regard de ${i.guest}`]), ['together', w('together')], ['sarah', w('sarahOrder')]].map(([k, label]) => (
                 <Pressable key={k} onPress={() => setTab(k)} style={[st.tab, tab === k && st.tabOn]} accessibilityRole="tab">
-                  <Text style={[st.btnTxt, tab === k && { color: '#fff' }]}>{label}</Text>
+                  <Text style={[st.btnTxt, tab === k && { color: C.onAccent }]}>{label}</Text>
                 </Pressable>
               ))}
             </View>
@@ -140,7 +140,7 @@ export default function Regards() {
             </View>
             <Text style={st.small}>Lien temporaire, sans compte. Il s’envoie par SMS, WhatsApp ou mail depuis la tablette.</Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Inviter</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={send} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Inviter</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setForm(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
@@ -193,12 +193,12 @@ const st = StyleSheet.create({
   ideaName: { width: 160, fontFamily: F.body, fontSize: 14, color: C.text },
   track: { flex: 1, height: 40, borderRadius: 10, backgroundColor: C.surface2, justifyContent: 'center' },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
-  mark: { position: 'absolute', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999, backgroundColor: C.violetInk, color: '#fff', fontFamily: F.bold, fontSize: 12, overflow: 'hidden' },
-  markOther: { backgroundColor: '#eef3fb', color: '#3d5a8a', borderWidth: 2, borderStyle: 'dashed', borderColor: '#5f78a8', top: 20 },
+  mark: { position: 'absolute', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 12, overflow: 'hidden' },
+  markOther: { backgroundColor: C.blue.soft, color: C.blue.mark, borderWidth: 2, borderStyle: 'dashed', borderColor: C.blue.line, top: 20 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
-  pickOn: { borderColor: C.violet, backgroundColor: '#f6effb' },
-  overlay: { position: 'absolute', inset: 0, backgroundColor: 'rgba(13,17,23,.35)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  pickOn: { borderColor: C.violet, backgroundColor: C.violetSoft },
+  overlay: { position: 'absolute', inset: 0, backgroundColor: C.scrim, alignItems: 'center', justifyContent: 'center', padding: 24 },
   sheet: { width: '100%', maxWidth: 560, gap: 10, padding: 24, borderRadius: 20, backgroundColor: C.surface },
   sheetTitle: { fontFamily: F.display, fontSize: 24, color: C.ink },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },

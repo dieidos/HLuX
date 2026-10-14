@@ -69,13 +69,13 @@ export default function Suivi() {
       <ScrollView contentContainerStyle={{ gap: 12 }}>
         {nodes.length === 0 ? (
           <Pressable onPress={() => ATLAS.forEach((a) => act('groupe', a))} style={[st.btn, st.on]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: '#fff' }]}>Poser le suivi décidé (exemple de l’Atlas)</Text>
+            <Text style={[st.btnTxt, { color: C.onAccent }]}>Poser le suivi décidé (exemple de l’Atlas)</Text>
           </Pressable>
         ) : (
           <PathView columns={MONTHS} lanes={LANES} nodes={nodes} links={f.links} showOthers={others} />
         )}
         <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}>
-          <Text style={[st.btnTxt, others && { color: '#fff' }]}>🌈 Conditions et dépendances</Text>
+          <Text style={[st.btnTxt, others && { color: C.onAccent }]}>🌈 Conditions et dépendances</Text>
         </Pressable>
 
         <View style={st.box}>
@@ -86,7 +86,7 @@ export default function Suivi() {
               <View style={st.row}>
                 {l.carriers.map((c) => (
                   <Pressable key={c} onPress={() => setMoving({ load: id, from: c })} style={[st.chip, moving?.load === id && moving.from === c && st.on]} accessibilityRole="button" accessibilityLabel={`${c} porte ${l.name}. Toucher pour passer la main.`}>
-                    <Text style={[st.btnTxt, moving?.load === id && moving.from === c && { color: '#fff' }]}>{c}</Text>
+                    <Text style={[st.btnTxt, moving?.load === id && moving.from === c && { color: C.onAccent }]}>{c}</Text>
                   </Pressable>
                 ))}
                 {moving?.load === id && PEOPLE.filter((p) => !l.carriers.includes(p)).map((p) => (
@@ -106,7 +106,7 @@ export default function Suivi() {
           <AideButton kind="phrase" label="Mettre en mots le résultat" text={result} who="Le groupe" onProposal={(p) => { setResult(p); setAided(true); }} />
           <View style={st.row}>
             <Pressable onPress={() => noteResult(false)} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>Noter le résultat</Text></Pressable>
-            <Pressable onPress={() => noteResult(true)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: '#fff' }]}>🔁 Retour au constat</Text></Pressable>
+            <Pressable onPress={() => noteResult(true)} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>🔁 Retour au constat</Text></Pressable>
           </View>
         </View>
 
@@ -117,7 +117,7 @@ export default function Suivi() {
             {Object.values(f.proposals).map((p) => <Text key={p} style={st.result}>📣 {p}</Text>)}
             {!Object.keys(f.proposals).length && (
               <Pressable onPress={() => act('groupe', { act: 'proposal', proposal: 'atelier-mardi', text: "L'atelier courriers du mardi" })} style={[st.btn, st.on]} accessibilityRole="button">
-                <Text style={[st.btnTxt, { color: '#fff' }]}>Le CHRS propose : l’atelier courriers du mardi</Text>
+                <Text style={[st.btnTxt, { color: C.onAccent }]}>Le CHRS propose : l’atelier courriers du mardi</Text>
               </Pressable>
             )}
           </View>

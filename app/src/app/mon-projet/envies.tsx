@@ -83,7 +83,7 @@ export default function Envies() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Créer</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
@@ -96,7 +96,7 @@ export default function Envies() {
 const st = StyleSheet.create({
   bottom: { flexDirection: 'row', gap: 12, marginTop: 16, alignItems: 'stretch', flexWrap: 'wrap' },
   tray: { flex: 1, minWidth: 260, backgroundColor: C.surface2 },
-  discard: { width: 220, justifyContent: 'center', borderColor: '#e2b4ac' },
+  discard: { width: 220, justifyContent: 'center', borderColor: C.discard },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   idea: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderTopColor: C.violet },
   ideaTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
@@ -105,10 +105,10 @@ const st = StyleSheet.create({
   btn: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 16, borderRadius: S.radiusPill, backgroundColor: C.surface, borderWidth: 1, borderColor: C.line, alignSelf: 'center' },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
   btnTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
-  overlay: { position: 'absolute', inset: 0, backgroundColor: 'rgba(13,17,23,.35)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  overlay: { position: 'absolute', inset: 0, backgroundColor: C.scrim, alignItems: 'center', justifyContent: 'center', padding: 24 },
   sheet: { width: '100%', maxWidth: 560, gap: 10, padding: 24, borderRadius: 20, backgroundColor: C.surface },
   sheetTitle: { fontFamily: F.display, fontSize: 24, color: C.ink },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line },
-  pickOn: { borderColor: C.violet, backgroundColor: '#f6effb' },
+  pickOn: { borderColor: C.violet, backgroundColor: C.violetSoft },
 });

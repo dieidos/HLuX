@@ -83,7 +83,7 @@ export function AidsBar({ side }: { side: 'pp' | 'pe' }) {
 function Aid({ on, label, onPress, font }: { on: boolean; label: string; onPress: () => void; font: string }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="switch" accessibilityState={{ checked: on }} style={[st.aid, on && st.aidOn]}>
-      <Text style={[st.aidTxt, { fontFamily: font }, on && { color: '#fff' }]}>{label}</Text>
+      <Text style={[st.aidTxt, { fontFamily: font }, on && { color: C.onAccent }]}>{label}</Text>
     </Pressable>
   );
 }

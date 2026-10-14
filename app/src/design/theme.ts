@@ -17,6 +17,21 @@ export const C = {
   pe: tokens.color.pe,
   logo: tokens.color.logo,
   feeling: tokens.color.feeling,
+  yellow: tokens.color.yellow,
+  blue: tokens.color.blue,
+  green: tokens.color.green,
+  coral: tokens.color.coral,
+  onAccent: tokens.color.onAccent,
+  violetSoft: tokens.color.violet.soft,
+  violetHover: tokens.color.violet.hover,
+  warn: tokens.color.warn,
+  amber: tokens.color.amber,
+  discard: tokens.color.discard,
+  shadow: tokens.color.shadow,
+  band: tokens.color.band,
+  scrim: tokens.color.scrim,
+  veil: tokens.color.veil,
+  picto: tokens.color.picto,
 };
 
 export const F = {

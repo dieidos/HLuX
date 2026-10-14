@@ -100,9 +100,9 @@ export default function Constat() {
         <View style={[st.row, st.addRow]}>
           <TextInput value={title} onChangeText={setTitle} placeholder={`${speaker} pose une carte…`} style={st.input} accessibilityLabel="Nouvelle carte du constat" />
           {(['team', 'cvs', 'consented_word'] as Source[]).map((s) => (
-            <Pressable accessibilityRole="button" key={s} onPress={() => setSource(s)} style={[st.btn, source === s && st.on]}><Text style={[st.btnTxt, source === s && { color: '#fff' }]}>{SOURCE_WORDS[s]}</Text></Pressable>
+            <Pressable accessibilityRole="button" key={s} onPress={() => setSource(s)} style={[st.btn, source === s && st.on]}><Text style={[st.btnTxt, source === s && { color: C.onAccent }]}>{SOURCE_WORDS[s]}</Text></Pressable>
           ))}
-          <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Poser</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={add} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Poser</Text></Pressable>
         </View>
         <Text style={st.small}>Un cas isolé reste un signal ; il faut plusieurs voix pour faire un constat. Chaque parole garde le nom de qui l’a dite.</Text>
         <View style={st.tray}>

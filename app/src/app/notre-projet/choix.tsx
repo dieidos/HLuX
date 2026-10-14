@@ -95,7 +95,7 @@ export default function Choix() {
 
         <View style={st.row}>
           {orientations.map(([id, x]) => (
-            <Pressable accessibilityRole="button" key={id} onPress={() => setCurrent(id)} style={[st.btn, current === id && st.on]}><Text style={[st.btnTxt, current === id && { color: '#fff' }]}>🧭 {x.title}</Text></Pressable>
+            <Pressable accessibilityRole="button" key={id} onPress={() => setCurrent(id)} style={[st.btn, current === id && st.on]}><Text style={[st.btnTxt, current === id && { color: C.onAccent }]}>🧭 {x.title}</Text></Pressable>
           ))}
           <Pressable accessibilityRole="button" onPress={newOrientation} style={st.btn}><Text style={st.btnTxt}>＋ Une orientation</Text></Pressable>
         </View>
@@ -130,12 +130,12 @@ export default function Choix() {
                         ))}
                       </View>
                     ))}
-                    <Pressable accessibilityRole="button" onPress={submitPrivate} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>J’ai placé</Text></Pressable>
+                    <Pressable accessibilityRole="button" onPress={submitPrivate} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: C.onAccent }]}>J’ai placé</Text></Pressable>
                   </View>
                 )}
                 <Text style={st.small}>👁️ On voit qui a placé ; les positions se dévoilent ensemble.</Text>
                 <Pressable accessibilityRole="button" onPress={reveal} disabled={o.placedBy.length < 2} style={[st.btn, st.on, o.placedBy.length < 2 && { opacity: 0.5 }]}>
-                  <Text style={[st.btnTxt, { color: '#fff' }]}>Tout révéler, ensemble</Text>
+                  <Text style={[st.btnTxt, { color: C.onAccent }]}>Tout révéler, ensemble</Text>
                 </Pressable>
               </>
             )}
@@ -149,7 +149,7 @@ export default function Choix() {
                     <View key={c} style={st.lineRow}>
                       <Text style={[st.crit, { width: 240 }]}>{label}</Text>
                       <View style={st.track}>
-                        <View style={[st.band, { left: `${(LEANS.indexOf(b.from) * 100) / 3}%`, width: `${((LEANS.indexOf(b.to) - LEANS.indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? '#a9d18e88' : '#f08a7e66' }]} />
+                        <View style={[st.band, { left: `${(LEANS.indexOf(b.from) * 100) / 3}%`, width: `${((LEANS.indexOf(b.to) - LEANS.indexOf(b.from) + 1) * 100) / 3}%`, backgroundColor: b.narrow ? C.band.near : C.band.far }]} />
                         {marks.map((m, i) => (
                           <Text key={m.by} style={[st.mark, { left: `${(LEANS.indexOf(m.lean) * 100) / 3 + 2}%`, top: 2 + (i % 2) * 18 }]}>{m.by}</Text>
                         ))}
@@ -174,7 +174,7 @@ export default function Choix() {
                       const [author, prov, conf] = provenanceOf(aided && !!words.trim(), true, 'groupe');
                       act(author, { act: 'decision', orientation: current!, dictated: dictated.trim(), words: (words || dictated).trim() }, prov, conf);
                     }} style={[st.btn, st.on]}>
-                      <Text style={[st.btnTxt, { color: '#fff' }]}>Validée par le groupe · vers les actions</Text>
+                      <Text style={[st.btnTxt, { color: C.onAccent }]}>Validée par le groupe · vers les actions</Text>
                     </Pressable>
                   </>
                 )}
@@ -200,16 +200,16 @@ const st = StyleSheet.create({
   btnTxt: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   voice: { minWidth: 110, padding: 10, borderRadius: 14, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
   voiceDone: { borderColor: C.pe.value, backgroundColor: C.pe.soft },
-  private: { padding: 12, borderRadius: 14, backgroundColor: '#f6effb', gap: 8, borderWidth: 2, borderColor: C.violet },
+  private: { padding: 12, borderRadius: 14, backgroundColor: C.violetSoft, gap: 8, borderWidth: 2, borderColor: C.violet },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 12, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
   pickOn: { borderColor: C.violet, backgroundColor: C.lavender },
   lineRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   track: { flex: 1, height: 44, borderRadius: 10, backgroundColor: C.surface2 },
   band: { position: 'absolute', top: 4, bottom: 4, borderRadius: 8 },
-  mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: '#fff', fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
+  mark: { position: 'absolute', paddingHorizontal: 6, borderRadius: 999, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 11, overflow: 'hidden' },
   readings: { gap: 6 },
   conv: { fontFamily: F.bold, fontSize: 14, color: C.pe.ink, padding: 8, borderRadius: 10, backgroundColor: C.pe.soft },
-  diff: { fontFamily: F.bold, fontSize: 14, color: '#7a5418', padding: 8, borderRadius: 10, backgroundColor: '#fff6e0' },
+  diff: { fontFamily: F.bold, fontSize: 14, color: C.warn.ink, padding: 8, borderRadius: 10, backgroundColor: C.warn.soft },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink },
   decision: { fontFamily: F.bold, fontSize: 16, color: C.ink, padding: 12, borderRadius: 12, backgroundColor: C.pe.soft },
 });

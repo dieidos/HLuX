@@ -53,7 +53,7 @@ export default function Cap() {
           <Text style={st.small}>À tour de rôle, guidé par {f.mandate ?? "l'animatrice"} — place :</Text>
           {PEOPLE.map((p) => (
             <Pressable key={p} onPress={() => setBy(p)} style={[st.btn, by === p && st.on]} accessibilityRole="radio" accessibilityState={{ checked: by === p }}>
-              <Text style={[st.btnTxt, by === p && { color: '#fff' }]}>{p}</Text>
+              <Text style={[st.btnTxt, by === p && { color: C.onAccent }]}>{p}</Text>
             </Pressable>
           ))}
         </View>
@@ -78,7 +78,7 @@ export default function Cap() {
             <View style={st.row}>
               <TextInput value={title} onChangeText={setTitle} placeholder="Une carte de cap, dite par le groupe…" style={st.input} accessibilityLabel="Nouvelle carte de cap" />
               <Pressable accessibilityRole="button" onPress={() => { if (title.trim()) { act(by, { act: 'cap_placed', cap: `cap-${caps.length + 1}`, title: title.trim(), by, spot: { at: 'tray' } }); setTitle(''); } }} style={[st.btn, st.on]}>
-                <Text style={[st.btnTxt, { color: '#fff' }]}>Ajouter</Text>
+                <Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text>
               </Pressable>
             </View>
           </View>
@@ -92,7 +92,7 @@ export default function Cap() {
           <AideButton kind="phrase" label="Mettre en mots ce que le groupe a dit" text={change} who="Le groupe" onProposal={(p) => { setChange(p); setAided(true); }} />
           <View style={st.row}>
             <Pressable accessibilityRole="button" onPress={() => sayChange(false)} style={st.btn}><Text style={st.btnTxt}>À discuter</Text></Pressable>
-            <Pressable accessibilityRole="button" onPress={() => sayChange(true)} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: '#fff' }]}>Validé par le groupe</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => sayChange(true)} style={[st.btn, st.on]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Validé par le groupe</Text></Pressable>
           </View>
           {f.expectedChange && <Text style={st.small}>{f.expectedChange.validated ? '✓ validé' : 'à discuter'} : {f.expectedChange.text}</Text>}
         </View>
@@ -114,7 +114,7 @@ const st = StyleSheet.create({
   tray: { marginTop: 12, padding: 12, borderRadius: S.radius, backgroundColor: C.surface2, gap: 8 },
   card: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: C.surface, borderTopWidth: 4, borderTopColor: C.pe.value },
   input: { flex: 1, minWidth: 240, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 10, fontFamily: F.body, fontSize: 16, color: C.ink, backgroundColor: C.surface },
-  note: { fontFamily: F.bold, fontSize: 14, color: '#7a5418', padding: 10, borderRadius: S.radius, backgroundColor: '#fff6e0' },
+  note: { fontFamily: F.bold, fontSize: 14, color: C.warn.ink, padding: 10, borderRadius: S.radius, backgroundColor: C.warn.soft },
   change: { padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 8 },
   h: { fontFamily: F.bold, fontSize: 17, color: C.ink },
 });

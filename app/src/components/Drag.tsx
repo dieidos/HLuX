@@ -118,9 +118,9 @@ export function Draggable({ id, children, label }: { id: string; children: React
 
 const st = StyleSheet.create({
   zone: { borderRadius: 18, borderWidth: 2, borderStyle: 'dashed', borderColor: C.line, padding: 14 },
-  zoneLit: { borderColor: C.violet, backgroundColor: '#f6effb' },
-  zoneHover: { borderStyle: 'solid', backgroundColor: '#efe4f8' },
+  zoneLit: { borderColor: C.violet, backgroundColor: C.violetSoft },
+  zoneHover: { borderStyle: 'solid', backgroundColor: C.violetHover },
   here: { alignSelf: 'flex-start', marginTop: 8, minHeight: 44, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.violetInk },
-  hereTxt: { color: '#fff', fontFamily: 'SourceSans3Bold', fontSize: 15 },
-  lifted: { zIndex: 10, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
+  hereTxt: { color: C.onAccent, fontFamily: 'SourceSans3Bold', fontSize: 15 },
+  lifted: { zIndex: 10, shadowColor: C.shadow, shadowOpacity: 0.2, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
 });

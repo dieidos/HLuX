@@ -11,7 +11,9 @@ export const tokens = {
     "line": "#dfe3ea",
     "violet": {
       "value": "#8c6aa8",
-      "ink": "#6d4f88"
+      "ink": "#6d4f88",
+      "soft": "#f6effb",
+      "hover": "#efe4f8"
     },
     "night": "#2d1d3d",
     "lavender": "#cfafe7",
@@ -21,7 +23,10 @@ export const tokens = {
     },
     "blue": {
       "value": "#8faadc",
-      "ink": "#3f5a90"
+      "ink": "#3f5a90",
+      "soft": "#eef3fb",
+      "mark": "#3d5a8a",
+      "line": "#5f78a8"
     },
     "green": {
       "value": "#a9d18e",
@@ -47,6 +52,30 @@ export const tokens = {
       "fine": "#eef7e7",
       "unsure": "#fff6d6",
       "hard": "#fde7e4"
+    },
+    "onAccent": "#ffffff",
+    "warn": {
+      "ink": "#7a5418",
+      "soft": "#fff6e0"
+    },
+    "amber": {
+      "value": "#e0a84f",
+      "ink": "#b07a1f"
+    },
+    "discard": "#e2b4ac",
+    "shadow": "#000000",
+    "band": {
+      "near": "#a9d18e88",
+      "far": "#f08a7e66"
+    },
+    "scrim": "rgba(13,17,23,0.35)",
+    "veil": {
+      "strong": "rgba(255,255,255,0.85)",
+      "light": "rgba(255,255,255,0.75)"
+    },
+    "picto": {
+      "fill": "#ffffff",
+      "stroke": "#3d4555"
     }
   },
   "font": {

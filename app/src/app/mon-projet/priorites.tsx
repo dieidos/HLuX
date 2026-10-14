@@ -15,7 +15,7 @@ import { C, F, S } from '../../design/theme';
 import type { WordKey } from '../../i18n/words';
 
 const AXES: [Circle, WordKey, string][] = [
-  ['love', 'love', '#cfafe7'], ['able', 'able', '#8faadc'], ['useful', 'useful', '#a9d18e'], ['living', 'living', '#ffd966'],
+  ['love', 'love', C.lavender], ['able', 'able', C.blue.value], ['useful', 'useful', C.green.value], ['living', 'living', C.yellow.value],
 ];
 const RANKS: [Rank, WordKey][] = [['first', 'first'], ['then', 'then'], ['also', 'also'], ['less', 'less'], ['not_yet', 'notYet']];
 const ORDER: Rank[] = ['first', 'then', 'also', 'less', 'not_yet'];
@@ -57,7 +57,7 @@ export default function Priorites() {
       <View style={st.tabs}>
         {(['a', 'b'] as const).map((p) => (
           <Pressable key={p} onPress={() => setPane(p)} style={[st.tab, pane === p && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: pane === p }}>
-            <Text style={[st.tabTxt, pane === p && { color: '#fff' }]}>{w(p === 'a' ? 'ranks' : 'lines')}</Text>
+            <Text style={[st.tabTxt, pane === p && { color: C.onAccent }]}>{w(p === 'a' ? 'ranks' : 'lines')}</Text>
           </Pressable>
         ))}
       </View>
@@ -139,8 +139,8 @@ const st = StyleSheet.create({
   lineHead: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: S.touch },
   track: { borderRadius: 12, padding: 10, gap: 6 },
   idea: { flexDirection: 'row', alignItems: 'center', borderRadius: S.radiusPill, backgroundColor: C.violetInk },
-  ideaTxt: { fontFamily: F.bold, fontSize: 14, color: '#fff', paddingHorizontal: 4 },
+  ideaTxt: { fontFamily: F.bold, fontSize: 14, color: C.onAccent, paddingHorizontal: 4 },
   arrow: { minWidth: S.touch, minHeight: S.touch, alignItems: 'center', justifyContent: 'center' },
-  arrowTxt: { color: '#fff', fontSize: 14 },
+  arrowTxt: { color: C.onAccent, fontSize: 14 },
   live: { fontFamily: F.bold, fontSize: 16, color: C.ink, padding: 12, borderRadius: S.radius, backgroundColor: C.pp.soft },
 });

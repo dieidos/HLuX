@@ -98,7 +98,7 @@ export default function Cartes() {
               <View key={e.rank} style={st.proposal}>
                 <Text style={st.simpler}>Proposition : {e.act && 'text' in e.act ? e.act.text : ''}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, me.id); setAideMsg(`Validé par ${me.name}.`); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Je valide</Text></Pressable>
+                  <Pressable accessibilityRole="button" onPress={() => { confirm(e.rank, me.id); setAideMsg(`Validé par ${me.name}.`); }} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Je valide</Text></Pressable>
                   <Pressable accessibilityRole="button" onPress={() => { undo(me.id, e.rank); setAideMsg('Écartée.'); }} style={st.btn}><Text style={st.btnTxt}>Non merci</Text></Pressable>
                 </View>
               </View>
@@ -122,7 +122,7 @@ export default function Cartes() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>Créer ma Carte</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={create} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>Créer ma Carte</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => setAdding(false)} style={st.btn}><Text style={st.btnTxt}>Annuler</Text></Pressable>
             </View>
           </View>
@@ -138,7 +138,7 @@ const st = StyleSheet.create({
   plus: { fontSize: 32, color: C.slate },
   newTitle: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   muted: { fontFamily: F.body, fontSize: 13, color: C.muted },
-  overlay: { position: 'absolute', inset: 0, backgroundColor: 'rgba(13,17,23,.35)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  overlay: { position: 'absolute', inset: 0, backgroundColor: C.scrim, alignItems: 'center', justifyContent: 'center', padding: 24 },
   bigCard: { width: '100%', maxWidth: 620, gap: 10, padding: 24, borderRadius: 20, backgroundColor: C.surface, borderTopWidth: 8, borderTopColor: C.pp.value },
   bigTitle: { fontFamily: F.display, fontSize: 26, color: C.ink },
   verbatim: { fontFamily: F.display, fontSize: 22, color: C.ink },
@@ -148,7 +148,7 @@ const st = StyleSheet.create({
   step: { flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: -9 },
   dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: C.pp.value },
   stepTxt: { flexShrink: 1, fontFamily: F.body, fontSize: 15, color: C.text },
-  proposal: { gap: 6, padding: 10, borderRadius: 12, backgroundColor: '#f6effb', borderWidth: 1, borderStyle: 'dashed', borderColor: C.violet },
+  proposal: { gap: 6, padding: 10, borderRadius: 12, backgroundColor: C.violetSoft, borderWidth: 1, borderStyle: 'dashed', borderColor: C.violet },
   input: { minHeight: 80, borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.body, fontSize: 17, color: C.ink },
   pictos: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   pick: { borderRadius: 16, padding: 3, borderWidth: 3, borderColor: 'transparent' },

@@ -74,7 +74,7 @@ export default function Chemin() {
             <AideButton kind="narrate" label="Raconter ce qui s'ouvre, ce qui se ferme" text={facts} who={me.name} onProposal={setStory} />
             {story ? <TextInput value={story} onChangeText={setStory} multiline style={st.input} accessibilityLabel="Récit de la copie" /> : null}
             <View style={st.chips}>
-              <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: '#fff' }]}>{w('keepIdea')}</Text></Pressable>
+              <Pressable accessibilityRole="button" onPress={() => closeWhatIf(true)} style={[st.btn, st.primary]}><Text style={[st.btnTxt, { color: C.onAccent }]}>{w('keepIdea')}</Text></Pressable>
               <Pressable accessibilityRole="button" onPress={() => closeWhatIf(false)} style={st.btn}><Text style={st.btnTxt}>{w('closeIt')}</Text></Pressable>
             </View>
           </View>
@@ -91,15 +91,15 @@ export default function Chemin() {
                 say('Relié à ton chemin.');
               }}
               style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
-              <Text style={[st.btnTxt, { color: '#fff' }]}>Je le relie à mon chemin</Text>
+              <Text style={[st.btnTxt, { color: C.onAccent }]}>Je le relie à mon chemin</Text>
             </Pressable>
           </View>
         ))}
 
         <View style={st.chips}>
-          <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: '#fff' }]}>{w('otherPaths')}</Text></Pressable>
+          <Pressable onPress={() => setOthers(!others)} style={[st.btn, others && st.on]} accessibilityRole="switch" accessibilityState={{ checked: others }}><Text style={[st.btnTxt, others && { color: C.onAccent }]}>{w('otherPaths')}</Text></Pressable>
           <Pressable accessibilityRole="button" onPress={() => setWhatIf(true)} style={st.btn}><Text style={st.btnTxt}>{w('whatIf')}</Text></Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: '#fff' }]}>{w('myPlan')}</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setPlan(!plan)} style={[st.btn, plan && st.on]}><Text style={[st.btnTxt, plan && { color: C.onAccent }]}>{w('myPlan')}</Text></Pressable>
         </View>
 
         <View style={st.export}>
@@ -118,7 +118,7 @@ export default function Chemin() {
               }
             }}
             style={[st.btn, st.primary, { alignSelf: 'flex-start' }]} accessibilityRole="button">
-            <Text style={[st.btnTxt, { color: '#fff' }]}>Emporter</Text>
+            <Text style={[st.btnTxt, { color: C.onAccent }]}>Emporter</Text>
           </Pressable>
           {saved ? <Text style={st.small} accessibilityLiveRegion="polite">{saved}</Text> : null}
         </View>
@@ -148,10 +148,10 @@ const st = StyleSheet.create({
   on: { backgroundColor: C.violetInk, borderColor: C.violetInk },
   primary: { backgroundColor: C.violetInk, borderColor: C.violetInk },
   btnTxt: { fontFamily: F.bold, fontSize: 15, color: C.ink },
-  copy: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: S.radiusPill, backgroundColor: C.violetInk, color: '#fff', fontFamily: F.bold, fontSize: 12, letterSpacing: 1 },
+  copy: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: S.radiusPill, backgroundColor: C.violetInk, color: C.onAccent, fontFamily: F.bold, fontSize: 12, letterSpacing: 1 },
   input: { borderWidth: 1, borderColor: C.line, borderRadius: 12, padding: 12, fontFamily: F.bold, fontSize: 17, color: C.ink, backgroundColor: C.surface },
   pick: { minHeight: S.touch, justifyContent: 'center', paddingHorizontal: 14, borderRadius: S.radiusPill, borderWidth: 2, borderColor: C.line, backgroundColor: C.surface },
-  pickOn: { borderColor: C.violet, backgroundColor: '#f6effb' },
+  pickOn: { borderColor: C.violet, backgroundColor: C.violetSoft },
   plan: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tile: { flexGrow: 1, flexBasis: 200, padding: 14, borderRadius: S.radius, backgroundColor: C.surface, gap: 4 },
   tileTitle: { fontFamily: F.bold, fontSize: 15, color: C.ink },
