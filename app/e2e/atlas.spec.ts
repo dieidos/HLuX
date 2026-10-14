@@ -118,7 +118,7 @@ test.describe('03 Envies', () => {
     await mine(page, /Envies/);
     await tap(page, '＋ Une idée');
     await fill(page, 'Mon idée', 'Comprendre mes courriers seule');
-    // Papiers fait le fil : la nouvelle envie naît d'elle sans qu'on ait à la rechoisir.
+    await tap(page, 'Papiers');
     await tap(page, 'Créer');
     await expect(page.getByText('née de Papiers')).toBeVisible();
   });

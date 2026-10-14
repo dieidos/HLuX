@@ -43,3 +43,16 @@ test('08 : une carte posée sur la table se reprend', async ({ page }) => {
   await expect(page.getByText('Horaires de la laverie : reprise.').filter({ visible: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Horaires de la laverie', exact: true })).toHaveCount(0);
 });
+
+test('le fil : la Carte reprise en 01 suit la personne, et une envie naît d’elle', async ({ page }) => {
+  await demo(page);
+  await vis(page, 'Papiers').click();
+  await vis(page, 'Fermer').click();
+  await expect(page.getByLabel('Le fil : Papiers')).toBeVisible();
+  await page.getByRole('link', { name: /Envies/ }).filter({ visible: true }).click();
+  await expect(page.getByLabel('Le fil : Papiers').filter({ visible: true })).toBeVisible();
+  await vis(page, '＋ Une idée').click();
+  await page.getByLabel('Mon idée', { exact: true }).filter({ visible: true }).fill('Comprendre mes courriers seule');
+  await vis(page, 'Créer').click();
+  await expect(page.getByText('née de Papiers').filter({ visible: true }).first()).toBeVisible();
+});

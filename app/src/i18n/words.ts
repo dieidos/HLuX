@@ -5,7 +5,6 @@ export type Register = 'fr' | 'ar' | 'falc';
 
 export const WORDS = {
   hello: { fr: 'Bonjour', ar: 'مرحبا', falc: 'Bonjour' },
-  next: { fr: 'Suivant', ar: 'التالي', falc: 'Après' },
   myProject: { fr: 'Mon projet', ar: 'مشروعي', falc: 'Mon projet' },
   ourProject: { fr: 'Notre projet', ar: 'مشروعنا', falc: 'Notre projet' },
   listen: { fr: '🔊 Écouter', ar: '🔊 استماع', falc: '🔊 Écouter' },

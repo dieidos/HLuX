@@ -1,7 +1,7 @@
 // Le fil d'une Carte : ce qu'elle est devenue, de la parole d'Amina jusqu'à l'engagement du collectif.
 // « Ta Carte garde tout son parcours » — rien n'est calculé : chaque étape est un geste du journal.
 
-import type { Id } from './acts';
+import type { Entry, Id } from './acts';
 import type { FacilityState } from './facility';
 import type { ProjectState } from './project';
 
@@ -59,12 +59,12 @@ export function threadPassed(card: Id, p: ProjectState, f: FacilityState | null)
   return out;
 }
 
-/** La Carte qui fait le fil : celle que la personne a reprise, sinon la dernière qu'elle a touchée. */
-export function currentThread(chosen: Id | null, p: ProjectState, entries: { act?: { act: string; card?: Id | null; from_card?: Id | null } }[]): Id | null {
-  if (chosen && p.cards[chosen]) return chosen;
-  for (const e of [...entries].reverse()) {
-    const id = e.act?.card ?? e.act?.from_card;
-    if (id && p.cards[id]) return id;
+/** Les Cartes que les gestes de la séance ont prises (dans l'ordre). */
+export function chosenCards(taken: string[], entries: Entry[], since: number, known: Record<string, unknown>): string[] {
+  const out = [...taken];
+  for (const e of entries.slice(since)) {
+    const a = e.act as { card?: string | null; from_card?: string | null } | undefined;
+    for (const id of [a?.card, a?.from_card]) if (id && known[id] && !out.includes(id)) out.push(id);
   }
-  return Object.keys(p.cards)[0] ?? null;
+  return out;
 }

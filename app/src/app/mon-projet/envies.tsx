@@ -3,7 +3,7 @@
 // l'écarter par le bord est le seul geste irréversible, et l'écran le dit.
 
 import { Picto } from '../../components/Picto';
-import { useThreadCard } from '../../core/useThread';
+import { useThreadCards } from '../../core/useThread';
 import { usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -29,8 +29,8 @@ export default function Envies() {
   const [from, setFrom] = useState<string | null>(null);
   const [inSession, setInSession] = useState(false);
   const pro = useProject((x) => x.pro);
-  // La Carte du fil : une nouvelle envie naît d'elle, sauf si la personne en choisit une autre.
-  const thread = useThreadCard();
+  // Le fil : une nouvelle envie naît de la dernière Carte choisie, sauf si la personne en choisit une autre.
+  const thread = useThreadCards();
 
   const place = (idea: string, spot: Spot, words: string) => {
     act(me.id, { act: 'idea_placed', idea, spot });
@@ -80,7 +80,7 @@ export default function Envies() {
           <Zone id="discard" label={w('discard')} onDrop={(id) => place(id, { at: 'discarded' }, t('écartée, pour toujours', 'أُبعدت نهائياً', 'enlevée pour toujours'))} style={st.discard}>
             <Text style={st.small}>🗑️ {w('discard')}</Text>
           </Zone>
-          <Pressable onPress={() => { setFrom(thread.id); setAdding(true); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('newIdea')}</Text></Pressable>
+          <Pressable onPress={() => { setFrom(thread.at(-1)?.id ?? null); setAdding(true); }} style={st.btn} accessibilityRole="button"><Text style={st.btnTxt}>{w('newIdea')}</Text></Pressable>
         </View>
         </ScrollView>
       </DragArea>
