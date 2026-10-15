@@ -2,6 +2,8 @@
 // l'animatrice ; quand deux personnes placent différemment, les deux positions restent à l'écran,
 // chacune à son nom. Puis le changement attendu, formulé pour pouvoir être observé.
 
+import { Picto } from '../../components/Picto';
+import { PictoPicker } from '../../components/PictoPicker';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
@@ -31,6 +33,7 @@ export default function Cap() {
   const act = useFacility((x) => x.act);
   const [by, setBy] = useState(f.mandate || opener);
   const [title, setTitle] = useState('');
+  const [picto, setPicto] = useState<string | null>(null);
   const [live, setLive] = useState('');
   const [capFor, setCapFor] = useState<string | null>(null);
   const [change, setChange] = useState(f.expectedChange?.text ?? '');
@@ -99,6 +102,7 @@ export default function Cap() {
             at={(spot) => caps.flatMap(([id, c]) => c.placements.filter((p) => same(p.spot, spot)).map((p) => {
               const mark = (
                 <View key={`${id}-${p.by}`} style={[st.mark, p.by !== by && st.ghost]}>
+                  {f.pictos[`cap:${id}`] ? <Picto name={f.pictos[`cap:${id}`]} size={20} label={false} /> : null}
                   <Text style={st.markTxt}>{c.title}</Text>
                   <Text style={st.markBy}>{p.by}</Text>
                 </View>
@@ -111,15 +115,16 @@ export default function Cap() {
             <Text style={st.small}>Cartes de cap à placer par {by} :</Text>
             <View style={st.row}>
               {[...unplaced.map(([id, c]) => [id, c.title] as const), ...fromFindings.map(([id, c]) => [`cap-${id}`, c.title] as const)].map(([id, t]) => (
-                <Draggable key={id} id={id} label={t}><View style={st.card}><Text style={st.markTxt}>{t}</Text></View></Draggable>
+                <Draggable key={id} id={id} label={t}><View style={st.card}>{f.pictos[`cap:${id}`] ? <Picto name={f.pictos[`cap:${id}`]} size={24} label={false} /> : null}<Text style={st.markTxt}>{t}</Text></View></Draggable>
               ))}
             </View>
             <View style={st.row}>
               <TextInput value={title} onChangeText={setTitle} placeholder="Une carte de cap, dite par le groupe…" style={st.input} accessibilityLabel="Nouvelle carte de cap" />
-              <Pressable accessibilityRole="button" onPress={() => { if (title.trim()) { act(by, { act: 'cap_placed', cap: `cap-${caps.length + 1}`, title: title.trim(), by, spot: { at: 'tray' } }); setTitle(''); } }} style={[st.btn, st.on]}>
+              <Pressable accessibilityRole="button" onPress={() => { if (title.trim()) { const cap = `cap-${caps.length + 1}`; act(by, { act: 'cap_placed', cap, title: title.trim(), by, spot: { at: 'tray' } }); if (picto) act(by, { act: 'pictured', item: `cap:${cap}`, picto }); setTitle(''); setPicto(null); } }} style={[st.btn, st.on]}>
                 <Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text>
               </Pressable>
             </View>
+            <PictoPicker value={picto} onChange={setPicto} />
           </Zone>
         </DragArea>
         {caps.some(([, c]) => new Set(c.placements.filter((p) => p.spot.at !== 'tray').map((p) => JSON.stringify(p.spot))).size > 1) && (

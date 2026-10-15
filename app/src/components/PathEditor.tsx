@@ -3,6 +3,7 @@
 // si l'on veut, un lien vers une étape déjà posée — chemin choisi, alternative ouverte, condition
 // écrite sur sa branche, ou dépendance. Rien n'est proposé à la place de la personne : on écrit soi-même.
 
+import { PictoPicker } from './PictoPicker';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -21,6 +22,8 @@ export interface NewStep {
   thread: boolean;
   /** La Carte dont l'étape est née (écran 06), s'il y en a une. */
   card: string | null;
+  /** Une image choisie par le groupe (écran 12), facultative. */
+  picto: string | null;
 }
 
 type LinkChoice = 'none' | 'chosen' | 'open' | 'condition' | 'dependency';
@@ -32,7 +35,7 @@ const LINKS: [LinkChoice, string, string][] = [
   ['dependency', 'attend…', 'ينتظر…'],
 ];
 
-export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false, cards = [], actions = null }: {
+export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemove, threadOption = false, cards = [], actions = null, pictoOption = false }: {
   columns: string[];
   lanes: string[];
   nodes: PNode[];
@@ -47,6 +50,8 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
   cards?: { id: string; title: string }[];
   /** Les autres boutons de l'écran, sur la même rangée (une seule rangée d'action, comme l'Atlas). */
   actions?: ReactNode;
+  /** Proposer une image facultative pour l'étape (écran 12, chemin collectif). */
+  pictoOption?: boolean;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -60,6 +65,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
   const [words, setWords] = useState('');
   const [current, setCurrent] = useState(false);
   const [card, setCard] = useState<string | null>(null);
+  const [picto, setPicto] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
 
   const add = () => {
@@ -68,9 +74,10 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
     const lk: LinkKind | null =
       link === 'none' || !from ? null : link === 'condition' || link === 'dependency' ? { kind: link, words: words.trim() } : { kind: link };
     if (lk && 'words' in lk && !lk.words) return; // une condition ou une attente s'écrit
-    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null, thread: current, card });
+    onAdd({ lane: l, when, kind, label: label.trim(), link: lk && from ? { from, link: lk } : null, thread: current, card, picto });
     setCurrent(false);
     setCard(null);
+    setPicto(null);
     setLabel('');
     setNewLane('');
     setFrom(null);
@@ -135,6 +142,7 @@ export function PathEditor({ columns, lanes, nodes, decisionLabel, onAdd, onRemo
           <View style={st.row}>{cards.map((c) => chip(card === c.id, c.title, () => setCard(card === c.id ? null : c.id), `card-${c.id}`))}</View>
         </>
       )}
+      {pictoOption && <PictoPicker value={picto} onChange={setPicto} />}
       {threadOption && (
         <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: current }} onPress={() => setCurrent(!current)} style={[st.pick, current && st.pickOn]}>
           <Text style={st.pickTxt}>{t('📍 C’est l’étape en cours', '📍 هذه هي الخطوة الحالية', '📍 Je suis là')}</Text>

@@ -32,7 +32,9 @@ export type FacilityAct =
   | { act: 'link_set'; from: Id; to: Id; link: LinkKind }
   | { act: 'load'; load: Id; name: string; carriers: string[]; rhythm: string }
   | { act: 'result'; text: string; back_to_finding: boolean; when?: string }
-  | { act: 'proposal'; proposal: Id; text: string };
+  | { act: 'proposal'; proposal: Id; text: string }
+  /** 09-12 : le groupe donne une image à une carte qu'il a écrite (`cap:…`, `orientation:…`, `solution:…`, `node:…`). */
+  | { act: 'pictured'; item: Id; picto: string };
 
 export interface FEntry { rank: number; author: string; provenance: 'by_hand' | 'dictated' | 'hypothesis' | 'generated'; confirmedBy?: string; undone?: number; act?: FacilityAct }
 
@@ -53,11 +55,13 @@ export interface FacilityState {
   loads: Record<Id, { name: string; carriers: string[]; rhythm: string }>;
   results: { text: string; backToFinding: boolean; when: string }[];
   proposals: Record<Id, string>;
+  /** carte écrite par le groupe (09-12) → son image. */
+  pictos: Record<Id, string>;
 }
 
 export const emptyFacility = (): FacilityState => ({
   agenda: [], attendance: null, floor: null, mandate: null, findings: {}, caps: {}, expectedChange: null, criteria: {},
-  orientations: {}, solutions: {}, commitments: {}, nodes: {}, links: [], loads: {}, results: [], proposals: {},
+  orientations: {}, solutions: {}, commitments: {}, nodes: {}, links: [], loads: {}, results: [], proposals: {}, pictos: {},
 });
 
 const orientation = (s: FacilityState, id: Id) =>
@@ -102,6 +106,7 @@ function fold(s: FacilityState, a: FacilityAct): void {
     case 'load': s.loads[a.load] = { name: a.name, carriers: a.carriers, rhythm: a.rhythm }; break;
     case 'result': s.results.push({ text: a.text, backToFinding: a.back_to_finding, when: a.when ?? '' }); break;
     case 'proposal': s.proposals[a.proposal] = a.text; break;
+    case 'pictured': { const p = genericPicto(a.picto); if (p) s.pictos[a.item] = p; break; }
   }
 }
 

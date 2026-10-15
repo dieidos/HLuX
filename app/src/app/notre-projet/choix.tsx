@@ -3,6 +3,8 @@
 // Puis tout se révèle : les bandes nomment qui se rejoint et qui diverge — jamais de vote, jamais
 // « la plupart » ; un désaccord reste sur la table. La décision est une phrase du groupe.
 
+import { Picto } from '../../components/Picto';
+import { PictoPicker } from '../../components/PictoPicker';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AideButton } from '../../components/AideButton';
@@ -49,6 +51,7 @@ export default function Choix() {
   const [words, setWords] = useState('');
   const [aided, setAided] = useState(false);
   const [naming, setNaming] = useState('');
+  const [picto, setPicto] = useState<string | null>(null);
   const [others, setOthers] = useState(false);
   const [folded, setFolded] = useState(true);
   const [live, setLive] = useState('');
@@ -62,6 +65,8 @@ export default function Choix() {
     if (!title.trim()) return;
     const id = `o-${orientations.length + 1}`;
     act('groupe', { act: 'orientation', orientation: id, title: title.trim() });
+    if (picto) act('groupe', { act: 'pictured', item: `orientation:${id}`, picto });
+    setPicto(null);
     setCurrent(id);
     setNaming('');
     setOthers(false);
@@ -135,6 +140,7 @@ export default function Choix() {
           <View style={st.row}>
             <TextInput value={naming} onChangeText={setNaming} placeholder="Nommer une orientation…" style={[st.input, { flex: 1, minWidth: 220 }]} accessibilityLabel="Nouvelle orientation" />
             <Pressable accessibilityRole="button" onPress={() => newOrientation(naming)} style={st.btn}><Text style={st.btnTxt}>＋ Une orientation</Text></Pressable>
+            <PictoPicker value={picto} onChange={setPicto} />
           </View>
           {capTitles.length > 0 && (
             <View style={st.row}>
@@ -148,7 +154,10 @@ export default function Choix() {
 
         {o && (
           <View style={st.box}>
-            <Text style={st.h}>Une orientation, {VOICES.length} regards</Text>
+            <View style={st.row}>
+              {current && f.pictos[`orientation:${current}`] ? <Picto name={f.pictos[`orientation:${current}`]} size={28} label={false} /> : null}
+              <Text style={st.h}>Une orientation, {VOICES.length} regards</Text>
+            </View>
             {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
             {!o.revealed && (
               <>

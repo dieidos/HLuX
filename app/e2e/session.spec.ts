@@ -56,3 +56,16 @@ test('le départ : effacer demande une confirmation qui dit « définitif »', a
   await expect(page.getByText('Qui est là ?')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Amina', exact: true })).toHaveCount(0);
 });
+
+test('09 : une carte de cap peut avoir une image, choisie par le groupe', async ({ page }) => {
+  await demo(page, 'Aïcha', null);
+  await toOurs(page);
+  await page.getByRole('link', { name: /Cap/ }).filter({ visible: true }).first().click();
+  await page.getByLabel('Nouvelle carte de cap', { exact: true }).filter({ visible: true }).fill('Lire ensemble les courriers');
+  await page.getByRole('radio', { name: 'Papiers', exact: true }).filter({ visible: true }).first().click();
+  await vis(page, 'Ajouter').click();
+  await expect(page.getByText('Lire ensemble les courriers').filter({ visible: true }).first()).toBeVisible();
+  const gestures = await page.evaluate(() => Object.entries(localStorage).filter(([k]) => k.endsWith('hlux.facility')).map(([, v]) => v).join(''));
+  expect(gestures).toContain('"act":"pictured"');
+  expect(gestures).toContain('"picto":"papiers"');
+});

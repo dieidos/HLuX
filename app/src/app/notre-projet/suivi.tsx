@@ -55,7 +55,7 @@ export default function Suivi() {
       router.push('/notre-projet/constat');
     }
   };
-  const nodes = Object.entries(f.nodes).map(([id, n]) => ({ id, ...n }));
+  const nodes = Object.entries(f.nodes).map(([id, n]) => ({ id, ...n, picto: f.pictos[`node:${id}`] ?? null }));
   const now = new Date().getMonth();
   const rank = (m: string) => (MONTH_NAMES.indexOf(m) - now + 12) % 12;
   const months = [...new Set([...nextMonths(), ...nodes.map((n) => n.when)])].sort((a, b) => rank(a) - rank(b));
@@ -103,9 +103,11 @@ export default function Suivi() {
             const last = [...facilityEntries].reverse().find((e) => e.act?.act === 'node_set' && e.act.node === id && !undone.has(e.rank));
             if (last) undoF(by, last.rank);
           }}
+          pictoOption
           onAdd={(n) => {
             const id = freshId('suivi', Object.keys(f.nodes));
             act(by, { act: 'node_set', node: id, lane: n.lane, kind: n.kind, label: n.label, when: n.when });
+            if (n.picto) act(by, { act: 'pictured', item: `node:${id}`, picto: n.picto });
             if (n.link) act(by, { act: 'link_set', from: n.link.from, to: id, link: n.link.link });
             say(`${n.label} : posé sur le chemin collectif, ${n.when}.`);
             setLive(`${n.label} : posé sur le chemin collectif, ${n.when}.`);

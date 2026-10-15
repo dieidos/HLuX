@@ -2,6 +2,8 @@
 // effet pour les personnes ; quand l'équipe et les personnes jugent la faisabilité différemment,
 // l'écart reste affiché. Puis la carte-engagement, avec des noms, une date pour en reparler, et son fil.
 
+import { Picto } from '../../components/Picto';
+import { PictoPicker } from '../../components/PictoPicker';
 import { More } from '../../components/More';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -34,6 +36,7 @@ export default function Actions() {
   const [review, setReview] = useState('');
   const [modality, setModality] = useState('');
   const [rhythm, setRhythm] = useState('');
+  const [picto, setPicto] = useState<string | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [live, setLive] = useState('');
   const [from, setFrom] = useState<string[]>([]);
@@ -44,7 +47,10 @@ export default function Actions() {
 
   const addSolution = () => {
     if (!title.trim()) return;
-    act(who, { act: 'solution', solution: `s-${solutions.length + 1}`, title: title.trim(), modality: modality.trim(), rhythm: rhythm.trim() });
+    const solution = `s-${solutions.length + 1}`;
+    act(who, { act: 'solution', solution, title: title.trim(), modality: modality.trim(), rhythm: rhythm.trim() });
+    if (picto) act(who, { act: 'pictured', item: `solution:${solution}`, picto });
+    setPicto(null);
     setTitle('');
     setModality('');
     setRhythm('');
@@ -103,7 +109,10 @@ export default function Actions() {
           {live ? <Text style={st.small} accessibilityLiveRegion="polite">{live}</Text> : null}
           {solutions.map(([id, s]) => (
             <View key={id} style={st.sol}>
-              <Text style={st.solTitle}>{s.title}</Text>
+              <View style={st.row}>
+                {f.pictos[`solution:${id}`] ? <Picto name={f.pictos[`solution:${id}`]} size={28} label={false} /> : null}
+                <Text style={st.solTitle}>{s.title}</Text>
+              </View>
               <Text style={st.small}>{[s.modality, s.rhythm].filter(Boolean).join(' · ')}</Text>
               {([true, false] as const).flatMap((effect) => {
                 const r = readingOf(s.leans.filter((l) => l.effect === effect), effect ? "l'effet pour les personnes" : "la faisabilité pour l'équipe");
@@ -130,6 +139,7 @@ export default function Actions() {
               <TextInput value={rhythm} onChangeText={setRhythm} placeholder="à quel rythme" style={st.input} accessibilityLabel="Rythme" />
               <Pressable onPress={addSolution} style={[st.btn, st.on]} accessibilityRole="button"><Text style={[st.btnTxt, { color: C.onAccent }]}>Ajouter</Text></Pressable>
             </View>
+            <PictoPicker value={picto} onChange={setPicto} />
           </More>
         </View>
 

@@ -309,6 +309,8 @@ pub struct FacilityState {
     pub agenda: Vec<(Id, String, Source, String)>,
     /// point de l'ordre du jour → l'image de la Carte d'où il vient.
     pub agenda_pictos: BTreeMap<Id, String>,
+    /// carte écrite par le groupe (09-12) → l'image qu'il lui a donnée.
+    pub pictos: BTreeMap<Id, String>,
     pub attendance: Option<(String, Vec<String>, Vec<String>, String)>,
     pub floor: Option<String>,
     pub mandate: Option<String>,
@@ -426,6 +428,11 @@ impl Reducer<FacilityAct> for FacilityReducer {
             FacilityAct::Result { text, back_to_finding, when } => s.results.push((text, back_to_finding, when)),
             FacilityAct::Proposal { proposal, text } => {
                 s.proposals.insert(proposal, text);
+            }
+            FacilityAct::Pictured { item, picto } => {
+                if let Some(p) = generic_picto(Some(picto)) {
+                    s.pictos.insert(item, p);
+                }
             }
         }
     }

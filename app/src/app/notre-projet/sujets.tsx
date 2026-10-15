@@ -36,6 +36,8 @@ export default function Sujets() {
   const fromFil = [...fil].reverse().find((c) => cards.some(([id]) => id === c.id))?.id ?? null;
   const chosen = cardId ?? fromFil ?? (cards.length === 1 ? cards[0][0] : null);
   const card = chosen ? p.cards[chosen] : null;
+  // L'image qui partira avec le sujet : un picto générique ; jamais « santé » (rien de la santé ne passe au collectif).
+  const sharedPicto = card?.picto && card.picto in PICTOS && card.picto !== 'sante' ? card.picto : null;
   const subjectId = chosen ? `sujet-${me.id}-${chosen}` : '';
   const subject = Object.entries(p.subjects).find(([, x]) => x.card === chosen)?.[1];
   const brought = !!chosen && f.agenda.some((a) => a.item === subjectId);
@@ -66,7 +68,7 @@ export default function Sujets() {
     }
     // Le sas : la version « pour le collectif » seulement. Au lot 5 : Consent{Publish} → Crystallization → project() → tableau dieidos.
     actP(aided ? 'hlux-ia' : me.id, { act: 'subject_prepared', subject: subjectId, card: chosen!, mine: card.verbatim || card.title, for_collective: collective.trim() }, aided ? 'generated' : 'by_hand', aided ? me.id : undefined);
-    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session, picto: card.picto && card.picto in PICTOS ? card.picto : null });
+    actF(me.id, { act: 'agenda_item', item: subjectId, title: collective.trim(), source: 'consented_word', session, picto: sharedPicto });
     tell(tNow("Oui, j'apporte. Le sujet entre à l'ordre du jour.", 'نعم، أقدّمه. يدخل الموضوع جدول الأعمال.', "Oui. Le sujet va au groupe."), pathname);
   };
   // « Pas maintenant » : rien ne passe, et la Carte le garde dans son parcours.
@@ -143,7 +145,10 @@ export default function Sujets() {
             </View>
             <Text style={st.arrow}>→</Text>
             <View style={[st.version, { borderTopColor: C.pe.value }]}>
-              <Text style={st.kicker}>{t('POUR LE COLLECTIF', 'للمجموعة', 'POUR LE GROUPE')}</Text>
+              <View style={st.kickRow}>
+                {sharedPicto ? <Picto name={sharedPicto} size={32} label={false} /> : null}
+                <Text style={st.kicker}>{t('POUR LE COLLECTIF', 'للمجموعة', 'POUR LE GROUPE')}</Text>
+              </View>
               {brought ? <Text style={st.quote}>{subject?.forCollective ?? collective}</Text> : (
                 <>
                   <TextInput value={collective} onChangeText={setCollective} multiline placeholder={t('Une phrase pour tous, sans nom ni détail personnel', 'جملة للجميع، بلا اسم ولا تفاصيل شخصية', 'Une phrase pour tous')} style={st.input} accessibilityLabel={t('Version pour le collectif', 'النسخة للمجموعة')} />

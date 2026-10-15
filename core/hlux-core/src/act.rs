@@ -196,6 +196,9 @@ pub enum FacilityAct {
     },
     /// Ce que le CHRS propose, visible depuis l'espace de la personne.
     Proposal { proposal: Id, text: String },
+    /// 09-12 : le groupe donne une image (un picto générique) à une carte qu'il a écrite ; facultatif.
+    /// `item` est nommé par sa famille : `cap:…`, `orientation:…`, `solution:…`, `node:…`.
+    Pictured { item: Id, picto: String },
 }
 
 /// Les octets identifiants d'un geste : sa forme JSON canonique.

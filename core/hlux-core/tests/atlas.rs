@@ -76,6 +76,11 @@ fn le_collectif_valide_ce_que_l_aide_propose_et_deplacer_garde_la_qualification(
     // Un texte libre à la place d'une image ne passe pas.
     e.act_facility(&Who::hand("bruno"), FacilityAct::FindingPlaced { finding: "c9".into(), title: "x".into(), zone: Feeling::Unsure, source: Source::Team, author: "Bruno".into(), picto: Some("Amina a peur".into()) }).unwrap();
     assert_eq!(e.facility_state().findings["c9"].picto, None);
+    // 09-12 : le groupe donne une image à une carte qu'il a écrite ; jamais un texte libre.
+    e.act_facility(&Who::hand("bruno"), FacilityAct::Pictured { item: "cap:lecture".into(), picto: "papiers".into() }).unwrap();
+    e.act_facility(&Who::hand("bruno"), FacilityAct::Pictured { item: "cap:autre".into(), picto: "Ses mots".into() }).unwrap();
+    assert_eq!(e.facility_state().pictos.get("cap:lecture").map(String::as_str), Some("papiers"));
+    assert!(!e.facility_state().pictos.contains_key("cap:autre"));
 
     let p = e.act_facility(&Who::machine(), FacilityAct::FindingPlaced { finding: "c2".into(), title: "Proposé".into(), zone: Feeling::Unsure, source: Source::Team, author: "".into(), picto: None }).unwrap();
     assert_eq!(e.pending_facility().len(), 1, "la proposition attend l'animateur");
